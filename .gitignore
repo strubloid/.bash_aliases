@@ -1,0 +1,8 @@
+
+# this will ignore everything except my exceptions below
+/*
+/*/
+
+# [exceptions] files that i want to keep it
+!.bash_aliases
+!.gitignore
