@@ -108,19 +108,9 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# this is path aliases
-if [ -f ~/.path_aliases ]; then
-    . ~/.path_aliases
-fi
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.shopware_aliases
-fi
-
 if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
 fi
-
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -140,4 +130,3 @@ fi
 
 # Binding f12 to launch a command prepending the time command
 bind '"\e[24~": "\e[1~time \e[4~\n"'
-
