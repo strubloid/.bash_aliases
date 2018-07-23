@@ -1,0 +1,172 @@
+# become root #
+alias root='sudo -i'
+alias su='sudo -i'
+
+# Colorize the grep command output for ease of use (good for log files)##
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+# reboot / halt / poweroff
+alias reboot='sudo /sbin/reboot'
+alias poweroff='sudo /sbin/poweroff'
+alias halt='sudo /sbin/halt'
+alias shutdown='sudo /sbin/shutdown'
+
+# APT-GET: commands
+alias update='sudo apt-get update && sudo apt-get upgrade'
+alias apt-get="sudo apt-get"
+alias aptitude="sudo aptitude -y"
+alias aptitudey="sudo aptitude"
+alias updatey="sudo apt-get --yes"
+
+# confirmation #
+alias mv='mv -i'
+alias cp='cp -i'
+alias ln='ln -i'
+
+## Quick way to get out of current directory ##
+alias ..='cd ..'
+alias ...='cd ../../../'
+alias ....='cd ../../../../'
+alias .....='cd ../../../../'
+
+# handy short cuts #
+alias h='history'
+alias j='jobs -l'
+
+# install  colordiff package :)
+alias diff='colordiff'
+
+# better mkdir
+alias mkdir='mkdir -pv'
+
+# start the calculator with math support
+alias bc='bc -l'
+
+# show open ports
+alias ports='netstat -tulanp'
+
+# get web server headers #
+# alias header='curl -I'
+
+## Get server cpu info ##
+alias cpuinfo='lscpu'
+
+## get GPU ram on desktop / laptop##
+alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
+
+## set some other defaults ##
+alias df='df -H'
+alias du='du -ch'
+
+# top is atop, just like vi is vim
+alias top='htop'
+
+## this one saved by butt so many times ##
+alias wget='wget -c'
+
+## get top process eating memory
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+
+## pass options to free ##
+alias meminfo='free -m -l -t'
+
+# vim alias
+alias vi=vim
+alias svi='sudo vi'
+alias vis='vim "+set si"'
+#alias edit='vim'
+
+# handy commands
+# alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias nowtime=now
+alias nowdate='date +"%d-%m-%Y"'
+
+
+# Stop after sending count ECHO_REQUEST packets #
+alias ping='ping -c 5'
+# Do not wait interval 1 second, go fast #
+alias fastping='ping -c 100 -s.2'
+
+# find out if remote server supports gzip / mod_deflate or not #
+# alias headerc='curl -I --compress'
+
+
+## Colorize the ls output ##
+alias ls='ls -lap --group-directories-first --color=auto'
+
+## Use a long listing format ##
+alias ll='ls -la --group-directories-first --color=auto'
+
+## Show hidden files ##
+alias l.='ls -lapd .* --group-directories-first --color=auto'
+
+
+# xdebug turning on in command line
+alias terminal-xdebug="export XDEBUG_CONFIG=1"
+
+# php cli version changes
+alias change-php-version='sudo update-alternatives --list php'
+alias change-php56='sudo update-alternatives --set php /usr/bin/php5.6'
+alias change-php70='sudo update-alternatives --set php /usr/bin/php7.0'
+alias change-php71='sudo update-alternatives --set php /usr/bin/php7.1'
+
+## alias for restarting the apache
+alias raa='sudo systemctl restart apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service && sudo service hhvm restart'
+alias saa='sudo systemctl stop apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service'
+
+## php helpers
+## alias php="time php";
+
+# linux commands
+alias swap-cache-off="sudo swapoff -a";
+alias swap-cache-on="sudo swapon -a";
+alias swap-cache-restart="swapoff -a && swapon -a";
+alias restart-mate="gsettings reset-recursively org.mate.panel";
+
+# 1. Freeing Up the Page Cache
+alias linux-memory-clean-1="sudo echo 1 > /proc/sys/vm/drop_caches"
+
+# 2. Freeing Up the Dentries and Inodes
+alias linux-memory-clean-2="sudo echo 2 > /proc/sys/vm/drop_caches"
+
+# 3. Freeing Up the Page Cache, Dentries and Inodes
+alias linux-memory-clean-3="sudo echo 3 > /proc/sys/vm/drop_caches"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

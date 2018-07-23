@@ -1,0 +1,21 @@
+
+# configuring gulp
+alias configuregulp="bower install && npm install"
+
+## clean redis
+alias rc="redis-cli flushall"
+
+## create alias later
+# pv {filename} | gunzip | mysql -uroot -proot
+# pv {filename} | mysql -uroot -proot
+
+# you need to add the path to the file to test the google feed
+alias google-feed-test="xmllint --schema http://www.gstatic.com/productsearch/static/reviews/5.0/merchant_reviews.xsd --noout"
+
+## alias for phpstorm
+# alias phpstorm="/home/strubloid/sf9/programs/PhpStorm-171.4249.3/bin/phpstorm.sh %f"
+
+## command to load the phpstorm without so much priority
+# nice -n 15 /snap/bin/phpstorm
+
+alias tk-clean-stage-cache='curl --insecure -I0 -X PURGE -H "Host: stage.tonykealys.com" https://stage.tonykealys.com/js/klarna/checkout.js'
