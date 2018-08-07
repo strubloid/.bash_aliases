@@ -19,3 +19,6 @@ alias google-feed-test="xmllint --schema http://www.gstatic.com/productsearch/st
 # nice -n 15 /snap/bin/phpstorm
 
 alias tk-clean-stage-cache='curl --insecure -I0 -X PURGE -H "Host: stage.tonykealys.com" https://stage.tonykealys.com/js/klarna/checkout.js'
+alias encrypt="gpg --encrypt -r gpg@studioforty9.com "
+alias decrypt="gpg --decrypt --armor -r gpg@studioforty9.com "
+
