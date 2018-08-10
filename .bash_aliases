@@ -23,6 +23,11 @@ if [ -f ~/rafael/.sf9 ]; then
     . ~/rafael/.sf9
 fi
 
+## adding linux shortcuts
+if [ -f ~/rafael/.linux ]; then
+    . ~/rafael/.linux
+fi
+
 ## adding version control aliases (git and mercurial)
 if [ -f ~/rafael/.version-control ]; then
     . ~/rafael/.version-control
