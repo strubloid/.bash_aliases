@@ -32,3 +32,8 @@ fi
 if [ -f ~/rafael/.version-control ]; then
     . ~/rafael/.version-control
 fi
+
+## adding all synergy commands
+if [ -f ~/rafael/.synergy ]; then
+    . ~/~/rafael/.synergy
+fi

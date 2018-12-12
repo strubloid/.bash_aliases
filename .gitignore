@@ -9,3 +9,6 @@
 !.bashrc
 !.gitconfig
 !rafael/
+
+# removing all .swp files
+*.swp
