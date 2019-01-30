@@ -25,3 +25,6 @@ alias rafa-boot-time="systemd-analyze blame"
 # system functions
 # alias rafa-swap-clean="sudo swapoff -a && swapon -a"
 # alias rafa-ran-clean="sudo rafacacheclean.sh"
+
+# servers
+alias connect-dreamhost='ssh lampiao@ps478548.dreamhostps.com'
