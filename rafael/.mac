@@ -1,0 +1,6 @@
+alias mac-synergy-pids='ps -eo pid,ni,args | grep synergy | grep -v grep | cut -d" " -f2 | while read pid; do printf $pid" "; done'
+
+alias mac-synergy-super='ps -eo pid,ni,args | grep synergy | grep -v grep | cut -d" " -f2 | while read pid; do printf $pid" "; done | xargs renice -19'
+
+## Colorize the ls output ##
+alias ls='gls -lapF --group-directories-first --color=auto'
