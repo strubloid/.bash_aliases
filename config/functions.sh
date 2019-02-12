@@ -22,11 +22,13 @@ checkStringExistIntoFile()
     fi
 
 }
+
 operationalSystem()
 {
     OS=`lowercase \`uname\``
     echo ${OS}/
 }
+
 lowercase(){
     echo "$1" | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/"
 }

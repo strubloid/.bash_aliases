@@ -25,7 +25,7 @@ if [[ ${RETURN_CODE} -eq "0" ]];
     then
         echo "[step 2]: It is missing ~/.bash_aliases line, creating now!"
 
-        # adding a new line to this file
+        ## adding a new line to this file
         printf "\n" >> ${BASHRC}
 
         ## adding the configuration for the ~/.bash_aliases
