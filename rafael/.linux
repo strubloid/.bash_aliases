@@ -1,3 +1,0 @@
-
-# alias for java
-alias update-java="sudo update-alternatives --config java"
