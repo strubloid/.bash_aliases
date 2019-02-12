@@ -16,7 +16,7 @@
 * The last configuration will be to upgrade all data
 ```
     $ chmod +x upgrade.sh (only if necessary) 
-    $ ./ugrade.sh
+    $ ./upgrade.sh
 ```
 That's it, now it is installed a few good aliases for you, have fun =]
 
