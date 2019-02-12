@@ -1,2 +1,27 @@
-# .bash_aliases
-My idea of a good bash aliases
+# How to install this shell script?
+
+* You must clone this repository, doing:
+```
+    $ git clone git@github.com:strubloid/.bash_aliases.git
+```
+* Now that we have the git project you need to enter into the .bash_aliases folder
+```
+    $ cd .bash_aliases
+```
+* After you entering the folder ".bash_aliases" you must run the first configuration
+```
+    $ chmod +x install.sh (only if necessary) 
+    $ ./install.sh
+```
+* The last configuration will be to upgrade all data
+```
+    $ chmod +x upgrade.sh (only if necessary) 
+    $ ./ugrade.sh
+```
+That's it, now it is installed a few good aliases for you, have fun =]
+
+# How to add a new alias and upgrade the data o your Operational System?
+1. you must add/edit a file on aliases/linux/[name-of-anexistent-or-a-new-file]
+2. you need to save the the file and run the upgrade command **./upgrade.sh**
+
+After those steps you will be able to see the changes in your terminal. 
