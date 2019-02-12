@@ -7,8 +7,13 @@
 !.bash_aliases
 !.gitignore
 !.bashrc
-!.gitconfig
 !rafael/
+
+# ignoring the exported file to be coppied
+.bash_aliases_export
 
 # removing all .swp files
 *.swp
+
+# ignoring git
+.gitconfig
