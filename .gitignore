@@ -8,6 +8,10 @@
 !.gitignore
 !.bashrc
 !rafael/
+!aliases/
+!install.sh
+!upgrade.sh
+!config/
 
 # ignoring the exported file to be coppied
 .bash_aliases_export

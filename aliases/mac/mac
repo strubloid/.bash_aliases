@@ -1,0 +1,2 @@
+## Colorize the ls output ##
+alias ls='gls -lapF --group-directories-first --color=auto'

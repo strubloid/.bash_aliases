@@ -1,0 +1,11 @@
+# php cli version changes
+alias change-php-version='sudo update-alternatives --list php'
+alias change-php56='sudo update-alternatives --set php /usr/bin/php5.6'
+alias change-php70='sudo update-alternatives --set php /usr/bin/php7.0'
+alias change-php71='sudo update-alternatives --set php /usr/bin/php7.1'
+
+## php helpers
+## alias phpt="time php";
+
+# xdebug turning on in command line
+alias terminal-xdebug="export XDEBUG_CONFIG=1"

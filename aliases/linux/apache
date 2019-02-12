@@ -1,0 +1,3 @@
+## alias for restarting the apache
+alias raa='sudo systemctl restart apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service && sudo service hhvm restart'
+alias saa='sudo systemctl stop apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service'
