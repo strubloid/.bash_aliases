@@ -70,3 +70,7 @@ alias rc="redis-cli flushall"
 
 ## see all linux versions of it
 alias linuxversion="cat /etc/*-release"
+
+
+## command to clean all linux caches
+alias clean-linux-caches="sudo sh -c 'echo 3 >/proc/sys/vm/drop_caches'"
