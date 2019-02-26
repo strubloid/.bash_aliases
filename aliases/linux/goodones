@@ -73,4 +73,10 @@ alias linuxversion="cat /etc/*-release"
 
 
 ## command to clean all linux caches
-alias clean-linux-caches="sudo sh -c 'echo 3 >/proc/sys/vm/drop_caches'"
+alias clean-linux-caches="sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'"
+
+
+## changing the system blacklight
+alias rafael-monitor-low="sudo sh -c 'echo 30 > /sys/class/backlight/nvidia_0/brightness'"
+alias rafael-monitor-medium="sudo sh -c 'echo 50 > /sys/class/backlight/nvidia_0/brightness'"
+alias rafael-monitor-high="sudo sh -c 'echo 80 > /sys/class/backlight/nvidia_0/brightness'"
