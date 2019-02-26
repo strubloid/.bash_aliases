@@ -1,0 +1,3 @@
+
+## alias for the pacman
+alias apt2='sudo pacman -S'

@@ -67,3 +67,6 @@ alias configuregulp="bower install && npm install"
 
 ## clean redis
 alias rc="redis-cli flushall"
+
+## see all linux versions of it
+alias linuxversion="cat /etc/*-release"
