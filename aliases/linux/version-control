@@ -5,13 +5,8 @@ alias revert-redis-fpc='hg revert app/etc/fpc.xml app/etc/redis.xml '
 # Mercurial aliases
 alias hg-last-files="hg status --change tip"
 alias hgupdate="hg checkout develop && hg pull && hg update"
-
-# mercurial clean
-alias hg-revert="hg clean"
-
-#mercurial
-alias hst="hg status"
-alias hs="hg status"
+alias hg-revert="hg clean"                # mercurial clean
+alias hgs="hg status"                     # mercurial status
 alias hadd="hg addremove"
 alias ha="hg addremove"
 alias hdiff="hg diff"

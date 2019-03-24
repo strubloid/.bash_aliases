@@ -1,19 +1,7 @@
-# root alias
-alias root='sudo -i'
-
-## this one saved by butt so many times ##
-alias wget='wget -c'
-
-## Colorize the ls output ##
-alias ls='ls -lap --group-directories-first --color=auto'
-
-## Use a long listing format ##
-alias ll='ls -la --group-directories-first --color=auto'
-
-# Colorize the grep command output for ease of use (good for log files)##
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
+# changing the system blacklight
+alias rafael-monitor-low="sudo sh -c 'echo 30 > /sys/class/backlight/nvidia_0/brightness'"
+alias rafael-monitor-medium="sudo sh -c 'echo 50 > /sys/class/backlight/nvidia_0/brightness'"
+alias rafael-monitor-high="sudo sh -c 'echo 80 > /sys/class/backlight/nvidia_0/brightness'"
 
 # reboot / halt / poweroff
 alias reboot='sudo /sbin/reboot'
@@ -21,44 +9,12 @@ alias poweroff='sudo /sbin/poweroff'
 alias halt='sudo /sbin/halt'
 alias shutdown='sudo /sbin/shutdown'
 
-# confirmation #
-alias mv='mv -i'
-alias cp='cp -i'
-alias ln='ln -i'
-
-## Quick way to get out of current directory ##
-alias ..='cd ..'
-alias ...='cd ../../../'
-alias ....='cd ../../../../'
-alias .....='cd ../../../../'
-
 # handy short cuts #
 alias h='history'
 alias j='jobs -l'
-
-# better mkdir
-alias mkdir='mkdir -pv'
-
-# start the calculator with math support
-alias bc='bc -l'
-
-# install  colordiff package :)
-alias diff='colordiff'
-
-# handy commands
-# alias path='echo -e ${PATH//:/\\n}'
+alias diff='colordiff'                # install colordiff package
 alias now='date +"%T"'
 alias nowtime=now
 alias nowdate='date +"%d-%m-%Y"'
-
-# Stop after sending count ECHO_REQUEST packets #
-alias ping='ping -c 5'
-
-# Do not wait interval 1 second, go fast #
-alias fastping='ping -c 100 -s.2'
-
-## get GPU ram on desktop / laptop##
-alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
-
-# alias for java
-alias update-java="sudo update-alternatives --config java"
+alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'          # get GPU ram on desktop / laptop
+alias update-java="sudo update-alternatives --config java"             # alias for java

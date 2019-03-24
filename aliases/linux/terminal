@@ -1,0 +1,53 @@
+# Mate #
+alias restart-mate="gsettings reset-recursively org.mate.panel";
+
+# Memory management #
+alias swap-cache-off="sudo swapoff -a";
+alias swap-cache-on="sudo swapon -a";
+alias swap-cache-restart="swapoff -a && swapon -a";
+
+# Memory RAM management #
+
+# An inode in your context is a data structure that represents a file.
+# A dentries is a data structure that represents a directory
+#     These structures could be used to build a memory cache that represents the file structure on a disk.
+#     To get a directly listing, the OS could go to the dentries--if the directory is there--list
+#     its contents (a series of inodes).
+#     If not there, go to the disk and read it into memory so that it can be used again.
+# The page cache could contain any memory mappings to blocks on disk.
+#     That could conceivably be buffered I/O, memory mapped files, paged areas of executables--anything
+#     that the OS could hold in memory from a file.
+alias linux-memory-clean-1="sudo echo 1 > /proc/sys/vm/drop_caches"        # cleaninig the page cache
+alias linux-memory-clean-2="sudo echo 2 > /proc/sys/vm/drop_caches"        # cleaning Dentries and Inodes
+alias linux-memory-clean-3="sudo echo 3 > /proc/sys/vm/drop_caches"        # cleaninig page cache, dentries and Inodes
+
+# Trackpad #
+alias touchpad-off="synclient TouchpadOff=1"                               # Trackpad off on UBUNTU
+alias touchpad-on="synclient TouchpadOff=0"                                # Trackpad on on UBUNTU
+
+## how to see who is loading in the boot
+alias rafa-boot-time="systemd-analyze blame"
+
+## see all linux versions of it
+alias linuxversion="cat /etc/*-release"
+
+### CHECK THOSE COMMANDS ###
+
+## how to check your devices
+# alias rafa-devices="inxi -Fxz"
+# alias rafa-devices-network="inxi -Nn"
+
+## checkin network drivers
+# alias rafa-network="lspci -nnk | grep -iA2 net"
+# alias rafa-network-service-status="systemctl status networking.service"
+# alias rafa-network-status="lshw -c net"
+
+## devices
+# alias rafa-devices="rfkill list all"
+
+## command to load the phpstorm without so much priority
+# nice -n 15 /snap/bin/phpstorm
+
+## system functions
+# alias rafa-swap-clean="sudo swapoff -a && swapon -a"
+# alias rafa-ran-clean="sudo rafacacheclean.sh"

@@ -7,7 +7,7 @@ alias mageconfigsync='php /home/strubloid/webroot/mageconfigsync/bin/mageconfigs
 alias magerun-setup-incremental='magerun sys:setup:incremental'
 alias magerun-setup-run='magerun sys:setup:run'
 alias magerun-template-hints='magerun dev:template-hints'
-alias magerun-create-user='magerun admin:user:create rafael rafael@studioforty9.com rafa1234 rafael mendes'
+alias magerun-create-user='magerun admin:user:create rafael rafael@test.com rafa1234 rafael mendes'
 alias magerun-apply-price-rules='magerun sys:cron:run catalogrule_apply_all'
 
 ## magerun cron commands

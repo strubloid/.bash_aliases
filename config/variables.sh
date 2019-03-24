@@ -16,3 +16,4 @@ if [ -f ~/.bash_aliases ]; then
 fi"
 
 EXPORTEDFILE='.bash_aliases_export'
+FILESTOREAD='files_to_read.txt'

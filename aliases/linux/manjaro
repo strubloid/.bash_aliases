@@ -1,17 +1,10 @@
+## List of aliases for Manjaro
 
-## List of aliases for pacman
-
-## installing a package
-alias apt2-i='sudo pacman -S'
-
-## removing a package
-alias apt2-r='sudo pacman -Rs'
-
-## searching for a package
-alias apt2-s='sudo pacman -Ss'
-
-## upgrade packages
-alias apt2-up='sudo pacman -Syu'
+## Pacman
+alias apt2-i='sudo pacman -S'       # install of a package
+alias apt2-r='sudo pacman -Rs'      # removing a package
+alias apt2-s='sudo pacman -Ss'      # search of a package
+alias apt2-up='sudo pacman -Syu'    # package upgrade
 
 ## remove mirrors that are failing
 alias apt2-up-mirrors="sudo pacman-mirrors -g && sudo pacman -Syy && sync"

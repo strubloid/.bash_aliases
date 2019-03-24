@@ -1,6 +1,6 @@
-# Apt get: commands
+## Apt get: commands
 alias update='sudo apt-get update && sudo apt-get upgrade'
 alias apt-get="sudo apt-get"
-alias aptitude="sudo aptitude -y"
-alias aptitudey="sudo aptitude"
+alias aptitudey="sudo aptitude -y"
+alias aptitude="sudo aptitude"
 alias updatey="sudo apt-get --yes"
