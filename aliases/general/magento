@@ -13,3 +13,8 @@ alias magerun-cron-run="magerun sys:cron:run"
 
 ## alias to send email each 10 seconds
 alias magento-send-email='watch -n 10 magerun sys:cron:run core_email_queue_send_all'
+
+
+
+
+# n98-magerun admin:user:create rafael rafael@monsoonconsulting.com rafa1234 rafael mendes
