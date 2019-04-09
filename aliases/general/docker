@@ -16,3 +16,6 @@ alias dk-database-login="docker-compose exec database bash"
 alias dk-php-login="docker-compose exec php bash"
 alias dk-processlist='docker-compose exec database mysqladmin -u root -proot -i 1 processlist'
 
+alias dk-query='docker-compose exec database mysql -u root -proot -e "select * from magento.catalogsearch_result"'
+
+alias dk-query-w='watch -n 1 docker-compose exec database mysql -u root -proot -e "select * from magento.catalogsearch_result"'
