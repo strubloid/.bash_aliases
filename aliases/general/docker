@@ -1,4 +1,3 @@
-
 # How to see what is going on into a database process
 # docker exec -i williamsco_database_1  mysqladmin -u root -proot -i 1 processlist
 

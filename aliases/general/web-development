@@ -8,4 +8,3 @@ httpHeaders () { /usr/bin/curl -I -L $@ ; }             # httpHeaders:      Grab
 
 ## clean redis
 alias rc="redis-cli flushall"
-

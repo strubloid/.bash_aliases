@@ -140,5 +140,3 @@ alias meminfo='free -m -l -t'
 
 # configuring gulp
 alias configuregulp="bower install && npm install"
-
-
