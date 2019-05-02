@@ -13,6 +13,9 @@
 !upgrade.sh
 !config/
 
+#ignoring work aliases
+aliases/general/monsoon
+
 # ignoring the exported file to be coppied
 .bash_aliases_export
 

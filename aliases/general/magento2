@@ -1,0 +1,6 @@
+
+
+# how to turn it on the magento 2 production enviroment?
+alias dk-project-production="bin/magento deploy:mode:set production"
+
+alias dk-project-developer="bin/magento deploy:mode:set developer"

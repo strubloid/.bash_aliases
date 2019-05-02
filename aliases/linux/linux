@@ -3,6 +3,9 @@ alias rafael-monitor-low="sudo sh -c 'echo 30 > /sys/class/backlight/nvidia_0/br
 alias rafael-monitor-medium="sudo sh -c 'echo 50 > /sys/class/backlight/nvidia_0/brightness'"
 alias rafael-monitor-high="sudo sh -c 'echo 80 > /sys/class/backlight/nvidia_0/brightness'"
 
+# checking linux errors
+alias rafael-linux-errors="journalctl -f -n 0"
+
 # reboot / halt / poweroff
 alias reboot='sudo /sbin/reboot'
 alias poweroff='sudo /sbin/poweroff'
