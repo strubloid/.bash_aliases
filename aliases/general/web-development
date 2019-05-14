@@ -8,3 +8,11 @@ httpHeaders () { /usr/bin/curl -I -L $@ ; }             # httpHeaders:      Grab
 
 ## clean redis
 alias rc="redis-cli flushall"
+
+
+## How to get url availability
+```
+     curl -Is [url] | head -1
+
+     Example: curl -Is https://uat-order.pallasfoods.com/food-drink/meat-poultry/beef.html | head -1
+```

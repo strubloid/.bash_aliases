@@ -16,3 +16,7 @@ alias magerun-cron-run="magerun sys:cron:run"
 
 ## alias to send email each 10 seconds
 alias magento-send-email='watch -n 10 magerun sys:cron:run core_email_queue_send_all'
+
+# issue with m1-invalid form key
+# DELETE FROM core_config_data WHERE path='web/cookie/cookie_domain';
+# DELETE FROM core_config_data WHERE path='web/cookie/cookie_path';
