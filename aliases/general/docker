@@ -16,6 +16,14 @@ alias dk-query-w='watch -n 1 docker-compose exec database mysql -u root -proot -
 ## new commands
 # docker-compose exec database mysql -u root -proot -e "SELECT * FROM sales_flat_order ORDER BY created_at DESC LIMIT 2"
 # watch -n 1 'docker-compose exec database mysql -u root -proot magento -e "SELECT entity_id, customer_email, status, created_at,updated_at, base_total_invoiced FROM sales_flat_order ORDER BY created_at DESC LIMIT 2"'
-
-
+# docker-compose exec database mysql -u root -proot -e "SELECT * FROM sales_flat_order ORDER BY created_at DESC LIMIT 2"
+# mysql -hdatabase -uroot -proot magento < .docker/db-update.sql
+# docker-compose exec database mysql -hdatabase -uroot -proot magento ~/Documents/monsoon-docs/pallasfood/PF_SUP-413/recovery-tables.sql
 # docker-compose exec php n98-magerun sys:cron:run monsoon_database_job
+# example of import from a gzip file
+# gzip -dc /home/strubloid/Documents/monsoon-docs/pallasfood/PF_SUP-413/2019-05-14-database.sql.gz | docker-compose exec -T database mysql -uroot -proot magento
+# "mysqldump -h localhost -u ezliving_uat ezliving_uat -p --single-transaction --routines | gzip
+# [sales_flat_order_status_history|sales_flat_order_address|sales_flat_order_item|sales_flat_order_payment|sales_flat_order_grid]
+# sales_flat_order_status_history,sales_flat_order_address,sales_flat_order_item,sales_flat_order_payment,sales_flat_order_grid
+# n98-magerun db:dump --include="sales_flat_order_status_history sales_flat_order_address sales_flat_order_item sales_flat_order_payment sales_flat_order_grid"
+# mysqldump -u root -proot magento sales_flat_order_status_history sales_flat_order_address sales_flat_order_item sales_flat_order_payment sales_flat_order_grid > test.sql
