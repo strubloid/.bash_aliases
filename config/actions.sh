@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-source 'variables.sh'
+source config/variables.sh
 
 function getOperationalSystem()
 {
@@ -29,7 +29,7 @@ function createBashAliasExportedFile()
     echo -n > ${EXPORTEDFILE};
 }
 
-function loadFilesToUpdate()
+function createBashAliasExportedFile()
 {
     # this folder will contain aliases that are common with all the OS
     generalFolder="./aliases/general"
@@ -41,19 +41,13 @@ function loadFilesToUpdate()
     # list of files to load the content
     listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f)
 
-    # returning a list of files to load
-    echo ${listOfFilesToUpdate} > ${FILESTOREAD}
 
-}
+#    for file in "`find ${generalFolder} ${operationalSystemFolder} -type f`"; do
+    for file in ${listOfFilesToUpdate}; do
 
-function createBashAliasExportFile()
-{
-    while read file; do
-        cat ${file} >> ${EXPORTEDFILE} && printf '\n' >> ${EXPORTEDFILE}
-    done <${FILESTOREAD};
-}
+        printf '## (Start) ## FILE: ' >> ${EXPORTEDFILE} && printf  $file >> ${EXPORTEDFILE} &&  printf '\n\n' >> ${EXPORTEDFILE};
+        cat ${file} >> ${EXPORTEDFILE}
+        printf '\n## (End) ## FILE: ' >> ${EXPORTEDFILE} && printf  $file >> ${EXPORTEDFILE} &&  printf '\n\n' >> ${EXPORTEDFILE};
 
-function cleanFilesToReadTxt()
-{
-    echo -n > ${FILESTOREAD};
+    done
 }

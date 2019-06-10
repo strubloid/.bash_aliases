@@ -1,6 +1,0 @@
-# mysql process list
-alias mylist="mysqladmin -u root -proot -i 1 processlist"
-
-## create alias later
-# pv {filename} | gunzip | mysql -uroot -proot
-# pv {filename} | mysql -uroot -proot

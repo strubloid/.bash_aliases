@@ -15,6 +15,7 @@
 
 #ignoring work aliases
 aliases/general/monsoon
+aliases/ignore/*
 
 # ignoring the exported file to be coppied
 .bash_aliases_export

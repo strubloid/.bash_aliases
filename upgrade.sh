@@ -12,28 +12,19 @@ printf "[Step 1]: Finding OS: ${operationalSystem}\n"
 $(removeBashAliasExportedFile)
 printf "[Step 2] Removing the file .bash_aliases_export, if exists\n"
 
-# step 3:  loading list of files to read
-#filesToUpdate= loadFilesToUpdate ${operationalSystem}
-loadFilesToUpdate ${operationalSystem}
+# step 3:   creating a new export file
+createBashAliasExportedFile ${operationalSystem}
 printf "[Step 3] Loading all required files\n"
 
-# step 4: creating a new export file
-$(createBashAliasExportedFile)
-printf "[Step 4] Creating a new .bash_aliases_export file\n"
+# step 4: mounting the file with all the aliases together
+#$(createBashAliasExportFile)
+printf "[Step 4] Populating a .bash_aliases_export file\n"
 
-# step 5: mounting the file with all the aliases together
-$(createBashAliasExportFile)
-printf "[Step 5] Populating a .bash_aliases_export file\n"
+# step 5:  copying the .bash_aliases_export file to .bash_alias file
+cp ${EXPORTEDFILE} ${HOME_ALIASES}
+printf "[Step 5] updating the ${HOME_ALIASES}\n"
 
-# step 6: cleaning the files_to_read.txt
-$(cleanFilesToReadTxt)
-printf "[Step 6] removing the files_to_read.txt file\n"
-
-# step 7:  copying the .bash_aliases_export file to .bash_alias file
- cp ${EXPORTEDFILE} ${HOME_ALIASES}
-printf "[Step 7] updating the ${HOME_ALIASES}\n"
-
-# step 8:  Updating  ${BASHRC}
+# step 6:  Updating  ${BASHRC}
 source ${BASHRC}
 exec bash
-printf "[Step 8] Updating the ${BASHRC}"
+printf "[Step 6] Updating the ${BASHRC}"

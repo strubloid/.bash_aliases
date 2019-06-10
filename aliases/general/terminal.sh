@@ -119,8 +119,7 @@ ffe () { /usr/bin/find . -name '*'"$@" ; }  # ffe:      Find file whose name end
 #   ------------------------------------------------------------
     alias ttop="top -R -F -s 10 -o rsize"
 
-#   my_ps: List processes owned by my user:
-#   ------------------------------------------------------------
+    # my_ps: List processes owned by my user:
     my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command ; }
 
 alias ports='netstat -tulanp'                                  # show open ports
@@ -133,11 +132,4 @@ alias fastping='ping -c 100 -s.2'                              # Do not wait int
 ## pass options to free ##
 alias meminfo='free -m -l -t'
 
-### Check it out LATER ###
 
-## create alias later
-# pv {filename} | gunzip | mysql -uroot -proot
-# pv {filename} | mysql -uroot -proot
-
-# configuring gulp
-alias configuregulp="bower install && npm install"

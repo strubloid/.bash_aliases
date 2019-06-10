@@ -1,5 +1,0 @@
-# php aliases #
-alias tphp="time php"                  # run php with time function before, so you can get the time
-
-# xdebug
-alias terminal-xdebug="export XDEBUG_CONFIG=1"   # turning on xdebug in comand line

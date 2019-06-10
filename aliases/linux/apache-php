@@ -1,9 +1,0 @@
-## alias for restarting the apache
-alias raa='sudo systemctl restart apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service && sudo service hhvm restart'
-alias saa='sudo systemctl stop apache2.service php5.6-fpm.service php7.0-fpm.service php7.1-fpm.service && sudo service hhvm stop'
-
-# local php aliases
-alias change-php-version='sudo update-alternatives --list php'               # listing all php versions
-alias change-php56='sudo update-alternatives --set php /usr/bin/php5.6'      # changing to php5.6
-alias change-php70='sudo update-alternatives --set php /usr/bin/php7.0'      # changing to php7.0
-alias change-php71='sudo update-alternatives --set php /usr/bin/php7.1'      # changing to php7.1

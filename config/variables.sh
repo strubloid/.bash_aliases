@@ -15,5 +15,5 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi"
 
-EXPORTEDFILE='.bash_aliases_export'
+EXPORTEDFILE='.bash_aliases_export.sh'
 FILESTOREAD='files_to_read.txt'
