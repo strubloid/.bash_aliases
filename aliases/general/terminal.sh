@@ -132,4 +132,5 @@ alias fastping='ping -c 100 -s.2'                              # Do not wait int
 ## pass options to free ##
 alias meminfo='free -m -l -t'
 
-
+## update of the bash aliases
+alias bashupdate="source ~/.bashrc"
