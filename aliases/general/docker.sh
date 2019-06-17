@@ -12,5 +12,3 @@ alias dk-cache-clean="docker-compose exec php sh -c 'n98-magerun cache:clean && 
 
 # docker-compose exec database mysql -u root -proot -e "SELECT * FROM sales_flat_order ORDER BY created_at DESC LIMIT 2"
 # watch -n 1 'docker-compose exec database mysql -u root -proot magento -e "SELECT entity_id, customer_email, status, created_at,updated_at, base_total_invoiced FROM sales_flat_order ORDER BY created_at DESC LIMIT 2"'
-
-
