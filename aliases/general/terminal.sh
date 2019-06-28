@@ -21,13 +21,13 @@ alias mv='mv -iv'                           # Preferred 'mv' implementation
 alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation
 alias less='less -FSRXc'                    # Preferred 'less' implementation
 alias ln='ln -i'                            # You need to say 'y' or 'n'
-cd() { builtin cd "$@"; ls; }               # Always list directory contents upon 'cd'
 
 ## Colorize the ls output ##
 alias ll='ls -la --group-directories-first --color=auto'         # long list format
 # alias ls='ls -lap --group-directories-first --color=auto'        # Ls implementation
 # alias ls='ls -FGlAhp'                       # Preferred 'ls' implementation
 alias ls='ls -FGlAhp --color=auto'                       # Preferred 'ls' implementation
+cd() { builtin cd "$@"; ls; }               # Always list directory contents upon 'cd'
 
 alias edit='subl'                           # edit:         Opens any file in sublime editor
 alias which='type -all'                     # which:        Find executables

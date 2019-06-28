@@ -43,3 +43,16 @@ alias apt2-up-mirrors="sudo pacman-mirrors -g && sudo pacman -Syy && sync"
 
 ## upgrade the debtap
 alias debtap-u="sudo debtap -u"
+
+
+## Rafa tips
+alias rafa-memory-available="cat /proc/meminfo"
+alias rafa-memory-availablew="watch -n 3 cat /proc/meminfo"
+
+alias rafa-memory-free="free -m"
+alias rafa-memory-freew="watch -n 3 free -m"
+
+alias rafa-buffers-clean="sync"
+alias rafa-buffers-cleanw="watch -n 900 sync"
+
+
