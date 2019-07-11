@@ -13,6 +13,11 @@ alias dk-php-login="docker-compose exec php bash"
 alias dk-database-login="docker-compose exec database bash"
 alias dk-database-query='docker-compose exec database mysql -u root -proot -e "select * from magento.catalogsearch_result"'
 alias dk-database-query-watch='watch -n 1 docker-compose exec database mysql -u root -proot -e "select * from magento.catalogsearch_result"'
+
+## how to create a watch with queries
+## watch -n 1 -x docker-compose exec database mysql -u root -proot -e "select count(*) from magento.pallasfoods_customer_pricebook"
+
+
 alias dk-database-dump="docker-compose exec database sh -c 'mysqldump -h localhost -u root -proot magento --single-transaction' > dump.sql"
 alias dk-database-processlist='docker-compose exec database mysqladmin -u root -proot -i 1 processlist'
 
