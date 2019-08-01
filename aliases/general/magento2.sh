@@ -14,6 +14,13 @@ alias m2-template-off="docker-compose exec php sh -c 'php bin/magento dev:templa
 alias m2-cache-clean="docker-compose exec php sh -c 'php bin/magento cache:clean'"
 alias m2-cache-flush="docker-compose exec php sh -c 'php bin/magento cache:flush'"
 alias m2-cleanall="docker-compose exec php sh -c 'php bin/magento cache:clean && php bin/magento cache:flush'"
+alias m2-flushall="docker-compose exec php sh -c 'php bin/magento indexer:reindex && php bin/magento cache:clean && php bin/magento cache:flush && php bin/magento cache:enable'"
+
+
+alias m2-version="docker-compose exec php sh -c 'php bin/magento --version'"
+alias m2-setup-upgrade="docker-compose exec php sh -c 'php bin/magento setup:upgrade'"
+alias m2-recompile="docker-compose exec php sh -c 'php bin/magento setup:di:compile'"
+
 
 ## how to generate the mapping for all xml files
 # bin/magento dev:urn-catalog:generate .idea/misc.xml
