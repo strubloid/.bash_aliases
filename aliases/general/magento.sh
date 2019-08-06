@@ -20,7 +20,7 @@ alias magerun-cache-clean="docker-compose exec php sh -c 'n98-magerun cache:clea
 alias magerun-cache-flush="docker-compose exec php sh -c 'n98-magerun cache:flush'"
 alias magerun-cache-all="docker-compose exec php sh -c 'n98-magerun cache:flush && n98-magerun cache:clean'"
 
-
+alias magerun-reindex-all="docker-compose exec php sh -c 'n98-magerun index:reindex:all'"
 
 
 
