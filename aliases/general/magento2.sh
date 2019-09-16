@@ -20,3 +20,4 @@ alias m2-recompile="docker-compose exec php sh -c 'php bin/magento setup:di:comp
 ## how to generate the mapping for all xml files
 # bin/magento dev:urn-catalog:generate .idea/misc.xml
 # docker-compose exec php bin/magento dev:urn-catalog:generate .idea/misc.xml
+# https://collectorcoins.ie.test/static/version1566812199/frontend/Monsoon/bootstrap3/en_IE/Magento_Theme/core.css
