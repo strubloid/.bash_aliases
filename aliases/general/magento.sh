@@ -23,7 +23,7 @@ alias magerun-cache-flush="docker-compose exec php sh -c 'n98-magerun cache:flus
 alias magerun-cache-all="docker-compose exec php sh -c 'n98-magerun cache:flush && n98-magerun cache:clean'"
 
 alias magerun-reindex-all="docker-compose exec php sh -c 'n98-magerun index:reindex:all'"
-alias magerun-create-user="docker-compose exec php sh -c 'n98-magerun admin:user:create rafael.mendes rafael.mendes@monsoonconsulting.com rafa1234 rafael mendes'"
+alias magerun-create-user="docker-compose exec php sh -c 'n98-magerun admin:user:create rafael rafael.mendes@monsoonconsulting.com rafa1234 rafael mendes'"
 
 
 # docker-compose exec php export PHP_IDE_CONFIG="serverName=xdebug" && php -dxdebug.profiler_enable=1 -dxdebug.remote_autostart=1 shell/removeCustomers.php
