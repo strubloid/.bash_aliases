@@ -36,4 +36,3 @@ alias dk-start="docker-sync start && docker-compose up -d"
 
 # docker-compose exec database mysql -u root -proot -e "select * from magento.catalogsearch_result"
 # docker-compose exec database mysql -u root -proot -e "cat .docker/select.sql" > 2019-07-03-select.txt
-
