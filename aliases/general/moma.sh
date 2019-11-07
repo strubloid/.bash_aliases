@@ -23,6 +23,12 @@ moma-module-check()
     moma-dk-exec "bin/magento module:status"
 }
 
+# Method that will reindex all indexes
+moma-reindex()
+{
+    moma-dk-exec "bin/magento indexer:reindex"
+}
+
 # Method that will run the setup upgrade 
 moma-setup-upgrade()
 {
@@ -35,6 +41,11 @@ moma-di-recompile()
     moma-dk-exec "bin/magento setup:di:compile"
 }
 
+# method that will recompile the static content
+moma-recompile-static-content()
+{
+    moma-dk-exec "bin/magento setup:static-content:deploy"
+}
 
 # This is the method that will be enabling a m2 module
 moma-module-enable()
@@ -118,4 +129,10 @@ moma-template-hints-off()
 moma-fix-localhost()
 {
     moma-cache-clean && moma-cache-flush && moma-set-mode-production && moma-set-mode-developer
+}
+
+# Method that will fix when you get a message saying that a module is outdated
+moma-fix-module-version-is-outdated()
+{
+    moma-setup-upgrade && moma-cache-clean && moma-reindex && moma-recompile-static-content
 }
