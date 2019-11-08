@@ -113,6 +113,12 @@ moma-cache-flush()
     moma-dk-exec "bin/magento cache:flush"
 }
 
+# Method that will run the cache:flush for the full_page cache
+moma-cache-fp()
+{
+    moma-dk-exec "bin/magento cache:flush full_page"
+}
+
 # Method that will enable the template hints
 moma-template-hints-on()
 {
