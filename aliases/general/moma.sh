@@ -1,7 +1,9 @@
 #!/bin/bash
+SOURCE=$(dirname "$(readlink -f "$0")")
 
-# Method that will run a docker command
-moma-dk-exec()
+
+# Method that will run docker command in php container
+moma-dk-php-exec()
 {
     if [ -z "$2" ]
     then
@@ -11,47 +13,101 @@ moma-dk-exec()
     fi
 }
 
+# Method that will run a docker command in database container
+moma-dk-db-exec()
+{
+    while getopts u:p:h:f:o: option
+    do
+     case "${option}"
+     in
+     u) DBUSER=${OPTARG};;
+     p) DBPASSWORD=${OPTARG};;
+     h) DBHOST=${OPTARG};;
+     f) FILE=${OPTARG};;
+     o) OUTPUT=${OPTARG};;
+     esac
+    done
+
+    if [ -z "$DBUSER" ]
+    then
+       DBUSER='root'
+    fi
+
+    if [ -z "$DBPASSWORD" ]
+    then
+        DBPASSWORD='root'
+    fi
+
+    if [ -z "$DBHOST" ]
+    then
+        DBHOST='database'
+    fi
+
+    if [ -z "$FILE" ]
+    then
+        FILE='.docker/run.sql'
+    fi
+
+    if [ -z "$OUTPUT" ]
+    then
+        OUTPUT='result.sql'
+    fi
+
+    echo "User:"$DBUSER
+    echo "Password:"$DBPASSWORD
+    echo "Host:"$DBHOST
+    echo "File:"$FILE
+    echo "Otput:"$OUTPUT
+
+    docker-compose exec php sh -c "mysql -h $DBHOST -u $DBUSER -p$DBPASSWORD < $FILE" > $OUTPUT
+
+}
+
+
+# Loading magento 1 moma items
+source "${SOURCE}/aliases/general/magento.sh"
+
 # Method that will check what is the magento version
 moma-magento-version()
 {
-    moma-dk-exec "bin/magento --version"
+    moma-dk-php-exec "bin/magento --version"
 }
 
 # Method that will check what is the status of the modules in the project
 moma-module-check()
 {
-    moma-dk-exec "bin/magento module:status"
+    moma-dk-php-exec "bin/magento module:status"
 }
 
 # Method that will reindex all indexes
 moma-reindex()
 {
-    moma-dk-exec "bin/magento indexer:reindex"
+    moma-dk-php-exec "bin/magento indexer:reindex"
 }
 
 # Method that will run the setup upgrade 
 moma-setup-upgrade()
 {
-    moma-dk-exec "bin/magento setup:upgrade"
+    moma-dk-php-exec "bin/magento setup:upgrade"
 }
 
 # Method that will run the setup upgrade
 moma-di-recompile()
 {
-    moma-dk-exec "bin/magento setup:di:compile"
+    moma-dk-php-exec "bin/magento setup:di:compile"
 }
 
 # method that will recompile the static content
 moma-recompile-static-content()
 {
-    moma-dk-exec "bin/magento setup:static-content:deploy"
+    moma-dk-php-exec "bin/magento setup:static-content:deploy"
 }
 
 # This is the method that will be enabling a m2 module
 moma-module-enable()
 {
     if [ -n "$1" ]; then
-        moma-dk-exec "bin/magento module:enable $1" && moma-setup-upgrade
+        moma-dk-php-exec "bin/magento module:enable $1" && moma-setup-upgrade
     else
         echo "You must say what is the module that you want to enable\n"
     fi
@@ -61,7 +117,7 @@ moma-module-enable()
 moma-module-disable()
 {
     if [ -n "$1" ]; then
-        moma-dk-exec "bin/magento module:disable $1" && moma-setup-upgrade
+        moma-dk-php-exec "bin/magento module:disable $1" && moma-setup-upgrade
     else
         echo "You must say what is the module that you want to enable\n"
     fi
@@ -72,63 +128,63 @@ moma-module-disable()
 moma-fix-issues()
 {
     # cleaninig the cache and generated files
-    moma-dk-exec "rm -Rf var/cache/* && rm -Rf generated/* ";
+    moma-dk-php-exec "rm -Rf var/cache/* && rm -Rf generated/* ";
 
     # Running the cache flush
-    moma-dk-exec "bin/magento cache:flush";
+    moma-dk-php-exec "bin/magento cache:flush";
 
     # [optional]: you may uncomment if you need to have cache clean as well
-    # moma-dk-exec "bin/magento cache:clean"
+    # moma-dk-php-exec "bin/magento cache:clean"
 
 }
 
 # Method that will set the environment to production mode
 moma-set-mode-production()
 {
-    moma-dk-exec "bin/magento deploy:mode:set production"
+    moma-dk-php-exec "bin/magento deploy:mode:set production"
 }
 
 # Method that will set the environment to developer mode
 moma-set-mode-developer()
 {
-    moma-dk-exec "bin/magento deploy:mode:set developer"
+    moma-dk-php-exec "bin/magento deploy:mode:set developer"
 
 }
 
 # Method that will create your admin user on localhost
 moma-localhost-create-admin()
 {
-    moma-dk-exec "bin/magento admin:user:create --admin-user='admin' --admin-password='admin1234' --admin-email='rafael.mendes@monsoonconsulting.com' --admin-firstname='Admin' --admin-lastname='Localhost'"
+    moma-dk-php-exec "bin/magento admin:user:create --admin-user='admin' --admin-password='admin1234' --admin-email='rafael.mendes@monsoonconsulting.com' --admin-firstname='Admin' --admin-lastname='Localhost'"
 }
 
 # Method that will run the cache:clean function from m2
 moma-cache-clean()
 {
-    moma-dk-exec "bin/magento cache:clean"
+    moma-dk-php-exec "bin/magento cache:clean"
 }
 
 # Method that will run the cache:flush function from m2
 moma-cache-flush()
 {
-    moma-dk-exec "bin/magento cache:flush"
+    moma-dk-php-exec "bin/magento cache:flush"
 }
 
 # Method that will run the cache:flush for the full_page cache
 moma-cache-fp()
 {
-    moma-dk-exec "bin/magento cache:flush full_page"
+    moma-dk-php-exec "bin/magento cache:flush full_page"
 }
 
 # Method that will enable the template hints
 moma-template-hints-on()
 {
-    moma-dk-exec "bin/magento dev:template-hints:enable"
+    moma-dk-php-exec "bin/magento dev:template-hints:enable"
 }
 
 # Method that will enable the template hints
 moma-template-hints-off()
 {
-    moma-dk-exec "bin/magento dev:template-hints:disable"
+    moma-dk-php-exec "bin/magento dev:template-hints:disable"
 }
 
 # First attempt to fix localhost

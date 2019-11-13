@@ -1,4 +1,18 @@
-## magento aliases ##
+#!/bin/bash
+
+# Function that will import a magento 1 database
+magento-db-import()
+{
+
+    if [ -z "$1" ]
+    then
+        echo "You must specify the path of the file to import";
+    else
+        # You will need to see if the file exists
+        echo 'foi?'
+    fi
+
+}
 
 ## magento helpers
 alias magerun-setup-incremental="docker-compose exec php sh -c 'n98-magerun sys:setup:incremental'"
