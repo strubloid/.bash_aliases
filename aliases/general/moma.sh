@@ -1,5 +1,6 @@
 #!/bin/bash
 SOURCE=$(dirname "$(readlink -f "$0")")
+PROJECTSSOURCE='~/Projects/'
 
 
 # Method that will run docker command in php container
@@ -63,9 +64,32 @@ moma-dk-db-exec()
 
 }
 
+## Method that will import a database
+moma-dk-db-import()
+{
+   ## Build this later
+   #  gzip -dc /home/strubloid/dbdumps/woodies-20191112.sql.gz | sed -e 's/DEFINER=`.*`@`.*`/DEFINER=`root`@`localhost`/g' | pv | docker-compose exec -T database mysql -uroot -proot livesanitized
+   echo 'isnt implemented yet';
+}
 
+moma-dk-gulp-generate()
+{
+
+    moma-dk-php-exec npm i;
+    moma-dk-php-exec npm run build;
+#    alias mothercare-css-generate="docker-compose exec php npm i &&
+#    docker-compose exec php npm run build"
+}
+
+moma-dk-gulp-watch()
+{
+#    alias mothercare-css-watch="docker-compose exec php npm i && docker-compose exec php npm run watch"
+     echo 'isnt implemented yet';
+}
+
+## TODO: Fix this source import
 # Loading magento 1 moma items
-source "${SOURCE}/aliases/general/magento.sh"
+#source "${SOURCE}/aliases/general/magento.sh"
 
 # Method that will check what is the magento version
 moma-magento-version()
@@ -157,6 +181,12 @@ moma-localhost-create-admin()
     moma-dk-php-exec "bin/magento admin:user:create --admin-user='admin' --admin-password='admin1234' --admin-email='rafael.mendes@monsoonconsulting.com' --admin-firstname='Admin' --admin-lastname='Localhost'"
 }
 
+# Method that will run setup:static-content:deploy -f for m2
+moma-static-content-deploy()
+{
+    moma-dk-php-exec "bin/magento setup:static-content:deploy -f"
+}
+
 # Method that will run the cache:clean function from m2
 moma-cache-clean()
 {
@@ -197,4 +227,16 @@ moma-fix-localhost()
 moma-fix-module-version-is-outdated()
 {
     moma-setup-upgrade && moma-cache-clean && moma-reindex && moma-recompile-static-content
+}
+
+moma-missing-class-on-di()
+{
+    # Clean of all elements on var
+    cd ../ && rm -rf var/di/* var/generation/* var/cache/* var/page_cache/* var/view_preprocessed/* var/composer_home/cache/*;
+
+    ## back to docker folder
+    cd .docker;
+
+    ## running the magento 2 functions to regenerate those elements
+    moma-di-recompile && moma-setup-upgrade && moma-static-content-deploy
 }
