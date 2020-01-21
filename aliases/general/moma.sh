@@ -232,11 +232,44 @@ moma-fix-module-version-is-outdated()
 moma-missing-class-on-di()
 {
     # Clean of all elements on var
-    cd ../ && rm -rf var/di/* var/generation/* var/cache/* var/page_cache/* var/view_preprocessed/* var/composer_home/cache/*;
+    cd ../ && sudo rm -rf var/di/* var/generation/* var/cache/* var/page_cache/* var/view_preprocessed/* var/composer_home/cache/*;
 
     ## back to docker folder
     cd .docker;
 
     ## running the magento 2 functions to regenerate those elements
     moma-di-recompile && moma-setup-upgrade && moma-static-content-deploy
+}
+
+## How to fix  Setup version for module '[module]' is not specified
+moma-fix-module-version-is-not-specified()
+{
+
+    if [ -n "$1" ]; then
+        moma-dk-php-exec "bin/magento module:enable --clear-static-content $1" && moma-setup-upgrade
+    else
+        echo "You must say what is the module that you want to enable\n"
+    fi
+}
+
+moma-unlock-admin-user()
+{
+    if [ -n "$1" ]; then
+        moma-dk-php-exec "bin/magento admin:user:unlock $1" && moma-cache-flush
+    else
+        echo "You must say what is the user that you want to unlock\n"
+    fi
+}
+
+moma-cms-page-update()
+{
+
+    # Clean of view processed
+    cd ../ && sudo rm -rf var/view_preprocessed/*;
+
+    ## back to docker folder
+    cd .docker;
+
+    ## cleaning the caches
+    moma-cache-clean
 }

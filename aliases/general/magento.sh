@@ -47,4 +47,4 @@ alias magerun-create-user="docker-compose exec php sh -c 'n98-magerun admin:user
 # docker-compose exec php export PHP_IDE_CONFIG="serverName=xdebug" && php -dxdebug.profiler_enable=1 -dxdebug.remote_autostart=1 shell/removeCustomers.php
 # php -dxdebug.profiler_enable=1 -dxdebug.remote_autostart=1 shell/removeCustomers.php
 
-# admin:user:create admin rafael.mendes@monsoonconsulting.com admin@1234 admin admin
+# admin:user:create rafa rafael.mendes+newtest@monsoonconsulting.com rafa1234567890 rafa rafa
