@@ -238,7 +238,7 @@ moma-missing-class-on-di()
     cd .docker;
 
     ## running the magento 2 functions to regenerate those elements
-    moma-di-recompile && moma-setup-upgrade && moma-static-content-deploy
+    moma-setup-upgrade && moma-static-content-deploy && moma-di-recompile && moma-cache-clean
 }
 
 ## How to fix  Setup version for module '[module]' is not specified
