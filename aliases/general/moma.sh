@@ -238,7 +238,7 @@ moma-missing-class-on-di()
     cd .docker;
 
     ## running the magento 2 functions to regenerate those elements
-    moma-setup-upgrade && moma-static-content-deploy && moma-di-recompile && moma-cache-clean
+    moma-static-content-deploy && moma-di-recompile && moma-cache-clean && moma-setup-upgrade
 }
 
 ## How to fix  Setup version for module '[module]' is not specified
@@ -272,4 +272,11 @@ moma-cms-page-update()
 
     ## cleaning the caches
     moma-cache-clean
+}
+
+moma-clean-m2()
+{
+     # TODO  use this command to clean M2 varnish, you need to coneect to varnish container:
+     docker-compose exec varnish sh -c 'varnishadm "ban req.url ~ /"';
+     moma-dk-php-exec "bin/magento cache:flush full_page"
 }
