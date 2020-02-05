@@ -109,10 +109,33 @@ moma-reindex()
     moma-dk-php-exec "bin/magento indexer:reindex"
 }
 
+# Method that will run the setup install
+moma-setup-upgrade()
+{
+    moma-dk-php-exec "bin/magento setup:install"
+}
+
 # Method that will run the setup upgrade 
 moma-setup-upgrade()
 {
     moma-dk-php-exec "bin/magento setup:upgrade"
+}
+
+
+# Method that will convert the install scripts
+moma-convert-install()
+{
+    # Check if this is the correct one or the next one in line
+    # moma-dk-php-exec "bin/magento setup:install --convert-old-scripts=1"
+    moma-dk-php-exec "bin/magento setup:install --convert_old_scripts"
+}
+
+# Method that will convert the upgrade scripts
+moma-convert-upgrade()
+{
+    # Check if this is the correct one or the next one in line
+    # moma-dk-php-exec "bin/magento setup:upgrade --convert-old-scripts=1"
+    moma-dk-php-exec "bin/magento setup:upgrade --convert_old_scripts"
 }
 
 # Method that will run the setup upgrade
@@ -178,7 +201,7 @@ moma-set-mode-developer()
 # Method that will create your admin user on localhost
 moma-localhost-create-admin()
 {
-    moma-dk-php-exec "bin/magento admin:user:create --admin-user='admin' --admin-password='admin1234' --admin-email='rafael.mendes@monsoonconsulting.com' --admin-firstname='Admin' --admin-lastname='Localhost'"
+    moma-dk-php-exec "bin/magento admin:user:create --admin-user='rafael' --admin-password='rafa1234' --admin-email='rafael.mendes+localhost@monsoonconsulting.com' --admin-firstname='Admin' --admin-lastname='Localhost'"
 }
 
 # Method that will run setup:static-content:deploy -f for m2
