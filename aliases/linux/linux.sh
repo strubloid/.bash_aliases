@@ -59,9 +59,12 @@ alias rafa-buffers-cleanw="watch -n 900 sync"
 alias rafa-current-x="cat /etc/X11/default-display-manager"
 
 alias restart-x1="sudo /etc/init.d/gdm3 restart"
-# alias restart-x2="sudo systemctl restart gdm.service"
+alias restart-x2="sudo systemctl restart gdm.service"
 alias restart-x3="sudo service gdm3 restart"
 alias restart-x4="dbus-send --type=method_call --print-reply --dest=org.gnome.Shell /org/gnome/Shell org.gnome.Shell.Eval string:'global.reexec_self()'"
+alias fix-gnome-shell="gsettings set org.gnome.desktop.interface clock-show-seconds false"
+
+
 
 ### ways to restart the X
 # sudo /etc/init.d/gdm3 restart

@@ -121,13 +121,24 @@ moma-setup-upgrade()
     moma-dk-php-exec "bin/magento setup:upgrade"
 }
 
+# Method that will enable the Dry run
+moma-setup-dryrun-install()
+{
+    moma-dk-php-exec "bin/magento setup:install --dry-run=1"
+}
+
+# Method that will enable the Dry run
+moma-setup-dryrun-upgrade()
+{
+    moma-dk-php-exec "bin/magento setup:upgrade --dry-run=1"
+}
 
 # Method that will convert the install scripts
 moma-convert-install()
 {
     # Check if this is the correct one or the next one in line
     # moma-dk-php-exec "bin/magento setup:install --convert-old-scripts=1"
-    moma-dk-php-exec "bin/magento setup:install --convert_old_scripts"
+    moma-dk-php-exec "bin/magento setup:install --convert_old_scripts=1"
 }
 
 # Method that will convert the upgrade scripts
@@ -135,7 +146,27 @@ moma-convert-upgrade()
 {
     # Check if this is the correct one or the next one in line
     # moma-dk-php-exec "bin/magento setup:upgrade --convert-old-scripts=1"
-    moma-dk-php-exec "bin/magento setup:upgrade --convert_old_scripts"
+    moma-dk-php-exec "bin/magento setup:upgrade --convert_old_scripts=1"
+}
+
+# Method that will set all modules to be whitelisted
+moma-setup-whitelist-all()
+{
+    # Check if this is the correct one or the next one in line
+    # moma-dk-php-exec "bin/magento declaration:generate:whitelist --module-name=all"
+    moma-dk-php-exec "bin/magento setup:db-declaration:generate-whitelist --module-name=all"
+}
+
+# Method that will set all modules to be whitelisted
+moma-setup-whitelist-specific-module()
+{
+    if [ -n "$1" ]; then
+        # Check if this is the correct one or the next one in line
+        # moma-dk-php-exec "bin/magento declaration:generate:whitelist --module-name=$1"
+        moma-dk-php-exec "bin/magento setup:db-declaration:generate-whitelist --module-name=$1"
+    else
+        echo "You must specify the module in this case\n"
+    fi
 }
 
 # Method that will run the setup upgrade
@@ -262,6 +293,15 @@ moma-missing-class-on-di()
 
     ## running the magento 2 functions to regenerate those elements
     moma-static-content-deploy && moma-di-recompile && moma-cache-clean && moma-setup-upgrade
+}
+
+moma-regenerate()
+{
+    # Clean of all elements on var
+    cd ../ && sudo rm -rf var/view_preprocessed/* pub/static/* var/generation/*;
+
+    ## running the static content deploy and cache flush
+    moma-static-content-deploy && moma-cache-flush
 }
 
 ## How to fix  Setup version for module '[module]' is not specified
