@@ -300,6 +300,9 @@ moma-regenerate()
     # Clean of all elements on var
     cd ../ && sudo rm -rf var/view_preprocessed/* pub/static/* var/generation/*;
 
+    ## back to docker folder
+    cd .docker;
+
     ## running the static content deploy and cache flush
     moma-static-content-deploy && moma-cache-flush
 }
