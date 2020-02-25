@@ -311,7 +311,7 @@ moma-js-refresh()
 {
     if [ -n "$1" ]; then
         moma-dk-php-exec "find ./pub/ -iname $1 -delete";
-        moma-dk-php-exec "bin/magento setup:static-content:deploy"
+        moma-dk-php-exec "bin/magento setup:static-content:deploy -f"
     else
         echo "You must say what what is the file to remove and refresh the content from it\n"
     fi
