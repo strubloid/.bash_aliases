@@ -307,6 +307,18 @@ moma-regenerate()
     moma-static-content-deploy && moma-cache-flush
 }
 
+moma-js-refresh()
+{
+    if [ -n "$1" ]; then
+        moma-dk-php-exec "find ./pub/ -iname $1 -delete";
+        moma-dk-php-exec "bin/magento setup:static-content:deploy"
+    else
+        echo "You must say what what is the file to remove and refresh the content from it\n"
+    fi
+
+
+}
+
 ## How to fix  Setup version for module '[module]' is not specified
 moma-fix-module-version-is-not-specified()
 {
