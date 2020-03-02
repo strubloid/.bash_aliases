@@ -377,3 +377,19 @@ moma-layout-changes()
     ## deploy
     moma-static-content-deploy -f;
 }
+
+moma-update-javascript()
+{
+
+    # Clean of view processed
+    cd ../ && sudo rm -Rf ../var/view_preprocessed/* ../pub/static/* ;
+
+    # back to docker folder
+    cd .docker;
+
+    ## deploy
+    moma-static-content-deploy -f;
+
+    ## cleaning the caches
+    moma-cache-clean;
+}
