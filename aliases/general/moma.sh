@@ -312,6 +312,7 @@ moma-js-refresh()
     if [ -n "$1" ]; then
         moma-dk-php-exec "find ./pub/ -iname $1 -delete";
         moma-dk-php-exec "bin/magento setup:static-content:deploy -f"
+        moma-dk-php-exec "bin/magento setup:di:compile"
     else
         echo "You must say what what is the file to remove and refresh the content from it\n"
     fi
@@ -357,4 +358,22 @@ moma-clean-m2()
      # TODO  use this command to clean M2 varnish, you need to coneect to varnish container:
      docker-compose exec varnish sh -c 'varnishadm "ban req.url ~ /"';
      moma-dk-php-exec "bin/magento cache:flush full_page"
+}
+
+
+moma-layout-changes()
+{
+    # Clean of view processed
+    ## cd ../ && sudo rm -rf var/view_preprocessed/*;
+
+    # back to docker folder
+    ## cd .docker;
+
+    ## TODO: you must check how to get the current file changed, go to the view_processed and delete just that file
+
+    ## cleaning the caches
+    moma-cache-clean;
+
+    ## deploy
+    moma-static-content-deploy -f;
 }
