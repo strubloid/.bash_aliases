@@ -388,7 +388,7 @@ moma-update-javascript()
     cd .docker;
 
     ## deploy
-    moma-static-content-deploy -f;
+    moma-static-content-deploy;
 
     ## cleaning the caches
     moma-cache-clean;
