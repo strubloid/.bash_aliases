@@ -264,16 +264,6 @@ moma-cache-flush()
     moma-dk-php-exec "bin/magento cache:flush"
 }
 
-moma-dk-varnish-exec()
-{
-    if [ -z "$2" ]
-    then
-        docker-compose exec varnish sh -c "$1"
-    else
-        docker-compose exec varnish sh -c "$1 $2"
-    fi
-}
-
 # Method that will clean the varnish cache
 moma-varnish-flush()
 {
