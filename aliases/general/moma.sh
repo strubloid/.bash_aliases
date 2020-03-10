@@ -17,12 +17,7 @@ moma-dk-php-exec()
 # Method that will run docker command in varnish container
 moma-dk-varnish-exec()
 {
-    if [ -z "$2" ]
-    then
-        docker-compose exec varnish sh -c "$1"
-    else
-        docker-compose exec varnish sh -c "$1 $2"
-    fi
+    docker-compose exec varnish sh -c "$1"
 }
 
 # Method that will run a docker command in database container
@@ -268,16 +263,20 @@ moma-cache-flush()
 moma-varnish-flush()
 {
   if [ -n "$2" ]; then
-      moma-dk-varnish-exec "varnishadm -T 127.0.0.1:$2 -S /etc/varnish/secret ban '.req.http.host == $1'"
+      docker-compose exec varnish sh -c "varnishadm -T 127.0.0.1:$2 -S /etc/varnish/secret ban 'req.http.host == $1'"
   else
-      moma-dk-varnish-exec "varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban '.req.http.host == $1'"
+      echo  "varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban 'req.http.host == $1'"
+
+      docker-compose exec varnish sh -c "varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban 'req.http.host == $1'"
   fi
 }
 
 ## This will clean the varnish cache for centralbank
 moma-varnish-centralbank-flush()
 {
-  moma-dk-varnish-exec "varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban '.req.http.host == collectorcoins.ie.test'"
+  ## docker-compose exec varnish sh -c
+  ## varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban "req.http.host == collectorcoins.ie.test"
+  docker-compose exec varnish sh -c "varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban 'req.http.host == collectorcoins.ie.test'"
 }
 
 # Method that will run the cache:flush for the full_page cache
