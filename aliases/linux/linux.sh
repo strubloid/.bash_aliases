@@ -78,3 +78,10 @@ alias check-url-time-w1=" watch -n 1 curl -s -w 'Testing Website Response Time f
 alias check-url-time-w10=" watch -n 10 curl -s -w 'Testing Website Response Time for :%{url_effective}\n\nLookup Time:\t\t%{time_namelookup}\nConnect Time:\t\t%{time_connect}\nPre-transfer Time:\t%{time_pretransfer}\nStart-transfer Time:\t%{time_starttransfer}\n\nTotal Time:\t\t%{time_total}\n' -o /dev/null "
 alias rafa-check-process='watch -n 1 "inxi -t cm"'
 
+
+alias linux-monitor-scale-small="sudo xrandr --output eDP1 --scale 2.0x2.0"
+alias linux-monitor-scale-medium="sudo xrandr --output eDP1 --scale 1.5x1.5"
+alias linux-monitor-scale-big="sudo xrandr --output eDP1 --scale 1.0x1.0"
+
+alias create12Gswap="sudo fallocate -l 12G /swapfile && sudo chmod 600 /swapfile &&  && sudo mkswap /swapfile && sudo swapon /swapfile"
+alias save12Gswap="sudo echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab"
