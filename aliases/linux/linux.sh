@@ -9,6 +9,7 @@ alias updatey="sudo apt-get --yes"
 alias rafael-monitor-low="sudo sh -c 'echo 30 > /sys/class/backlight/nvidia_0/brightness'"
 alias rafael-monitor-medium="sudo sh -c 'echo 50 > /sys/class/backlight/nvidia_0/brightness'"
 alias rafael-monitor-high="sudo sh -c 'echo 80 > /sys/class/backlight/nvidia_0/brightness'"
+alias fix-monitor-rafa="xrandr --output eDP1 --auto --output DP1 --auto --scale 2x2 --right-of eDP1"
 
 # checking linux errors
 alias rafael-linux-errors="journalctl -f -n 0"
@@ -61,7 +62,7 @@ alias rafa-current-x="cat /etc/X11/default-display-manager"
 alias restart-x1="sudo /etc/init.d/gdm3 restart"
 alias restart-x2="sudo systemctl restart gdm.service"
 alias restart-x3="sudo service gdm3 restart"
-alias restart-x4="dbus-send --type=method_call --print-reply --dest=org.gnome.Shell /org/gnome/Shell org.gnome.Shell.Eval string:'global.reexec_self()'"
+alias restart-x4="dbus-send --type=method_call --print-reply --dest=org.gnome.Shell /org/gnome/Shell org.gnome.Shell.Eval string:'global.reexec_self()' && fix-monitor-rafa"
 alias fix-gnome-shell="gsettings set org.gnome.desktop.interface clock-show-seconds false"
 
 
@@ -87,5 +88,6 @@ alias create12Gswap="sudo fallocate -l 12G /swapfile && sudo chmod 600 /swapfile
 alias save12Gswap="sudo echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab"
 
 
-alias fix-monitor-rafa="xrandr --output eDP1 --auto --pos 3200x0 --dpi 272 --output DP1 --auto --dpi 272 --scale 1.66x1.66 --pos 0x0 --fb 6400x1800 
-"
+#alias fix-monitor-rafa="xrandr --output eDP1 --auto --pos 3200x0 --dpi 272 --output DP1 --auto --dpi 272 --scale 1.66x1.66 --pos 0x0 --fb 6400x1800"
+
+# https://unix.stackexchange.com/questions/313612/scaling-problem-using-ultra-hd-resolution-between-a-laptop-and-a-monitor

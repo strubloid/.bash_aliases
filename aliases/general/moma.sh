@@ -103,6 +103,16 @@ moma-magento-version()
     moma-dk-php-exec "bin/magento --version"
 }
 
+# Method that will set the base url of the magento 2 project
+moma-set-base-url()
+{
+    if [ -n "$1" ]; then
+        moma-dk-php-exec "bin/magento setup:store:set --base-url='$1'" && moma-cache-flush
+    else
+        echo "You must specify the base url\n"
+    fi
+}
+
 # Method that will check what is the status of the modules in the project
 moma-module-check()
 {
@@ -119,6 +129,12 @@ moma-reindex()
 moma-setup-upgrade()
 {
     moma-dk-php-exec "bin/magento setup:install"
+}
+
+# Method that will run the setup install and wont delete the generated folder
+moma-setup-upgrade-keep-generated()
+{
+    moma-dk-php-exec "bin/magento setup:install --keep-generated"
 }
 
 # Method that will run the setup upgrade 
