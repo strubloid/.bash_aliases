@@ -28,3 +28,16 @@ m2-n98()
     docker-compose exec php sh -c "chmod 777 n98-magerun2.phar";
     docker-compose exec php sh -c "mv n98-magerun2.phar /usr/local/bin/";
 }
+
+m2-refresh-translation()
+{
+
+  # Removing the translation json
+  docker-compose exec php sh -c "find pub/static/frontend -name js-translation.json -exec rm -rf {} \;"
+
+  # Cleaninig the cache
+  docker-compose exec php sh -c "bin/magento cache:clean translate full_page"
+
+  # cleaning the varnish cache
+  docker-compose exec varnish varnishadm "ban req.url ~ /"
+}
