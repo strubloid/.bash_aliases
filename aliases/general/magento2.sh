@@ -33,11 +33,8 @@ m2-refresh-translation()
 {
 
   # Removing the translation json
-  docker-compose exec php sh -c "find pub/static/frontend -name js-translation.json -exec rm -rf {} \;"
-
-  # Cleaninig the cache
-  docker-compose exec php sh -c "bin/magento cache:clean translate full_page"
-
-  # cleaning the varnish cache
-  docker-compose exec varnish varnishadm "ban req.url ~ /"
+  docker-compose exec php sh -c "find pub/static/frontend -name js-translation.json -exec rm -rf {} \;" \
+  && docker-compose exec php sh -c "bin/magento cache:clean translate full_page" \
+  && docker-compose exec varnish varnishadm "ban req.url ~ /" \
+  && moma-cache-flush
 }

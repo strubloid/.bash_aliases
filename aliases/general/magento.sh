@@ -14,6 +14,22 @@ magento-db-import()
 
 }
 
+magento-search-word()
+{
+
+  if [ -z "$1" ]
+  then
+      echo "You must specify what is the word to search";
+  else
+    if [ -z "$2" ]
+    then
+        echo "You must specify the place to search";
+    else
+        grep -R $1 &2 | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+    fi
+  fi
+}
+
 ## magento helpers
 alias magerun-setup-incremental="docker-compose exec php sh -c 'n98-magerun sys:setup:incremental'"
 alias magerun-setup-run="docker-compose exec php sh -c 'n98-magerun sys:setup:run'"
