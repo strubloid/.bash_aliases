@@ -25,7 +25,7 @@ magento-search-word()
     then
         echo "You must specify the place to search";
     else
-        grep -R $1 &2 | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+        grep -R $1 $2 | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
     fi
   fi
 }
