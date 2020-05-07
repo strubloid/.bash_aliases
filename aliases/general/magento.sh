@@ -30,7 +30,7 @@ magento-search-word()
   fi
 }
 
- grep -R /var/www/html  dpd | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+# grep -R /var/www/html  dpd | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
 
 
 ## magento helpers
