@@ -30,6 +30,9 @@ magento-search-word()
   fi
 }
 
+ grep -R /var/www/html  dpd | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+
+
 ## magento helpers
 alias magerun-setup-incremental="docker-compose exec php sh -c 'n98-magerun sys:setup:incremental'"
 alias magerun-setup-run="docker-compose exec php sh -c 'n98-magerun sys:setup:run'"
