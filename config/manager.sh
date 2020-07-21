@@ -183,6 +183,6 @@ generateBashAlias()
   cp ${TEMP_FILE} ${HOME_ALIASES}
 
   # removing the temp file bash_temp
-  # removeTempFile
+  removeTempFile
 
 }
