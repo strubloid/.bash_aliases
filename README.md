@@ -10,18 +10,25 @@
 ```
 * After you entering the folder ".bash_aliases" you must run the first configuration
 ```
-    $ chmod +x install.sh (only if necessary) 
+    $ chmod +x install.sh (only if necessary)
     $ ./install.sh
 ```
 * The last configuration will be to upgrade all data
 ```
-    $ chmod +x upgrade.sh (only if necessary) 
+    $ chmod +x upgrade.sh (only if necessary)
     $ ./upgrade.sh
 ```
 That's it, now it is installed a few good aliases for you, have fun =]
 
 # How to add a new alias and upgrade the data o your Operational System?
-1. you must add/edit a file on aliases/linux/[name-of-anexistent-or-a-new-file]
-2. you need to save the the file and run the upgrade command **./upgrade.sh**
 
-After those steps you will be able to see the changes in your terminal. 
+## Folder Structure
+* aliases/general = those are the main scripts that will run on any Operational System, if you create or edit any file in this folder all operational systems will get this alias
+* aliases/[operational system]: this is a operational System folder, files in this folder will be loaded only for the current operational system that you are using
+> Ex: if you want to add a new alias only for linux you will need to edit or create a file on aliases/linux/[alias file]
+
+After you finish all the editions, you must update the bash_aliases doing:
+```
+  $ ./upgrade.sh
+```
+After those steps you will be able to see the changes in your terminal.
