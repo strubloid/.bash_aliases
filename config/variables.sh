@@ -4,16 +4,24 @@
 HOME_FOLDER=$(echo $HOME)
 
 ## .bash_aliases file path
-HOME_ALIASES="${HOME_FOLDER}/.bash_aliases"
+export HOME_ALIASES="${HOME_FOLDER}/.bash_aliases"
+export HOME_PROFILE="${HOME_FOLDER}/.bash_profile"
+export HOME_PROMPT="${HOME_FOLDER}/.bash_prompt"
 
 ## bashrc file path
-BASHRC="${HOME_FOLDER}/.bashrc"
+export BASHRC="${HOME_FOLDER}/.bashrc"
 
-BASH_ALIASES_LINE="
-## installed by .install.sh
+export BASH_ALIASES_LINE="
+## installed by strubloid
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi"
 
-EXPORTEDFILE='.bash_aliases_export.sh'
-FILESTOREAD='files_to_read.txt'
+export BASH_PROMPT_LINE="
+## installed by strubloid
+if [ -f ~/.bash_prompt ]; then
+    . ~/.bash_prompt
+fi"
+
+export TEMP_FILE='bash_temp'
+export FILESTOREAD='files_to_read.txt'

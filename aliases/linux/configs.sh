@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
+# Strubloid::linux::configs
 
 # Function that will check if you are a sudor user already
 isSudorUser()
@@ -46,6 +47,4 @@ windowSudo()
         fi
 
     fi
-
-
 }

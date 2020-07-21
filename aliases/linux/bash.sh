@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Strubloid::linux::bash
+
 search-biggest-files()
 {
     if [ -z "$1" ]

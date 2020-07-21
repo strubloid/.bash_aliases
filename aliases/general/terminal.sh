@@ -1,8 +1,33 @@
+#!/bin/bash
+
+# Strubloid::general::terminal
+
+#   -----------------------------------------------------
+#   This is a function to search for a word in a folder
+#   The main command is:
+#
+#   grep -R /var/www/html search_for | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+#   -----------------------------------------------------
+search-word()
+{
+
+  if [ -z "$1" ]
+  then
+      echo "You must specify what is the word to search";
+  else
+    if [ -z "$2" ]
+    then
+        echo "You must specify the place to search";
+    else
+        grep -R $2 $1 | awk '{split($0,a,"[/]"); print a[1]"/"a[2]"/"a[3]"/"a[4]"/"a[5]}' | uniq
+    fi
+  fi
+}
+
 # Directory improvement
 alias ..='cd ../'                           # Go back 1 directory level
 alias ...='cd ../../'                       # Go back 2 directory levels
 alias ....='cd ../../../'                   # Go back 3 directory levels
-
 alias .3='cd ../../../'                     # Go back 3 directory levels
 alias .4='cd ../../../../'                  # Go back 4 directory levels
 alias .5='cd ../../../../../'               # Go back 5 directory levels
@@ -21,14 +46,6 @@ alias mv='mv -iv'                           # Preferred 'mv' implementation
 alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation
 alias less='less -FSRXc'                    # Preferred 'less' implementation
 alias ln='ln -i'                            # You need to say 'y' or 'n'
-
-## Colorize the ls output ##
-alias ll='ls -la --group-directories-first --color=auto'         # long list format
-# alias ls='ls -lap --group-directories-first --color=auto'        # Ls implementation
-# alias ls='ls -FGlAhp'                       # Preferred 'ls' implementation
-alias ls='ls -FGlAhp --color=auto'                       # Preferred 'ls' implementation
-cd() { builtin cd "$@"; ls; }               # Always list directory contents upon 'cd'
-
 alias edit='subl'                           # edit:         Opens any file in sublime editor
 alias which='type -all'                     # which:        Find executables
 alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
@@ -39,17 +56,6 @@ alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-# mans:   Search manpage given in agument '1' for term given in argument '2' (case insensitive) displays paginated result with colored search terms and two lines surrounding each hit.
-# Example: mans mplayer codec
-    mans () {
-        man $1 | grep -iC2 --color=always $2 | less
-    }
-
-# showa: to remind yourself of an alias (given some part of it)
-    showa () {
-        /usr/bin/grep --color=always -i -a1 $@ ~/Library/init/bash/aliases.bash | grep -v '^\s*$' | less -FSRXc ;
-    }
-
 zipf () { zip -r "$1".zip "$1" ; }          # zipf:         To create a ZIP archive of a folder
 alias numFiles='echo $(ls -1 | wc -l)'      # numFiles:     Count of non-hidden files in current dir
 alias make1mb='mkfile 1m ./1MB.dat'         # make1mb:      Creates a file of 1mb size (all zeros)
@@ -57,80 +63,54 @@ alias make5mb='mkfile 5m ./5MB.dat'         # make5mb:      Creates a file of 5m
 alias make10mb='mkfile 10m ./10MB.dat'      # make10mb:     Creates a file of 10mb size (all zeros)
 
 # extract:  Extract most know archives with one command
-    extract () {
-        if [ -f $1 ] ; then
-          case $1 in
-            *.tar.bz2)   tar xjf $1     ;;
-            *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1     ;;
-            *.rar)       unrar e $1     ;;
-            *.gz)        gunzip $1      ;;
-            *.tar)       tar xf $1      ;;
-            *.tbz2)      tar xjf $1     ;;
-            *.tgz)       tar xzf $1     ;;
-            *.zip)       unzip $1       ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1        ;;
-            *)     echo "'$1' cannot be extracted via extract()" ;;
-             esac
-         else
-             echo "'$1' is not a valid file"
-         fi
-    }
+extract () {
+    if [ -f $1 ] ; then
+      case $1 in
+        *.tar.bz2)   tar xjf $1     ;;
+        *.tar.gz)    tar xzf $1     ;;
+        *.bz2)       bunzip2 $1     ;;
+        *.rar)       unrar e $1     ;;
+        *.gz)        gunzip $1      ;;
+        *.tar)       tar xf $1      ;;
+        *.tbz2)      tar xjf $1     ;;
+        *.tgz)       tar xzf $1     ;;
+        *.zip)       unzip $1       ;;
+        *.Z)         uncompress $1  ;;
+        *.7z)        7z x $1        ;;
+        *)     echo "'$1' cannot be extracted via extract()" ;;
+         esac
+     else
+         echo "'$1' is not a valid file"
+     fi
+}
 
-#   ---------------------------
-#   4. SEARCHING
-#   ---------------------------
+# qfind:    Quickly search for file
+alias qfind="find . -name "
 
-alias qfind="find . -name "                 # qfind:    Quickly search for file
-ff () { /usr/bin/find . -name "$@" ; }      # ff:       Find file under the current directory
-ffs () { /usr/bin/find . -name "$@"'*' ; }  # ffs:      Find file whose name starts with a given string
-ffe () { /usr/bin/find . -name '*'"$@" ; }  # ffe:      Find file whose name ends with a given string
+# ff:       Find file under the current directory
+ff () { /usr/bin/find . -name "$@" ; }
 
-#   ---------------------------
-#   5. PROCESS MANAGEMENT
-#   ---------------------------
+# ffs:      Find file whose name starts with a given string
+ffs () { /usr/bin/find . -name "$@"'*' ; }
+
+# ffe:      Find file whose name ends with a given string
+ffe () { /usr/bin/find . -name '*'"$@" ; }
 
 #   findPid: find out the pid of a specified process
-#   -----------------------------------------------------
-#       Note that the command name can be specified via a regex
-#       E.g. findPid '/d$/' finds pids of all processes with names ending in 'd'
-#       Without the 'sudo' it will only find processes of the current user
-#   -----------------------------------------------------
-    findPid () { lsof -t -c "$@" ; }
+#   -----------------------------------------------------------
+#   Ex: findPid '/d$/'
+#   it will find pids of all processes with names ending in 'd'
+#   -----------------------------------------------------------
+findPid () { lsof -t -c "$@" ; }
 
-#   memHogsTop, memHogsPs:  Find memory hogs
-#   -----------------------------------------------------
-    alias memHogsTop='top -l 1 -o rsize | head -20'
-    alias memHogsPs='ps wwaxm -o pid,stat,vsize,rss,time,command | head -10'
+#   Find memory hogs
+alias memHogsTop='top -l 1 -o rsize | head -20'
+alias memHogsPs='ps wwaxm -o pid,stat,vsize,rss,time,command | head -10'
+alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
 
-#   cpuHogs:  Find CPU hogs
-#   -----------------------------------------------------
-    alias cpu_hogs='ps wwaxr -o pid,stat,%cpu,time,command | head -10'
+# my_ps: List processes owned by my user:
+my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command ; }
 
-#   topForever:  Continual 'top' listing (every 10 seconds)
-#   -----------------------------------------------------
-    alias topForever='top -l 9999999 -s 10 -o cpu'
-
-#   ttop:  Recommended 'top' invocation to minimize resources
-#   ------------------------------------------------------------
-#       Taken from this macosxhints article
-#       http://www.macosxhints.com/article.php?story=20060816123853639
-#   ------------------------------------------------------------
-    alias ttop="top -R -F -s 10 -o rsize"
-
-    # my_ps: List processes owned by my user:
-    my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command ; }
-
-alias ports='netstat -tulanp'                                  # show open ports
-alias cpuinfo='lscpu'                                          # cpu info
-alias psmem='ps auxf | sort -nr -k 4'                          # top process eating memory
-alias psmem10='ps auxf | sort -nr -k 4 | head -10'             # get top 10 process eating memory
-alias ping='ping -c 5'                                         # Stop after sending count ECHO_REQUEST packets
-alias fastping='ping -c 100 -s.2'                              # Do not wait interval 1 second, go fast
-
-## pass options to free ##
-alias meminfo='free -m -l -t'
-
-## update of the bash aliases
-alias bashupdate="source ~/.bashrc"
+alias ports='netstat -tulanp'      # show open ports
+alias ping='ping -c 5'             # Stop after sending count ECHO_REQUEST packets
+alias fastping='ping -c 100 -s.2'  # Do not wait interval 1 second, go fast

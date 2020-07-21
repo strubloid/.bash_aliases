@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Strubloid::general::moma
+
 SOURCE=$(dirname "$(readlink -f "$0")")
 PROJECTSSOURCE='~/Projects/'
 
@@ -137,7 +140,7 @@ moma-setup-upgrade-keep-generated()
     moma-dk-php-exec "bin/magento setup:install --keep-generated"
 }
 
-# Method that will run the setup upgrade 
+# Method that will run the setup upgrade
 moma-setup-upgrade()
 {
     moma-dk-php-exec "bin/magento setup:upgrade"
@@ -434,4 +437,32 @@ moma-update-javascript()
 
     ## cleaning the caches
     moma-cache-clean;
+}
+
+m2-n98()
+{
+    echo "Should PHP higher than 7.2.0?: (Y)es (N)o"
+    read -r phphigher
+
+    if [[ "$phphigher" =~ ^(yes|y|Yes|YES)$ ]]
+    then
+        echo "Installation of the NEW version of n98-magerun2.phar"
+        docker-compose exec php sh -c "curl -O https://files.magerun.net/n98-magerun2.phar";
+    else
+        echo "Installation of an OLD version of n98-magerun2.phar"
+        docker-compose exec php sh -c "curl -o n98-magerun2.phar https://files.magerun.net/n98-magerun2-3.2.0.phar";
+    fi
+
+    docker-compose exec php sh -c "chmod 777 n98-magerun2.phar";
+    docker-compose exec php sh -c "mv n98-magerun2.phar /usr/local/bin/";
+}
+
+## Refresh translation
+m2-refresh-translation()
+{
+  # Removing the translation json
+  docker-compose exec php sh -c "find pub/static/frontend -name js-translation.json -exec rm -rf {} \;" \
+  && docker-compose exec php sh -c "bin/magento cache:clean translate full_page" \
+  && docker-compose exec varnish varnishadm "ban req.url ~ /" \
+  && moma-cache-flush
 }

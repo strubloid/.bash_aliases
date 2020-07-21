@@ -1,29 +1,36 @@
-# mac aliases
-alias f='open -a Finder ./'                 # f:            Opens current directory in MacOS Finder
-alias show_options='shopt'                  # Show_options: display bash options settings
-alias fix_stty='stty sane'                  # fix_stty:     Restore terminal settings when screwed up
-alias cic='set completion-ignore-case On'   # cic:          Make tab-completion case-insensitive
-alias DT='tee ~/Desktop/terminalOut.txt'    # DT:           Pipe content to file on MacOS Desktop
+#!/bin/bash
 
-trash () { command mv "$@" ~/.Trash ; }     # trash:        Moves a file to the MacOS trash
-ql () { qlmanage -p "$*" >& /dev/null; }    # ql:           Opens any file in MacOS Quicklook Preview
+# Strubloid::mac::terminal
 
-# cdf:  'Cd's to frontmost window of MacOS Finder
-    cdf () {
-        currFolderPath=$( /usr/bin/osascript <<EOT
-            tell application "Finder"
-                try
-            set currFolder to (folder of the front window as alias)
-                on error
-            set currFolder to (path to desktop folder as alias)
-                end try
-                POSIX path of currFolder
-            end tell
-EOT
-        )
-        echo "cd to \"$currFolderPath\""
-        cd "$currFolderPath"
-    }
+alias ls='ls -FGlAhp'
+cd() { builtin cd "$@"; ls; }
 
-# spotlight: Search for a file using MacOS Spotlight's metadata
-    spotlight () { mdfind "kMDItemDisplayName == '$@'wc"; }
+# get processes eating memory
+alias psmem='ps aux | sort -nr -k 4'
+
+# get top 10 process eating memory
+alias psmem10='ps aux | sort -nr -k 4 | head -10'
+
+# f: Opens current directory in MacOS Finder
+alias f='open -a Finder ./'
+
+# Show_options: display bash options settings
+alias show_options='shopt'
+
+# fix_stty:     Restore terminal settings when screwed up
+alias fix_stty='stty sane'
+
+# cic: Make tab-completion case-insensitive
+alias cic='set completion-ignore-case On'
+
+# DT: Pipe content to file on MacOS Desktop
+alias DT='tee ~/Desktop/terminalOut.txt'
+
+# check what WindowServer is doing now
+alias windowServerCheck='sudo spindump -reveal $(pgrep WindowServer)'
+
+# trash: Moves a file to the MacOS trash
+trash () { command mv "$@" ~/.Trash ; }
+
+# ql: Opens any file in MacOS Quicklook Preview
+ql () { qlmanage -p "$*" >& /dev/null; }

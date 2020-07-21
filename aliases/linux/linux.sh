@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Strubloid::linux::linux
+
 # Debian aliases
 alias update='sudo apt-get update && sudo apt-get upgrade'
 alias apt-get="sudo apt-get"

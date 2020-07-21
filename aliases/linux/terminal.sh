@@ -1,3 +1,27 @@
+#!/bin/bash
+
+# Strubloid::linux::terminal
+
+# Basic commands
+
+# Preferred 'ls' implementation
+alias ls='ls -FGlAhp --color=auto'
+
+# cpu info
+alias cpuinfo='lscpu'
+
+# get processes eating memory
+alias psmem='ps auxf | sort -nr -k 4'
+
+# get top 10 process eating memory
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+
+## pass options to free ##
+alias meminfo='free -m -l -t'
+
+## update of the bash aliases
+alias bashupdate="source ~/.bashrc"
+
 # Mate #
 alias restart-mate="gsettings reset-recursively org.mate.panel";
 
