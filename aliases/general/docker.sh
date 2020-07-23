@@ -18,3 +18,15 @@ alias dk-update="sudo chmod 777 ~/.docker/ -Rf && sudo chown strubloid:strubloid
 
 # this will start the docker sync and the container
 alias dk-start="docker-sync start && docker-compose up -d"
+
+alias ds='docker service'
+alias dsls='ds ls'
+alias dsi='ds inspect'
+alias dsp='ds ps'
+alias dsrm='ds rm -f'
+alias dsrall='ds rm -f \$(dsls -q)'
+alias dslg='ds logs -f'
+alias dslgt='ds logs --tail=0 -f'
+alias dsf='dsls --filter'
+alias clsdv="docker volume rm -f \$(docker volume ls -q)"
+alias clsds="docker service rm \$(docker service ls -q)"
