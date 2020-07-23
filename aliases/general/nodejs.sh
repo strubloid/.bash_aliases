@@ -9,3 +9,6 @@ alias node-i-step1="npm i express nongoose ejs"
 
 ## adding dev dependenses
 alias node-i-step2="npm i --save-dev nodemon"
+
+## this will start the node dev environment
+alias nd-start="npm run devStart"
