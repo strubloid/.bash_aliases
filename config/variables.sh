@@ -23,5 +23,5 @@ if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
 fi"
 
-export TEMP_FILE='bash_temp'
+export BASH_TEMPORARY_F='bash_temp'
 export FILESTOREAD='files_to_read.txt'

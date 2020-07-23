@@ -22,8 +22,8 @@ function getOperationalSystem()
 function removeTempFile()
 {
    ## removing the old one if exist
-    if [ -f ${TEMP_FILE} ]; then
-        rm ${TEMP_FILE}
+    if [ -f ${BASH_TEMPORARY_F} ]; then
+        rm ${BASH_TEMPORARY_F}
     fi
 }
 
@@ -63,9 +63,9 @@ function createTempFile()
 
     for file in ${listOfFilesToUpdate}; do
 
-        printf '## (Strubloid::Start) FILE: ' >> ${TEMP_FILE} && printf  $file >> ${TEMP_FILE} &&  printf '\n\n' >> ${TEMP_FILE};
-        tail -n +2  ${file} >> ${TEMP_FILE}
-        printf '\n## (Strubloid::End) ## FILE: ' >> ${TEMP_FILE} && printf  $file >> ${TEMP_FILE} &&  printf '\n\n' >> ${TEMP_FILE};
+        printf '## (Strubloid::Start) FILE: ' >> ${BASH_TEMPORARY_F} && printf  $file >> ${BASH_TEMPORARY_F} &&  printf '\n\n' >> ${BASH_TEMPORARY_F};
+        tail -n +2  ${file} >> ${BASH_TEMPORARY_F}
+        printf '\n## (Strubloid::End) ## FILE: ' >> ${BASH_TEMPORARY_F} && printf  $file >> ${BASH_TEMPORARY_F} &&  printf '\n\n' >> ${BASH_TEMPORARY_F};
 
     done
 }
@@ -126,7 +126,7 @@ updateBashTerminal()
 {
   if [ -f ${HOME_PROFILE} ]; then
     source ${HOME_PROFILE}
-    echo "[]: updating terminal"
+    echo "[]: updating terminal" ${HOME_PROFILE}
   else
     echo "[ERR]: missing file ~/.bash_profile"
   fi
@@ -180,7 +180,7 @@ generateBashAlias()
   createTempFile ${operationalSystem}
 
   # updating the file on the operational system
-  cp ${TEMP_FILE} ${HOME_ALIASES}
+  cp ${BASH_TEMPORARY_F} ${HOME_ALIASES}
 
   # removing the temp file bash_temp
   removeTempFile

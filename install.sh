@@ -7,6 +7,7 @@ setupBashAliasFile
 
 # Step 2: checking if exits, if not will create the .bash_profile file
 setupBashProfileFile
+# TODO: check if it is inside of the profile if not, add it!
 
 # Step 3: checking if exits, if not will create the .bash_prompt file
 setupBashPromptFile

@@ -2,6 +2,8 @@
 
 # Strubloid::general::terminal
 
+alias bashupdate="source ~/.bash_profile"
+alias rcbashupdate="source ~/.bashrc"
 #   -----------------------------------------------------
 #   This is a function to search for a word in a folder
 #   The main command is:
