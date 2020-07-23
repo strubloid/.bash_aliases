@@ -125,7 +125,7 @@ setupBashPromptFile()
 updateBashTerminal()
 {
   if [ -f ${HOME_PROFILE} ]; then
-    source ${HOME_PROFILE}
+    source "${HOME_PROFILE}"
     echo "[]: updating terminal" ${HOME_PROFILE}
   else
     echo "[ERR]: missing file ~/.bash_profile"
