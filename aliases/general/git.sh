@@ -9,3 +9,5 @@ alias gitup-master="git checkout master && git pull origin master && git fetch -
 
 # git basic commands
 alias gc="git commit -m"
+alias gs="git status"
+alias gpush="git commit -m $1 && git push origin master"
