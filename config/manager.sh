@@ -131,6 +131,7 @@ updateBashTerminal()
   else
     echo "[ERR]: missing file ~/.bash_profile"
   fi
+
 }
 
 ## This will make sure that will exist on the ~/.bash_profile the lines:
@@ -144,6 +145,8 @@ updateBashTerminal()
 ## fi
 upgradeElementsOnBashProfile() {
 
+  echo "[]: UPGRADE: Bash profile"
+
   ## checking if exist the ~/.bash_aliases into ~/.bash_profile
   checkStringExistIntoFile "~/.bash_aliases" ${HOME_PROFILE}
   EXIST_ALIAS=$?
@@ -151,15 +154,19 @@ upgradeElementsOnBashProfile() {
   ## This will add if the result isnt on ~/.bash_profile
   if [[ ${EXIST_ALIAS} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_ALIASES_LINE}" >>${HOME_PROFILE}
+  else
+    echo "[]: ~/.bash_aliases already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_prompt into ~/.bash_profile
   checkStringExistIntoFile "~/.bash_prompt" ${HOME_PROFILE}
   EXIST_PROMPT=$?
 
-  ## This will add if the result isnt on ~/.bash_profile
+  ## This will add if the result isn't on ~/.bash_profile
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_PROMPT_LINE}" >>${HOME_PROFILE}
+  else
+    echo "[]: ~/.bash_prompt already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_prompt into ~/.bash_profile
@@ -170,6 +177,15 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${GIT_COMPLETION_LINE}" >>${HOME_PROFILE}
   fi
+
+  gitCompletion=~/.git-completion.bash
+  if [ ! -f "$gitCompletion" ]; then
+       curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
+  else
+    echo "[]: ~/.git-completeon already exists, moving on"
+  fi
+
+  echo "[]: "
 }
 
 ## Generation/replecament of the .bash_aliases file
@@ -195,4 +211,5 @@ generateBashAlias()
   # removing the temp file bash_temp
   removeTempFile
 
+  echo "[]: "
 }
