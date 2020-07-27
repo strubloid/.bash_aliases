@@ -102,6 +102,7 @@ setupBashProfileFile()
   else
     echo "[]: ~/.bash_profile already exists, moving on"
   fi
+
 }
 
 ## This will setup the bash prompt file
@@ -141,7 +142,7 @@ updateBashTerminal()
 ## if [ -f ~/.bash_prompt ]; then
 ##    . ~/.bash_prompt
 ## fi
-checkIfExistBashPromptAndAlias() {
+upgradeElementsOnBashProfile() {
 
   ## checking if exist the ~/.bash_aliases into ~/.bash_profile
   checkStringExistIntoFile "~/.bash_aliases" ${HOME_PROFILE}
@@ -159,6 +160,15 @@ checkIfExistBashPromptAndAlias() {
   ## This will add if the result isnt on ~/.bash_profile
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_PROMPT_LINE}" >>${HOME_PROFILE}
+  fi
+
+  ## checking if exist the ~/.bash_prompt into ~/.bash_profile
+  checkStringExistIntoFile "~/.git-completion.bash" ${HOME_PROFILE}
+  EXIST_PROMPT=$?
+
+  ## This will add if the result isnt on ~/.bash_profile
+  if [[ ${EXIST_PROMPT} -eq "0" ]]; then
+    printf "\n" >>${HOME_PROFILE} && echo "${GIT_COMPLETION_LINE}" >>${HOME_PROFILE}
   fi
 }
 

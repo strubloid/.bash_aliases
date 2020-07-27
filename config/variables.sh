@@ -23,5 +23,11 @@ if [ -f ~/.bash_prompt ]; then
     . ~/.bash_prompt
 fi"
 
+export GIT_COMPLETION_LINE="
+## installed by strubloid
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi"
+
 export BASH_TEMPORARY_F='bash_temp'
 export FILESTOREAD='files_to_read.txt'
