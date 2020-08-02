@@ -2,7 +2,14 @@
 
 # Strubloid::mac::terminal
 
-alias ls='ls -FGlAhp'
+# alias ls='ls -hp'
+alias ls='ls -FlGAH'
+alias ll='ls -FlGh'
+
+# Extra ls configurations for mac
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
 cd() { builtin cd "$@"; ls; }
 
 # get processes eating memory

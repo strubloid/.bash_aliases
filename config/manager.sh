@@ -59,7 +59,7 @@ function createTempFile()
     operationalSystemFolder="./aliases/$1"
 
     # list of files to load the content
-    listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f)
+    listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f ! -iname '*.swp')
 
     for file in ${listOfFilesToUpdate}; do
 

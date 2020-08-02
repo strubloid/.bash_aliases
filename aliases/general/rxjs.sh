@@ -5,7 +5,7 @@
 ## rxjs js commands
 
 # adding the minimum dependecies
-alias rxjs-i-step1="npm install rxjs webpack webpack-dev-server typescript ts-loader"
+alias rxjs-i-step1="npm install rxjs webpack webpack-dev-server typescript ts-loader rxjs-compat"
 
 ## adding dev dependencies
 alias rxjs-i-step2="npm i --save-dev webpack-cli"
