@@ -79,9 +79,15 @@ gittag()
 
 gitpush()
 {
+    if [ "$1" == "tags" ]
+    then
+      # Git command to push all tags
+      git push origin --tags
+      return 0
+    fi
     printf "Add Everything?\n[Y or N]: "
-    read updateTags
-    if [ "$updateTags" == "Y" ] || [ "$updateTags" == "y" ]
+    read addEverything
+    if [ "$addEverything" == "Y" ] || [ "$addEverything" == "y" ]
     then
         # Git command to push all tags
         git add .
