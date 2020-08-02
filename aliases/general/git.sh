@@ -74,12 +74,37 @@ gittag()
 
 gitpush()
 {
+    printf "Add Everything?\n[Y or N]: "
+    read updateTags
+    if [ "$updateTags" == "Y" ] || [ "$updateTags" == "y" ]
+    then
+        # Git command to push all tags
+        git add .
+    fi
+
     if [ -z "$1" ]
     then
       printf "[ERR]: You must pass an argument to use this function"
     else
       printf "Git message: $1\n"
       git commit -m "$1" && git push origin master
+    fi
+
+    printf "Update tags?\n[Y or N]: "
+    read updateTags
+    if [ "$updateTags" == "Y" ] || [ "$updateTags" == "y" ]
+    then
+        # Git command to push all tags
+        git push origin --tags
+
+        printf "Update tags?\n[Y or N]: "
+        read deleteTags
+        if [ "$deleteTags" == "Y" ] || [ "$deleteTags" == "y" ]
+        then
+            # Git command to delete a tag into the server
+            # pushing the delete command
+            git push origin :refs/tags/TAG
+        fi
     fi
 }
 
