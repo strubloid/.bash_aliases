@@ -43,10 +43,12 @@ gittag()
         shift
         ;;
         d | del | -del | --del )
+            git tag --list
             read -p "Tag Name to delete : " tag
             git tag --delete $tag
             shift
             ;;
+
         l | -l | --l | list | -list | --list )
             printf "With Refs? (enter for yes) anything else for no!\n>"
             read refs
