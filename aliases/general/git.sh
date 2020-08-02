@@ -46,6 +46,11 @@ gittag()
             git tag --list
             read -p "Tag Name to delete : " tag
             git tag --delete $tag
+
+            # Git command to delete a tag into the server
+            # pushing the delete command
+            git push --delete origin $tag
+
             shift
             ;;
 
@@ -96,16 +101,6 @@ gitpush()
     then
         # Git command to push all tags
         git push origin --tags
-
-        printf "Update tags?\n[Y or N]: "
-        read deleteTags
-        if [ "$deleteTags" == "Y" ] || [ "$deleteTags" == "y" ]
-        then
-            # Git command to delete a tag into the server
-            # pushing the delete command
-            git push origin :refs/tags/TAG
-        fi
     fi
 }
-
 
