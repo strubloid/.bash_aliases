@@ -13,77 +13,61 @@ alias gs="git status"
 # tags
 alias gt-tag-c="git tag "
 
-
-usage-gittag()
-{
-  echo "Usage: alphabet [ -a | --alpha ] [ -b | --beta ]
-                        [ -c | --charlie CHARLIE ]
-                        [ -d | --delta   DELTA   ] filename(s)"
-  exit 2
-}
-
 gittag()
 {
-#  for param in "$@"; do
-#    echo $param ==null
-#    if [ -z "$param" ]
-#    then
-#      printf "[ERR]: You must pass this argument to use this function"
-#    fi
-#  done
-printf "Welcome to GITtag\n"
+    printf "Strubloid::GitTag\n"
+    if [ -z "$1" ]
+    then
+      echo "Usage: Gittag [ a | add | -add | --add ] -> Add tag
+                          [ d | del | -del | --del ] -> Delete tag
+                          [ l | -l | --l | list | -list | --list ] -> List of tags"
+      exit 2
+    fi
 
-# Option strings
-SHORT=ad:
-LONG=add,del:
+    case "$1" in
+        a | add | -add | --add )
+            printf "Now you will be passing: Message, Tag name and Git Id (Optional)\n"
+            printf "(Optional)-> Means that will get the current commitID\n"
+            read -p "Message : " message
+            read -p "Tag Name : " tag
+            read -p "Git Hash : " hash
 
-# read the options
-OPTS=$(getopt --options $SHORT --long $LONG --name "$0" -- "$@")
+            printf "You said: $message | $tag | $hash | "
 
-if [ $? != 0 ] ; then echo "Failed to parse options...exiting." >&2 ; exit 1 ; fi
+            if [ -z "$hash" ]
+            then
+              git tag -a "$tag" -m "$message"
+            else
+              git tag -a "$tag" -m "$message" "$hash"
+            fi
+        shift
+        ;;
+        d | del | -del | --del )
+            read -p "Tag Name to delete : " tag
+            git tag --delete $tag
+            shift
+            ;;
+        l | -l | --l | list | -list | --list )
+            printf "With Refs? (enter for yes) anything else for no!\n>"
+            read refs
+            if [ -z "$refs" ]
+            then
+                git show-ref --tags
+            else
+                git tag --list
+            fi
 
-eval set -- "$OPTS"
-
-# set initial values
-VERBOSE=false
-
-# extract options and their arguments into variables.
-while true ; do
-  case "$1" in
-      -add | --add )
-        printf "Now you will be passing: Message, Tag name and Git Id (Optional)\n"
-        printf "(Optional)-> Means that will get the current commitID\n"
-        read -p "Message : " message
-        read -p "Tag Name : " tag
-        read -p "Git Id : " id
-        if [ -z "$id" ]
-        then
-          git tag -am $message $tag
-        else
-          git tag -am $message $tag $id
-        fi
-      shift
-      ;;
-    -del | --del )
-        read -p "Tagname to delete : " tag
-        git tag del $tag
-      shift
-      ;;
-    -- )
-      shift
-      break
-      ;;
-    *)
-      echo "Internal error!"
-      exit 1
-      ;;
-  esac
-done
-
-# Print the variables
-echo "VERBOSE = $VERBOSE"
-echo "FILE = $FILE"
-
+            shift
+            ;;
+        -- )
+            shift
+            return 0
+            ;;
+        *)
+            echo "Internal error!"
+            return 0
+            ;;
+    esac
 }
 
 gitpush()
