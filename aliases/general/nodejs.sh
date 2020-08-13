@@ -12,3 +12,17 @@ alias node-i-step2="npm i --save-dev nodemon"
 
 ## this will start the node dev environment
 alias nd-start="npm run devStart"
+
+
+basic-node-scrapper()
+{
+  # starting the NPM project in the current folder
+  npm init -y
+
+  # installing the minimum dependency for this project have scrapper ability
+  npm install axios cheerio puppeteer --save
+
+  # installing the dev tools
+  npm install nodemon --save-dev
+
+}
