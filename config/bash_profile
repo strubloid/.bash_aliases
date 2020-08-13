@@ -1,7 +1,14 @@
 #!/bin/bash
 
+## PAth for the usr binaries folder
 export PATH="$PATH:/usr/local/bin/"
+
 export PATH="/usr/local/git/bin:/sw/bin/:/usr/local/bin:/usr/local/:/usr/local/sbin:/usr/local/mysql/bin:$PATH"
+
+## adding the .local to our source path, requirement for a good NPM global on ~/.local/
+export PATH="~/.npm-global/bin:$PATH"
+
+# export NPM_CONFIG_PREFIX=~/.npm-global/
 
 ## adding the .bash_aliases file
 if [ -f ~/.bash_aliases ]; then

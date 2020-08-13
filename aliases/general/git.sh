@@ -77,30 +77,9 @@ gittag()
     esac
 }
 
-gitpush()
+# Updating the tags action
+gitUpdateTags()
 {
-    if [ "$1" == "tags" ]
-    then
-      # Git command to push all tags
-      git push origin --tags
-      return 0
-    fi
-    printf "Add Everything?\n[Y or N]: "
-    read addEverything
-    if [ "$addEverything" == "Y" ] || [ "$addEverything" == "y" ]
-    then
-        # Git command to push all tags
-        git add .
-    fi
-
-    if [ -z "$1" ]
-    then
-      printf "[ERR]: You must pass an argument to use this function"
-    else
-      printf "Git message: $1\n"
-      git commit -m "$1" && git push origin master
-    fi
-
     printf "Update tags?\n[Y or N]: "
     read updateTags
     if [ "$updateTags" == "Y" ] || [ "$updateTags" == "y" ]
@@ -108,4 +87,35 @@ gitpush()
         # Git command to push all tags
         git push origin --tags
     fi
+}
+
+# Gitpush function that will provide a different way to push
+# the content to the server
+gitpush()
+{
+    # Special key just for updating tags when is necessary
+    if [ "$1" == "tags" ]
+    then
+      gitUpdateTags
+      return 0
+    fi
+
+    printf "Add Everything?\n[Y or N]: "
+    read addEverything
+    if [ "$addEverything" == "Y" ] || [ "$addEverything" == "y" ]
+    then
+        git add . # Git command to add all tags
+    fi
+
+    printf "Message (Mandatory):\n[]: "
+    read commitMessage
+
+    if [ -z "$commitMessage" ]
+    then
+      printf "[ERR]: You must pass an argument to use this function"
+    else
+      printf "Git message: $commitMessage\n"
+      git commit -m "$commitMessage" && git push origin master
+    fi
+
 }

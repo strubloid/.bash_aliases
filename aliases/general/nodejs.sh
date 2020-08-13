@@ -5,10 +5,10 @@
 ## node js commands
 
 # adding the minimum dependencies
-alias node-i-step1="npm i express nongoose ejs"
+alias node-i-step1="npm i express mongoose ejs"
 
 ## adding dev dependencies
-alias node-i-step2="npm i --save-dev nodemon"
+alias node-i-step2="npm i --save-dev nodemon dotenv"
 
 ## this will start the node dev environment
 alias nd-start="npm run devStart"
@@ -26,3 +26,5 @@ basic-node-scrapper()
   npm install nodemon --save-dev
 
 }
+## This is to remove the necessity of run with sudo a local project
+alias fix-local-npm="sudo chown -R $(whoami) node_modules/"
