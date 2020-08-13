@@ -1,15 +1,20 @@
 #!/bin/bash
 
-## home folder
-HOME_FOLDER=$(echo $HOME)
-
 ## .bash_aliases file path
-export HOME_ALIASES="${HOME_FOLDER}/.bash_aliases"
-export HOME_PROFILE="${HOME_FOLDER}/.bash_profile"
-export HOME_PROMPT="${HOME_FOLDER}/.bash_prompt"
+export HOME_ALIASES="$HOME/.bash_aliases"
+export HOME_PROFILE="$HOME/.bash_profile"
+export HOME_PROMPT="$HOME/.bash_prompt"
+export HOME_GLOBAL="$HOME/.bash_g"
+export BASHRC="$HOME/.bashrc"
+export BASH_TEMPORARY_F='bash_temp'
 
-## bashrc file path
-export BASHRC="${HOME_FOLDER}/.bashrc"
+export BASH_GLOBAL_LINE=$(cat << END
+## installed by strubloid
+if [ -f ~/.bash_global ]; then
+    . ~/.bash_global
+fi
+END
+)
 
 export BASH_ALIASES_LINE=$(cat << END
 ## installed by strubloid
@@ -34,6 +39,3 @@ if [ -f ~/.git-completion.bash ]; then
 fi
 END
 )
-
-export BASH_TEMPORARY_F='bash_temp'
-export FILESTOREAD='files_to_read.txt'

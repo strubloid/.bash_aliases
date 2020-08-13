@@ -1,7 +1,7 @@
 #!/bin/bash
 
-## loading all variables
-source config/variables.sh
+source $(pwd)/config/variables.sh
+source ~/.bash_g
 
 ## This will check what is the operational system loaded
 function getOperationalSystem()
@@ -73,34 +73,38 @@ function createTempFile()
 ## This will setup the bash aliases file
 setupBashAliasFile()
 {
+  echoHeader "[Setup Bash Alias File]: "
+
   checkFileExists ${HOME_ALIASES}
   RETURN_CODE=$?
 
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echo "[]: Creating the ~/.bash_alias file"
+    echoLine "[]: Creating the ~/.bash_alias file"
     touch ${HOME_ALIASES}
 
   else
-    echo "[]: ~/.bash_alias already exists, moving on"
+    echoLine "[]: ~/.bash_alias already exists, moving on"
   fi
 }
 
 ## This will setup the bash profile file
 setupBashProfileFile()
 {
+  echoHeader "[Setup Bash Profile File]: "
+
   checkFileExists ${HOME_PROFILE}
   RETURN_CODE=$?
 
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echo "[]: Creating the ~/.bash_profile file"
-    touch ${HOME_PROFILE} && cp config/bash_profile ${HOME_PROFILE}
+    echoLine "[]: Creating the ~/.bash_profile file"
+    touch ${HOME_PROFILE} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_profile ${HOME_PROFILE}
 
   else
-    echo "[]: ~/.bash_profile already exists, moving on"
+    echoLine "[]: ~/.bash_profile already exists, moving on"
   fi
 
 }
@@ -108,28 +112,50 @@ setupBashProfileFile()
 ## This will setup the bash prompt file
 setupBashPromptFile()
 {
+  echoHeader "[Setup Bash Prompt File]: "
+
   checkFileExists ${HOME_PROMPT}
   RETURN_CODE=$?
 
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echo "[]: Creating the ~/.bash_prompt file"
-    touch ${HOME_PROMPT} && cp config/bash_prompt ${HOME_PROMPT}
+    echoLine "[]: Creating the ~/.bash_prompt file"
+    touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
 
   else
-    echo "[]: ~/.bash_prompt already exists, moving on"
+    echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
+}
+
+## Creating the bash_g for global things
+setupBashGlobalFile()
+{
+  echoHeader "[Setup Bash Global File]: "
+
+  checkFileExists ${HOME_GLOBAL}
+  RETURN_CODE=$?
+
+  ## checking if doesn't exist the file
+  if [[ ${RETURN_CODE} -eq "0" ]]; then
+    echoLine "[]: Creating the $BASH_ALIASES_PROJECT_FOLDER/config/bash_g file"
+    touch ${HOME_GLOBAL} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_g ${HOME_GLOBAL}
+  else
+    echoLine "[]: ~/.bash_global already exists, moving on"
+  fi
+
 }
 
 # This will update the terminal configurations
 updateBashTerminal()
 {
+  echoHeader "[Update Bash Terminal]: "
+
   if [ -f ${HOME_PROFILE} ]; then
     source "${HOME_PROFILE}"
-    echo "[]: updating terminal" ${HOME_PROFILE}
+    echoLine "[]: updating terminal" ${HOME_PROFILE}
   else
-    echo "[ERR]: missing file ~/.bash_profile"
+    echoLine "[ERR]: missing file ~/.bash_profile"
   fi
 
 }
@@ -143,9 +169,20 @@ updateBashTerminal()
 ## if [ -f ~/.bash_prompt ]; then
 ##    . ~/.bash_prompt
 ## fi
-upgradeElementsOnBashProfile() {
+upgradeElementsOnBashProfile()
+{
+  echoHeader "[Upgrade Elements On Bash Profile]: "
 
-  echo "[]: UPGRADE: Bash profile"
+  ## checking if exist the ~/.bash_g into ~/.bash_profile
+  checkStringExistIntoFile "~/.bash_global" ${HOME_PROFILE}
+  EXIST_GLOBAL=$?
+
+  ## This will add if the result isnt on ~/.bash_profile
+  if [[ ${EXIST_GLOBAL} -eq "0" ]]; then
+    printf "\n" >>${HOME_PROFILE} && echo "${BASH_GLOBAL_LINE}" >>${HOME_PROFILE}
+  else
+    echoLine "[]: ~/.bash_global already exists, moving on"
+  fi
 
   ## checking if exist the ~/.bash_aliases into ~/.bash_profile
   checkStringExistIntoFile "~/.bash_aliases" ${HOME_PROFILE}
@@ -155,7 +192,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_ALIAS} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_ALIASES_LINE}" >>${HOME_PROFILE}
   else
-    echo "[]: ~/.bash_aliases already exists, moving on"
+    echoLine "[]: ~/.bash_aliases already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_prompt into ~/.bash_profile
@@ -166,7 +203,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_PROMPT_LINE}" >>${HOME_PROFILE}
   else
-    echo "[]: ~/.bash_prompt already exists, moving on"
+    echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_prompt into ~/.bash_profile
@@ -180,18 +217,17 @@ upgradeElementsOnBashProfile() {
 
   gitCompletion=~/.git-completion.bash
   if [ ! -f "$gitCompletion" ]; then
-       curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
+      curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
   else
-    echo "[]: ~/.git-completeon already exists, moving on"
+      echoLine "[]: ~/.git-completeon already exists, moving on"
   fi
 
-  echo "[]: "
 }
 
 ## Generation/replecament of the .bash_aliases file
 generateBashAlias()
 {
-  echo "[]: Generating the ~/.bash_aliases file"
+  echoHeader "[Generate Bash Alias]: "
 
   # getting what is the operational system
   operationalSystem=$(getOperationalSystem);
@@ -207,9 +243,9 @@ generateBashAlias()
 
   # updating the file on the operational system
   cp ${BASH_TEMPORARY_F} ${HOME_ALIASES}
+  echoLine "[]: creating $HOME/.bash_aliases"
 
   # removing the temp file bash_temp
   removeTempFile
-
-  echo "[]: "
+  echoLine "[]: remove temp file ${BASH_TEMPORARY_F}"
 }

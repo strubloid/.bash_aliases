@@ -1,5 +1,7 @@
 #!/bin/bash
-source config/manager.sh
+
+source $(pwd)/config/global/variables.sh
+source $(pwd)/config/manager.sh
 
 # Step 1: Configuration upgrades
 upgradeElementsOnBashProfile

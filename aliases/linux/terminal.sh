@@ -19,9 +19,6 @@ alias psmem10='ps auxf | sort -nr -k 4 | head -10'
 ## pass options to free ##
 alias meminfo='free -m -l -t'
 
-## update of the bash aliases
-alias bashupdate="source ~/.bashrc"
-
 # Mate #
 alias restart-mate="gsettings reset-recursively org.mate.panel";
 

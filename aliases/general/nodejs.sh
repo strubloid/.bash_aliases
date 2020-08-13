@@ -18,12 +18,30 @@ alias fix-local-npm="sudo chown -R $(whoami) node_modules/"
 
 basic-node-scrapper()
 {
+  echoHeader "[Basic Node Scrapper]: "
+
   # starting the NPM project in the current folder
+  echoLine "[]: Starting the project: npm init -y"
   npm init -y
 
   # installing the minimum dependency for this project have scrapper ability
+  echoLine "[]: Installation of basic node modules"
   npm install axios cheerio puppeteer --save
 
   # installing the dev tools
+  echoLine "[]: Installation of the dev node modules"
   npm install nodemon --save-dev
+
+  # copying the .gitgnore basic file
+  GITIGNOREFILE=$BASH_ALIASES_PROJECT_FOLDER/import/.gitignore
+  EXISTGITGNORE=$(pwd)/.gitignore
+
+  if [ ! -f $EXISTGITGNORE ]
+  then
+    echoLine "[]: Copying $BASH_ALIASES_PROJECT_FOLDER/import/.gitignore"
+    cp "$BASH_ALIASES_PROJECT_FOLDER/import/.gitignore" .
+  else
+    echoLine "[]: Exist already .gitgnore file in the $(pwd)"
+  fi
+
 }
