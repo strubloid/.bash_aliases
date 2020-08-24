@@ -4,7 +4,6 @@
 export HOME_ALIASES="$HOME/.bash_aliases"
 export HOME_PROFILE="$HOME/.bash_profile"
 export HOME_PROMPT="$HOME/.bash_prompt"
-export HOME_GLOBAL="$HOME/.bash_g"
 export BASHRC="$HOME/.bashrc"
 export BASH_TEMPORARY_F='bash_temp'
 

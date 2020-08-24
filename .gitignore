@@ -14,7 +14,6 @@
 !config/
 
 #ignoring work aliases
-aliases/general/monsoon*
 aliases/ignore/*
 
 # ignoring the exported file to be coppied

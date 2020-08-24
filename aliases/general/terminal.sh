@@ -37,9 +37,6 @@ alias .6='cd ../../../../../../'            # Go back 6 directory levels
 
 alias bc='bc -l'                            # start the calculator with math support
 
-#   lr:  Full Recursive Directory Listing
-alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
-
 # main comand list
 alias root='sudo -i'                        # root alias
 alias wget='wget -c'                        # this one saved by butt so many times

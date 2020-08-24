@@ -1,7 +1,8 @@
 #!/bin/bash
 
+source $(pwd)/config/global/functions.sh
 source $(pwd)/config/variables.sh
-source ~/.bash_g
+source $(pwd)/config/global/variables.sh
 
 ## This will check what is the operational system loaded
 function getOperationalSystem()
@@ -126,24 +127,6 @@ setupBashPromptFile()
   else
     echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
-}
-
-## Creating the bash_g for global things
-setupBashGlobalFile()
-{
-  echoHeader "[Setup Bash Global File]: "
-
-  checkFileExists ${HOME_GLOBAL}
-  RETURN_CODE=$?
-
-  ## checking if doesn't exist the file
-  if [[ ${RETURN_CODE} -eq "0" ]]; then
-    echoLine "[]: Creating the $BASH_ALIASES_PROJECT_FOLDER/config/bash_g file"
-    touch ${HOME_GLOBAL} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_g ${HOME_GLOBAL}
-  else
-    echoLine "[]: ~/.bash_global already exists, moving on"
-  fi
-
 }
 
 # This will update the terminal configurations

@@ -6,30 +6,47 @@ PWD_PROJECT_FOLDER=$(pwd)
 ## It will be adding variables to the bash_profile file
 BASHRC_FILE="$HOME/.bashrc"
 
-## export PATH="/usr/local/bin:/usr/bin:/usr/local:/usr/sbin:/sbin:/bin" - minimum on your .bashrc
-
 ## Building how should be the line to write inside of bash_profile
 PATH_VARIABLE=$(cat << END
 export PATH="$PATH:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
 END
 )
 
+# Configuration of the bashAliasesProject folder
 BASH_ALIASES_PROJECT_FOLDER_LINE=$(cat << END
 export BASH_ALIASES_PROJECT_FOLDER=${PWD_PROJECT_FOLDER}
 END
 )
 
+# Project separator line
 SEPARATOR_BEFORE="#strubloid# .bash_aliases project global variables"
-SEPARATOR_AFTER="#strubloid# .bash_aliases project global variables\n"
+SEPARATOR_AFTER="#strubloid# .bash_aliases project global variables"
+
+# configuration that will be insert in the ~/.bashrc
+BASH_PROFILE_CONFIGURATION_LINE=$(cat << END
+\n
+$SEPARATOR_BEFORE\n
+$PATH_VARIABLE\n
+$BASH_ALIASES_PROJECT_FOLDER_LINE\n
+$SEPARATOR_AFTER\n
+
+END
+)
 
 ## Adding only if not exist that line
-if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"
-then
+if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
 
-  sed -i "s/if \[ -f ~\/\.bash_profile \]; then/\n&/g" $BASHRC_FILE
-  sed -i "/if \[ -f ~\/\.bash_profile \]; then/i $SEPARATOR_BEFORE" $BASHRC_FILE
-  sed -i "/if \[ -f ~\/\.bash_profile \]; then/i $PATH_VARIABLE" $BASHRC_FILE
-  sed -i "/if \[ -f ~\/\.bash_profile \]; then/i $BASH_ALIASES_PROJECT_FOLDER_LINE" $BASHRC_FILE
-  sed -i "/if \[ -f ~\/\.bash_profile \]; then/i $SEPARATOR_AFTER" $BASHRC_FILE
+  BASH_PROFILE_LINE_CHECK="if [ -f ~/.bash_profile ]; then"
+  if ! grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
+    echo -e ${BASH_PROFILE_CONFIGURATION_LINE} >> ${BASHRC_FILE}
+  else
+    BASH_PROFILE_UPGRADE_LINE=$(awk -v pattern="if.*.bash_profile.*then" \
+        -v line1="$SEPARATOR_BEFORE" -v line2="$PATH_VARIABLE" \
+        -v line3="$BASH_ALIASES_PROJECT_FOLDER_LINE" \
+        -v line4="$SEPARATOR_AFTER" \
+        -v bashrcfile="$BASHRC_FILE" \
+        "\$0 ~ pattern {print \"\"; print line1; print line2; print line3; print line4; print \"\"; print; next} 1" "$BASHRC_FILE")
 
+    echo -e "$BASH_PROFILE_UPGRADE_LINE" > "$BASHRC_FILE"
+  fi
 fi
