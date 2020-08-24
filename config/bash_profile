@@ -1,10 +1,5 @@
 #!/bin/bash
 
-## adding the .bash_g file
-if [ -f ~/.bash_g ]; then
-    . ~/.bash_g
-fi
-
 ## adding the .bash_aliases file
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
