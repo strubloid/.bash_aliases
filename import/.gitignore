@@ -24,3 +24,12 @@ aliases/ignore/*
 
 # ignoring git
 .gitconfig
+
+# Ignoring all enviroment files
+.env
+
+# Ignoring the node modules, that the server will be loading/updating later on
+node_modules
+
+# removing the .idea folder from the webstorm application configuration
+.idea
