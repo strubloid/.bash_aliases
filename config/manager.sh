@@ -5,75 +5,69 @@ source $(pwd)/config/variables.sh
 source $(pwd)/config/global/variables.sh
 
 ## This will check what is the operational system loaded
-function getOperationalSystem()
-{
-    case "$OSTYPE" in
-      linux*)   echo "linux" ;;
-      darwin*)  echo "mac" ;;
-      win*)     echo "windows" ;;
-      msys*)    echo "msys" ;;
-      cygwin*)  echo "cygwin" ;;
-      bsd*)     echo "bsd" ;;
-      solaris*) echo "solaris" ;;
-      *)        echo "unknown" ;;
-    esac
+function getOperationalSystem() {
+  case "$OSTYPE" in
+  linux*) echo "linux" ;;
+  darwin*) echo "mac" ;;
+  win*) echo "windows" ;;
+  msys*) echo "msys" ;;
+  cygwin*) echo "cygwin" ;;
+  bsd*) echo "bsd" ;;
+  solaris*) echo "solaris" ;;
+  *) echo "unknown" ;;
+  esac
 }
 
 ## This will remove the temporary file
-function removeTempFile()
-{
-   ## removing the old one if exist
-    if [ -f ${BASH_TEMPORARY_F} ]; then
-        rm ${BASH_TEMPORARY_F}
-    fi
+function removeTempFile() {
+  ## removing the old one if exist
+  if [ -f ${BASH_TEMPORARY_F} ]; then
+    rm ${BASH_TEMPORARY_F}
+  fi
 }
 
 ## This will check if a file exist
-checkFileExists()
-{
-    if [[ -f  $1 ]]; then
-        return 1
-    else
-        return 0
-    fi
+checkFileExists() {
+  if [[ -f $1 ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 ## Check if exist a string $1 inside of a file $2
-checkStringExistIntoFile()
-{
-    EXISTLINE=$(grep -F "$1" $2 )
-    if [[ ${EXISTLINE} ]]; then
-        return 1
-    else
-        return 0
-    fi
+checkStringExistIntoFile() {
+  EXISTLINE=$(grep -F "$1" $2)
+  if [[ ${EXISTLINE} ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 # Creation of the temp file that we will be using
 # to build the new bash_alias
-function createTempFile()
-{
-    # this folder will contain aliases that are common with all the OS
-    generalFolder="./aliases/general"
+function createTempFile() {
+  # this folder will contain aliases that are common with all the OS
+  generalFolder="./aliases/general"
 
-    # this is the folder that will contain the actual OS specifications
-    operationalSystemFolder="./aliases/$1"
+  # this is the folder that will contain the actual OS specifications
+  operationalSystemFolder="./aliases/$1"
 
-    # list of files to load the content
-    listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f ! -iname '*.swp')
+  # list of files to load the content
+  listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f ! -iname '*.swp')
 
-    for file in ${listOfFilesToUpdate}; do
+  for file in ${listOfFilesToUpdate}; do
 
-        printf '## (Strubloid::Start) FILE: ' >> ${BASH_TEMPORARY_F} && printf  $file >> ${BASH_TEMPORARY_F} &&  printf '\n\n' >> ${BASH_TEMPORARY_F};
-        tail -n +2  ${file} >> ${BASH_TEMPORARY_F}
-        printf '\n## (Strubloid::End) ## FILE: ' >> ${BASH_TEMPORARY_F} && printf  $file >> ${BASH_TEMPORARY_F} &&  printf '\n\n' >> ${BASH_TEMPORARY_F};
+    printf '## (Strubloid::Start) FILE: ' >>${BASH_TEMPORARY_F} && printf $file >>${BASH_TEMPORARY_F} && printf '\n\n' >>${BASH_TEMPORARY_F}
+    tail -n +2 ${file} >>${BASH_TEMPORARY_F}
+    printf '\n## (Strubloid::End) ## FILE: ' >>${BASH_TEMPORARY_F} && printf $file >>${BASH_TEMPORARY_F} && printf '\n\n' >>${BASH_TEMPORARY_F}
 
-    done
+  done
 }
 
 ## This will setup the bash aliases file
-setupBashAliasFile()
-{
+setupBashAliasFile() {
   echoHeader "[Setup Bash Alias File]: "
 
   checkFileExists ${HOME_ALIASES}
@@ -91,8 +85,7 @@ setupBashAliasFile()
 }
 
 ## This will setup the bash profile file
-setupBashProfileFile()
-{
+setupBashProfileFile() {
   echoHeader "[Setup Bash Profile File]: "
 
   checkFileExists ${HOME_PROFILE}
@@ -111,8 +104,7 @@ setupBashProfileFile()
 }
 
 ## This will setup the bash prompt file
-setupBashPromptFile()
-{
+setupBashPromptFile() {
   echoHeader "[Setup Bash Prompt File]: "
 
   checkFileExists ${HOME_PROMPT}
@@ -130,8 +122,7 @@ setupBashPromptFile()
 }
 
 # This will update the terminal configurations
-updateBashTerminal()
-{
+updateBashTerminal() {
   echoHeader "[Update Bash Terminal]: "
 
   if [ -f ${HOME_PROFILE} ]; then
@@ -152,8 +143,7 @@ updateBashTerminal()
 ## if [ -f ~/.bash_prompt ]; then
 ##    . ~/.bash_prompt
 ## fi
-upgradeElementsOnBashProfile()
-{
+upgradeElementsOnBashProfile() {
   echoHeader "[Upgrade Elements On Bash Profile]: "
 
   ## checking if exist the ~/.bash_g into ~/.bash_profile
@@ -200,20 +190,19 @@ upgradeElementsOnBashProfile()
 
   gitCompletion=~/.git-completion.bash
   if [ ! -f "$gitCompletion" ]; then
-      curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
+    curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
   else
-      echoLine "[]: ~/.git-completeon already exists, moving on"
+    echoLine "[]: ~/.git-completeon already exists, moving on"
   fi
 
 }
 
 ## Generation/replecament of the .bash_aliases file
-generateBashAlias()
-{
+generateBashAlias() {
   echoHeader "[Generate Bash Alias]: "
 
   # getting what is the operational system
-  operationalSystem=$(getOperationalSystem);
+  operationalSystem=$(getOperationalSystem)
 
   # removing the temp file bash_temp
   removeTempFile
@@ -231,4 +220,22 @@ generateBashAlias()
   # removing the temp file bash_temp
   removeTempFile
   echoLine "[]: remove temp file ${BASH_TEMPORARY_F}"
+}
+
+# This will set the environment variable for this folder
+setupEnvironmentVariable() {
+  echoHeader "[Setup Environment Variables]: "
+
+  # checking if exist the line already
+  checkStringExistIntoFile "BASH_ALIASES_PROJECT_FOLDER" ${HOME_PROFILE}
+  EXIST_BASH_ALIASES_PROJECT_FOLDER=$?
+
+  ## This will add if the result isnt on ~/.bash_profile
+  if [[ ${EXIST_BASH_ALIASES_PROJECT_FOLDER} -eq "0" ]]; then
+    printf "\n" >>${HOME_PROFILE} && \
+    echo "export BASH_ALIASES_PROJECT_FOLDER=$(pwd)" >> ${HOME_PROFILE}
+  else
+    echoLine "[]: BASH_ALIASES_PROJECT_FOLDER already exists, moving on"
+  fi
+
 }
