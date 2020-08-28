@@ -93,13 +93,6 @@ gitUpdateTags()
 # the content to the server
 gitpush()
 {
-    # Special key just for updating tags when is necessary
-    if [ "$1" == "tags" ]
-    then
-      gitUpdateTags
-      return 0
-    fi
-
     printf "Add Everything?\n[Y or N]: "
     read addEverything
     if [ "$addEverything" == "Y" ] || [ "$addEverything" == "y" ]
@@ -118,4 +111,9 @@ gitpush()
       git commit -m "$commitMessage" && git push origin master
     fi
 
+}
+
+hp(){
+
+  gitpush && git push heroku master
 }

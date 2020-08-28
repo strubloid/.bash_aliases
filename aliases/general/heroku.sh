@@ -4,8 +4,6 @@
 
 alias heroku-login="heroku login"
 alias heroku-login-shell="heroku login --interactive"
-alias heroku-push="git push heroku master"
-
 
 # Adding a heroku repository to the current git project
 heroku-add-repository()
