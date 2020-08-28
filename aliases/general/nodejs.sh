@@ -8,10 +8,12 @@
 alias node-i-step1="npm i express mongoose ejs"
 
 ## adding dev dependencies
-alias node-i-step2="npm i --save-dev nodemon dotenv"
+alias node-i-step2="npm i --save-dev nodemon node-sass dotenv"
 
 ## this will start the node dev environment
 alias nd-start="npm run devStart"
+
+alias nd-package-update="npm install && npm install --safe-dev"
 
 ## This is to remove the necessity of run with sudo a local project
 alias fix-local-npm="sudo chown -R $(whoami) node_modules/"
