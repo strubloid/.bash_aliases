@@ -15,21 +15,26 @@ heroku-install() {
   sudo snap install --classic heroku
 }
 
-
 create-heroku-nodejs-project() {
 
-
   if [ -n "$1" ]; then
-    git clone https://github.com/mars/heroku-cra-node.git $1 && \
-    cd $1 && \
-    rm -rf LICENSE README.md .git .gitignore && \
-    rm package.json
+#    git clone https://github.com/mars/heroku-cra-node.git $1
+    cd $1
+#    rm -rf LICENSE README.md .git .gitignore
+#    rm package.json
+#    rm package-lock.json
+    PACKAGEJSON=$BASH_ALIASES_PROJECT_FOLDER/import/package.json
 
+    echo -e "[]: Copying $PACKAGEJSON"
+    cp "$PACKAGEJSON" .
+
+    # sed -i 's/"[app-name]"' "$1" '/g' package.json
+    cd ..
 
 
   else
+
     echo "You must specify the project name\n"
   fi
-
 
 }
