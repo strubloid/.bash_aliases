@@ -12,8 +12,6 @@
 !install.sh
 !upgrade.sh
 !config/
-!import/.gitignore
-!import/package.json
 
 #ignoring work aliases
 aliases/ignore/*
