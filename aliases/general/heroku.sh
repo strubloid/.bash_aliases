@@ -11,6 +11,11 @@ heroku-add-repository() {
   heroku git:remote -a "$1"
 }
 
+# this will purge the cache on the server
+heroku-server-clean(){
+  heroku repo:purge_cache -a $1
+}
+
 # Basic steps to install heroku on ubuntu
 heroku-install() {
   sudo snap install --classic heroku
@@ -22,7 +27,7 @@ heroku-node-new() {
         npx create-react-app $1
         cd $1
 
-        gitignore=$BASH_ALIASES_PROJECT_FOLDER/import/.gitignore
+        gitignore=$BASH_ALIASES_PROJECT_FOLDER/import/node/.gitignore
         echo -e "[]: Copying $gitignore"
         cp "$gitignore" .
 

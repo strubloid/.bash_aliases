@@ -35,13 +35,13 @@ basic-node-scrapper()
   npm install nodemon --save-dev
 
   # copying the .gitgnore basic file
-  GITIGNOREFILE=$BASH_ALIASES_PROJECT_FOLDER/import/.gitignore
+  GITIGNOREFILE=$BASH_ALIASES_PROJECT_FOLDER/import/node/.gitignore
   EXISTGITGNORE=$(pwd)/.gitignore
 
   if [ ! -f $EXISTGITGNORE ]
   then
-    echoLine "[]: Copying $BASH_ALIASES_PROJECT_FOLDER/import/.gitignore"
-    cp "$BASH_ALIASES_PROJECT_FOLDER/import/.gitignore" .
+    echoLine "[]: Copying $BASH_ALIASES_PROJECT_FOLDER/import/node/.gitignore"
+    cp "$BASH_ALIASES_PROJECT_FOLDER/import/node/.gitignore" .
   else
     echoLine "[]: Exist already .gitgnore file in the $(pwd)"
   fi

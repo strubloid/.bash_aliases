@@ -13,7 +13,8 @@
 !upgrade.sh
 !config/
 !import/.gitignore
-!import/package.json
+!import/node/package.json
+!import/node/.gitignore
 
 #ignoring work aliases
 aliases/ignore/*

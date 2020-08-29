@@ -44,7 +44,6 @@ if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
         -v line1="$SEPARATOR_BEFORE" -v line2="$PATH_VARIABLE" \
         -v line3="$BASH_ALIASES_PROJECT_FOLDER_LINE" \
         -v line4="$SEPARATOR_AFTER" \
-        -v bashrcfile="$BASHRC_FILE" \
         "\$0 ~ pattern {print \"\"; print line1; print line2; print line3; print line4; print \"\"; print; next} 1" "$BASHRC_FILE")
 
     echo -e "$BASH_PROFILE_UPGRADE_LINE" > "$BASHRC_FILE"
