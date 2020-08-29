@@ -112,7 +112,3 @@ gitpush()
     fi
 
 }
-
-hp(){
-  gitpush && git push heroku master
-}
