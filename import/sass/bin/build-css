@@ -1,0 +1,24 @@
+# This is the main function that will build the css
+# in the same folder, example
+#
+#   public/component/test.scss
+#   will generate
+#   public/component/test.css
+#
+function buildCssInTheSameFolder()
+{
+  componentsFolder=$1
+  echo $componentsFolder
+  if [ -d $componentsFolder ]; then
+    for filepathScss in $(find ${componentsFolder} -name '*.scss'); do
+        filepathCss=${filepathScss/scss/css}
+        folder=${filepathScss%/*}
+
+        # this is the command that will generate the Css file on the same path of the Scss
+        node-sass --include-path $folder $filepathScss $filepathCss
+    done
+  fi
+}
+
+buildCssInTheSameFolder "src"
+buildCssInTheSameFolder "src/components"

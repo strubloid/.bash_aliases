@@ -1,3 +1,11 @@
+# ignoring the exported file to be coppied
+.bash_aliases_export
+
+# removing all .swp files
+*.swp
+
+#ignoring work aliases
+aliases/ignore/*
 
 # this will ignore everything except my exceptions below
 /*
@@ -7,23 +15,12 @@
 !.bash_aliases
 !.gitignore
 !.bashrc
-!rafael/
 !aliases/
 !install.sh
 !upgrade.sh
 !config/
+!import/
 !import/.gitignore
 !import/node/package.json
 !import/node/.gitignore
-
-#ignoring work aliases
-aliases/ignore/*
-
-# ignoring the exported file to be coppied
-.bash_aliases_export
-
-# removing all .swp files
-*.swp
-
-# ignoring git
-.gitconfig
+!import/sass/bin/
