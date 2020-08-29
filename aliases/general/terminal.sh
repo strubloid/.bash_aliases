@@ -4,6 +4,25 @@
 
 alias bashupdate="source ~/.bash_profile"
 alias rcbashupdate="source ~/.bashrc"
+
+terminal-update()
+{
+  CurrentFolder=$(pwd)
+  echo -e "[you are]: $CurrentFolder \n"
+  ProjectFolder=$(getProjectFolder)
+
+  # move to the bash_aliases project folder and execute the upgrade function
+  echo -e "[moving to]:$ProjectFolder \n[upgrade]: starting upgrade of data\n"
+  cd $ProjectFolder && ./upgrade.sh
+
+  # this will update the bash
+  source "$HOME/.bash_profile"
+
+  # back to the previous folder that you're working
+  cd $CurrentFolder
+
+}
+
 #   -----------------------------------------------------
 #   This is a function to search for a word in a folder
 #   The main command is:

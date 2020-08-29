@@ -26,9 +26,9 @@ heroku-node-new() {
         echo -e "[]: Copying $gitignore"
         cp "$gitignore" .
 
-            until read -r -p "Git URL (Mandatory): " gitrepositoryurl && test "$gitrepositoryurl" != ""; do
-              continue
-            done
+          until read -r -p "Git URL (Mandatory): " gitrepositoryurl && test "$gitrepositoryurl" != ""; do
+            continue
+          done
 
         printf "Git URL: $gitrepositoryurl\n"
         git remote add origin $gitrepositoryurl

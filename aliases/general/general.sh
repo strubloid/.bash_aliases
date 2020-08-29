@@ -2,6 +2,13 @@
 
 # Strubloid::general::general
 
+
+# This will return where is the project folder
+getProjectFolder()
+{
+  echo $BASH_ALIASES_PROJECT_FOLDER;
+}
+
 # This will change a content of a file, you have the syntax
 # changeInFile [file] [search] [repplace]
 # sample:

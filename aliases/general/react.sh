@@ -16,15 +16,29 @@ react-create(){
 react-install-sass(){
 
   # you must install the node-saas package
-  npm install node-sass --save
+#  npm install node-sass --save
 
   # Renaming the App.css or creating a new App.scss
-  APPCSS="src/App.css";
-  if [ -f ${APPCSS} ]; then
-    mv $APPCSS src/App.scss
+  AppCss="src/App.css";
+  AppScss="src/App.scss";
+
+  if [ -f ${AppCss} ]; then
+    mv $AppCss $AppScss
   else
-    touch src/App.scss
+      if [ ! -f ${AppScss} ]; then
+
+        # create the file
+        touch src/App.scss
+
+        # Copy to the src/App.scss base file
+        ImportAppScss=$BASH_ALIASES_PROJECT_FOLDER/import/App.scss
+        echo -e "[]: Copying $ImportAppScss"
+        cp "$ImportAppScss" $AppScss
+      else
+        echo -e "[]: you have it already, moving on!"
+      fi
   fi
+
 
 
 }
