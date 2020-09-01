@@ -5,22 +5,30 @@
 alias bashupdate="source ~/.bash_profile"
 alias rcbashupdate="source ~/.bashrc"
 
+## Function that will update the terminal
 terminal-update()
 {
   CurrentFolder=$(pwd)
-  echo -e "[you are]: $CurrentFolder \n"
+  echo -e "[you are]: $CurrentFolder"
   ProjectFolder=$(getProjectFolder)
 
   # move to the bash_aliases project folder and execute the upgrade function
-  echo -e "[moving to]:$ProjectFolder \n[upgrade]: starting upgrade of data\n"
+  echo -e "[moving to]:$ProjectFolder \n[upgrade]: starting upgrade of data"
   cd $ProjectFolder && ./upgrade.sh
 
   # this will update the bash
+  echo -e "\n[updating]:$HOME/.bash_profile"
   source "$HOME/.bash_profile"
 
   # back to the previous folder that you're working
+  echo -e "[back to]: $CurrentFolder"
   cd $CurrentFolder
 
+}
+
+## Alias for the terminal update
+tu (){
+  terminal-update
 }
 
 #   -----------------------------------------------------
