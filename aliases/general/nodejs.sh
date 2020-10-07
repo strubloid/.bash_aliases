@@ -3,6 +3,8 @@
 # Strubloid::general::nodejs
 
 ## node js commands
+# cleaning the node cache
+alias npm-clean="npm cache clean --force"
 
 # adding the minimum dependencies
 alias node-i-step1="npm i express mongoose ejs"
