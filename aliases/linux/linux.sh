@@ -90,8 +90,10 @@ alias linux-monitor-scale-big="sudo xrandr --output eDP1 --scale 1.0x1.0"
 
 alias create12Gswap="sudo fallocate -l 12G /swapfile && sudo chmod 600 /swapfile &&  && sudo mkswap /swapfile && sudo swapon /swapfile"
 alias save12Gswap="sudo echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab"
-
-
 #alias fix-monitor-rafa="xrandr --output eDP1 --auto --pos 3200x0 --dpi 272 --output DP1 --auto --dpi 272 --scale 1.66x1.66 --pos 0x0 --fb 6400x1800"
-
 # https://unix.stackexchange.com/questions/313612/scaling-problem-using-ultra-hd-resolution-between-a-laptop-and-a-monitor
+
+function whatIsTheCurrentDriveWifi()
+{
+    nmcli
+}
