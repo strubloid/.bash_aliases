@@ -1,10 +1,18 @@
 #!/bin/bash
 
 # Strubloid::linux::ubuntu
+function check-network()
+{
+    # this will see the dns cache list
+    sudo systemd-resolve --statistics
+}
 
 function fix-network() {
+
+    ## command to clean the dns cache
+     sudo systemd-resolve --flush-caches
     # lshw -C network
-    sudo modprobe -r ath10k_pci && sudo modprobe ath10k_pci
+    # sudo modprobe -r ath10k_pci && sudo modprobe ath10k_pci
     ## check file  ~/bin/resetWireless
 }
 

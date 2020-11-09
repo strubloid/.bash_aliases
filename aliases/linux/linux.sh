@@ -132,8 +132,3 @@ function dns-cache-flush-all() {
 }
 
 
-function fix-network() {
-    # lshw -C network
-    sudo modprobe -r ath10k_pci && sudo modprobe ath10k_pci
-    ## check file  ~/bin/resetWireless
-}
