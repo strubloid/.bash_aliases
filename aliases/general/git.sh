@@ -5,7 +5,12 @@
 # git aliases
 alias git-revert="git clean -d -f -f"
 alias gitup-master="git checkout master && git pull origin master && git fetch --all"
-alias git-clean-merged=branches="git checkout master && git pull origin master && git fetch --all"
+
+# A way to clean all fetched itms
+git-clean-fetched-branches()
+{
+    git branch -D `git branch --merged | grep -v \* | xargs`
+}
 
 # git basic commands
 alias gc="git commit -m"
