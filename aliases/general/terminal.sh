@@ -93,7 +93,8 @@ alias bc='bc -l'                    # start the calculator with math support
 # main comand list
 alias root='sudo -i'                # root alias
 alias wget='wget -c'                # this one saved by butt so many times
-alias cp='cp -iv'                   # Preferred 'cp' implementation
+alias cp='cp -rf'                   # Preferred 'cp' implementation
+alias cpc='cp -iv'                   # Preferred 'cp' implementation
 alias mv='mv -iv'                   # Preferred 'mv' implementation
 alias mkdir='mkdir -pv'             # Preferred 'mkdir' implementation
 alias less='less -FSRXc'            # Preferred 'less' implementation

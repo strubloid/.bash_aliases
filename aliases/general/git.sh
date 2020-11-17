@@ -6,10 +6,28 @@
 alias git-revert="git clean -d -f -f"
 alias gitup-master="git checkout master && git pull origin master && git fetch --all"
 
-# A way to clean all fetched itms
-git-clean-fetched-branches()
+# A correct way to remove a hotfix branch on localhost after merged with master branch by a code reviewer
+gitflow-clean-hotfix()
 {
-    git branch -D `git branch --merged | grep -v \* | xargs`
+    read -p "Hotfix Branch Name: " 
+    if [ -z "$hotfixBranchName" ]
+    then
+        printf "[Err]: You must say what is the hotfix branch name to remove\m"
+    else
+        git flow hotfix delete $hotfixBranchName -f
+    fi
+}
+
+# A correct way to remove a feature branch on localhost after merged with master branch by a code reviewer
+gitflow-clean-feature()
+{
+    read -p "Hotfix Branch Name: " 
+    if [ -z "$featureBranchName" ]
+    then
+        printf "[Err]: You must say what is the feature branch name to remove\m"
+    else
+        git flow feature delete $featureBranchName -f
+    fi
 }
 
 # git basic commands
