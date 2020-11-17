@@ -7,7 +7,7 @@ search-biggest-files()
     if [ -z "$1" ]
     then
         echo "You must pass the folder that you will be checking";
-        exit 0;
+        return 1
     fi
 
     if [ -z "$2" ]; then

@@ -2,10 +2,44 @@
 
 # Strubloid::general::angular
 
+# alias angular-new-component=""
+angular-new-component()
+{
+    if [ -z "$1" ]
+    then
+        echo "[Missing Argument]: Component Name ";
+        return 1
+    fi
+    ng g c "compoenets/$1"
+}
+
+angular-new-service()
+{
+    if [ -z "$1" ]
+    then
+        echo "[Missing Argument]: Service Name ";
+        return 1
+    fi
+    ng g s "service/$1"
+}
+
+angular-new-material()
+{
+    ng add @angular/material
+}
+
 basic-angular-app()
 {
     # reference: https://www.youtube.com/watch?v=1tRLveSyNz8
     npm install -g @angular/cli
+
+    # creating the new angular project with command line option
+    printf "You must say the name of the project: "
+    read projectName
+    ng new $projectName
+
+
+
 }
 
 basic-node-API() {
