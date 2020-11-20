@@ -1,6 +1,12 @@
 #!/bin/bash
 
 # Strubloid::linux::ubuntu
+
+function cleanScreenshotKeyValue()
+{
+    gsettings set org.gnome.settings-daemon.plugins.media-keys screenshot ''
+}
+
 function check-network()
 {
     # this will see the dns cache list
