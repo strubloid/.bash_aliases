@@ -46,3 +46,6 @@ function install-hp-deskJet-2600()
     fi
 
 }
+
+alias gksu='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY'
+alias gksudo='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY'

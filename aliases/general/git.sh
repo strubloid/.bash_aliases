@@ -136,3 +136,26 @@ gitpush()
     fi
 
 }
+
+c-blocworx()
+{
+  currentBranch=$(git branch --show-current)
+  branchTag=$( echo $currentBranch | grep -Eo 'BLCX-[0-9]{1,4}')
+
+  # Showing differences to help the build of the message
+  git status
+
+  # Adding all files
+  git add .
+
+  printf "Message (Mandatory):\n[type the commit message]: "
+  read commitMessage
+
+  # Commit message
+  echo "[message]: $branchTag: $commitMessage\n"
+  git commit -m "$branchTag: $commitMessage"
+
+  # Pushing to
+  echo "[push to]: git push origin $currentBranch\n"
+  git push origin $currentBranch
+}
