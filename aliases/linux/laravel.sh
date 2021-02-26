@@ -30,9 +30,34 @@ function lv-create-model() {
 
 }
 
-function lv-re-run-migration() {
+function lv-seed-run() {
 
-    #    2020_11_20_150032_grid_cells_to_grid_cell_data
+  if [ -z "$1"]; then
+
+    if [ ! -f "/tmp/laravel_previous_seed.dat" ] ; then
+      seedToRun=0
+    else
+      seedToRun=`cat /tmp/laravel_previous_seed.dat`
+    fi
+
+    if [ -z "$seedToRun" ] ; then
+      printf "[]: Seed Object name: "
+      read seedToRun
+    fi
+
+  else
+    seedToRun="$1"
+  fi
+
+  # and save it for next time
+  echo "${seedToRun}" > /tmp/laravel_previous_seed.dat
+
+  # running the thing
+  vagrant ssh -c "cd /var/www/cartolytics && php artisan db:seed --class=$seedToRun"
+
+}
+
+function lv-re-run-migration() {
 
     printf "[]: Migration file name: "
     read migrationName
