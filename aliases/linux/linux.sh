@@ -135,3 +135,4 @@ function find-new-file-current-folder()
 {
     find . -daystart -ctime 0 -print
 }
+

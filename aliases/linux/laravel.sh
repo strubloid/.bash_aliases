@@ -32,7 +32,7 @@ function lv-create-model() {
 
 function lv-seed-run() {
 
-  if [ -z "$1"]; then
+  if [ -z "$1" ]; then
 
     if [ ! -f "/tmp/laravel_previous_seed.dat" ] ; then
       seedToRun=0
@@ -53,7 +53,7 @@ function lv-seed-run() {
   echo "${seedToRun}" > /tmp/laravel_previous_seed.dat
 
   # running the thing
-  vagrant ssh -c "cd /var/www/cartolytics && php artisan db:seed --class=$seedToRun"
+  vagrant ssh -c "cd /var/www/cartolytics && && composer dump-autoload &&  php artisan db:seed --class=$seedToRun"
 
 }
 

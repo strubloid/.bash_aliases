@@ -12,6 +12,12 @@ function ssh-stage-blocworx()
   ssh rafael@80.93.26.128 -p 22
 }
 
+function ssh-live-copy-blocworx()
+{
+  ssh root@185.57.119.34 -p 5422
+  ssh strubloid@185.57.119.34 -p 5422
+  #dxXq9i3P52
+}
 
 function vagrantReload()
 {
@@ -19,6 +25,7 @@ function vagrantReload()
 }
 
 function blocworx-setup-step1() {
+
     # Download of the virutal box
     sudo apt install virtualbox
 
@@ -68,6 +75,21 @@ function blocworx-setup-cartolytics() {
 
     # move the empty_blocworx clean file to vagrant root folder
 
+
+#    127.0.0.1       scotchbox       scotchbox
+#    127.0.0.1       localhost
+#    127.0.1.1       vagrant.vm      vagrant
+#    ::1     localhost ip6-localhost ip6-loopback
+#    ff02::1 ip6-allnodes
+#    ff02::2 ip6-allrouters
+#
+#    127.0.0.1       dev2.blocworx.local
+#    192.168.33.10   phpmyadmin.local
+#    192.168.33.10   dev.blocworx.local
+#    192.168.33.10   demo1.blocworx.local
+#    192.168.33.10   angularjs.local
+
+
     # Creating the database on local environment
     # vagrant@scotchbox:/var/www$ echo "create database cartolytics" | mysql -u root -proot
 
@@ -91,8 +113,8 @@ function blocworx-setup-cartolytics() {
 
     # create files: phpmyadmin.conf and cartolytics.conf
     # activate files doing a2ensite
-    # sudo a2ensite phpmyadmin.conf
-    # sudo a2ensite cartolytics.conf
+#     sudo a2ensite phpmyadmin.conf
+#     sudo a2ensite cartolytics.conf
 
     # Restart the server
     # sudo service apache2 restart

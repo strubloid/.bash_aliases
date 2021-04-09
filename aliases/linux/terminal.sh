@@ -7,6 +7,12 @@
 # Preferred 'ls' implementation
 alias ls='ls -FGlAhp --color=auto'
 
+ls-watch(){
+watch -n 1 'stat -c "- %s %n" *'
+}
+
+
+
 #   lr:  Full Recursive Directory Listing
 alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
 
