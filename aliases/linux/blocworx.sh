@@ -2,6 +2,70 @@
 
 # Strubloid::linux::blocworx
 
+
+#function createRouteBlocworx()
+#{
+#
+#  # ng g m components/scanStation/data --module app-routing
+#
+#}
+
+function changingTheDatabase()
+{
+  # reference: https://dev.to/kenfai/laravel-artisan-cache-commands-explained-41e1#:~:text=To%20clear%20your%20application%20cache,()%3B%20Facade%20method%20via%20code.
+  # first you must change on the .env file in your local folder
+
+
+  # cleaning the configuration cache
+  php artisan config:clear
+
+  # second you must clean the php cache
+  php artisan cache:clear
+
+  # this will clean all caches
+  php artisan optimize:clear
+
+  # only if necessary
+  # clean if a package isn' t showing up
+  # composer dump-autoload
+
+  # npm clean
+  # npm cache clean --force
+
+  # extra: cleaning the routes cache
+  # php artisan route:clear
+
+  # extra: cleaning the views cache
+  # php artisan view:clear
+
+  # extra: cleaning the events cache
+  # php artisan event:clear
+
+  # extra: cleaning the applciation cache
+  # php artisan cache:clear
+
+}
+
+function findingDatabaseLocalhost ()
+{
+  # 1 check file: app/Http/Middleware/IsUser.php
+
+  # 2 - handle function you must add
+  ```
+    $databases = \DB::select('show databases');
+    $currentDatabase = \DB::select('select database()');
+  ```
+
+  # 3 adding user permission to specific pages
+  # select of the place that you will be adding data:  select * from stage.cartolytics_customer_shared_station
+
+  # 4 cant find cartolyticsCustomerID user?
+  # app/Http/Middleware/SwitchDatabase.php
+  # check query: select * from stage.cartolytics_customer
+
+
+}
+
 function ssh-live-blocworx()
 {
   ssh rafael@185.57.119.163 -p 5422
@@ -9,7 +73,13 @@ function ssh-live-blocworx()
 
 function ssh-stage-blocworx()
 {
+#  80.93.26.128
   ssh rafael@80.93.26.128 -p 22
+}
+
+function ssh-aws-blocworx()
+{
+   ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@34.254.191.198
 }
 
 function ssh-live-copy-blocworx()
