@@ -77,16 +77,28 @@ function ssh-stage-blocworx()
   ssh rafael@80.93.26.128 -p 22
 }
 
+function aws-blocworx()
+{
+    if [ -z "$1" ]
+    then
+#        ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@172-31-18-120
+#        ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@52.30.205.57
+        ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@54.78.239.127
+    else
+      ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@$1
+    fi
+}
+
+
 function ssh-aws-blocworx()
 {
-   ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@34.254.191.198
+   ssh -i /home/strubloid/.ssh/BlocworxTemplateServer.pem ubuntu@52.30.205.57
 }
 
 function ssh-live-copy-blocworx()
 {
   ssh root@185.57.119.34 -p 5422
   ssh strubloid@185.57.119.34 -p 5422
-  #dxXq9i3P52
 }
 
 function vagrantReload()

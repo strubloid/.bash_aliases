@@ -12,6 +12,7 @@ export PATH="$PATH:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr
 END
 )
 
+
 # Configuration of the bashAliasesProject folder
 BASH_ALIASES_PROJECT_FOLDER_LINE=$(cat << END
 export BASH_ALIASES_PROJECT_FOLDER=${PWD_PROJECT_FOLDER}

@@ -59,14 +59,22 @@ function lv-seed-run() {
 
 function lv-re-run-migration() {
 
+  if [ -z "$1" ]; then
+
     printf "[]: Migration file name: "
     read migrationName
+
     if [ -z "$migrationName" ]; then
         printf "[Err]: You must inform the specific migration name (without the extension '.php') name\m"
     else
         path="/database/migrations/$migrationName.php"
-        vagrant ssh -c "cd /var/www/cartolytics && php artisan migrate --path=$path"
     fi
+
+  else
+    path="/database/migrations/$1.php"
+  fi
+
+  vagrant ssh -c "cd /var/www/cartolytics && php artisan migrate:refresh --path=$path"
 
 }
 

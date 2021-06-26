@@ -18,3 +18,12 @@ apt-refresh-all-keys()
    sudo apt-key adv --refresh-keys --keyserver keyserver.ubuntu.com
 }
 
+apt-clean-temporary ()
+{
+  sudo apt-get clean
+}
+
+apt-clean-unsused ()
+{
+  sudo apt-get autoremove
+}
