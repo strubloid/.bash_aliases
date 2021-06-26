@@ -9,6 +9,14 @@ function  l-show-ram-speed() {
 
 function l-show-ram() {
   printf "Current Memory Ram Status\n"
-  free –m
+  sudo /bin/su -c "free –m"
 }
 
+function firewall-log-off(){
+  sudo ufw logging off
+}
+
+function firewall-log-on ()
+{
+  sudo ufw logging low
+}
