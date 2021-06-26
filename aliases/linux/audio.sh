@@ -3,7 +3,7 @@
 # Strubloid::linux::audio
 
 reload-audio() {
-  sudo alsa force-reload
+  pulseaudio -k && sudo alsa force-reload
 }
 
 
