@@ -2,6 +2,44 @@
 
 # Strubloid::linux::laravel
 
+function lv-create-command() {
+    if [ -z "$1" ]; then
+      printf "[]: Command Name "
+      read commandName
+
+      if [ -z "$commandName" ]; then
+          printf "[Err]: You must inform what should be the command to run\n"
+      else
+          command="$commandName"
+      fi
+  else
+    command="$1"
+  fi
+
+  vagrant ssh -c "cd /var/www/cartolytics && php artisan make:command $command"
+}
+
+function lv-run-command() {
+
+    printf "[Tip]: You must get whatever will be on the \$signature of the app/console/commands \n\n"
+
+    if [ -z "$1" ]; then
+      printf "[]: Command Name "
+      read commandName
+
+      if [ -z "$commandName" ]; then
+          printf "[Err]: You must inform what should be the command to run\n"
+      else
+          command="$commandName"
+      fi
+  else
+    command="$1"
+  fi
+
+  vagrant ssh -c "cd /var/www/cartolytics && php artisan $command"
+}
+
+
 function lv-create-migration-table() {
     printf "[]: Task name: "
     read taskName
