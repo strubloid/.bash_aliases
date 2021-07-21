@@ -30,6 +30,11 @@ gitflow-clean-feature()
     fi
 }
 
+git-multiple-hotfix-on()
+{
+  git config --set gitflow.multi-hotfix true
+}
+
 # git basic commands
 alias gc="git commit -m"
 alias gs="git status"
