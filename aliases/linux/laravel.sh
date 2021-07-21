@@ -19,6 +19,17 @@ function lv-create-command() {
   vagrant ssh -c "cd /var/www/cartolytics && php artisan make:command $command"
 }
 
+
+function lv-scheduler-list() {
+    vagrant ssh -c "cd /var/www/cartolytics && php artisan schedule:list"
+}
+
+function lv-run-scheduler() {
+
+    printf "[Tip]: This will run all scheduled commands on app/Console/Kernel.php\n\n"
+    vagrant ssh -c "cd /var/www/cartolytics && php artisan schedule:run"
+}
+
 function lv-run-command() {
 
     printf "[Tip]: You must get whatever will be on the \$signature of the app/console/commands \n\n"

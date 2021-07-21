@@ -10,6 +10,126 @@
 #
 #}
 
+#function thingsThatIranOnTemplateServer2()
+#{
+#  sudo apt install php7.4-gd
+#  #  NOTICE: Not enabling PHP 7.4 FPM by default.
+#  #  NOTICE: To enable PHP 7.4 FPM in Apache2 do:
+#  #  NOTICE: a2enmod proxy_fcgi setenvif
+#  #  NOTICE: a2enconf php7.4-fpm
+#  #  NOTICE: You are seeing this message because you have apache2 package installed.
+#  sudo apt install php7.4-zip
+#  composer update
+#}
+
+function thingsThatIranOnStage()
+{
+
+  ## changed to root
+  sudo su -
+
+  sudo apt-get install software-properties-common python-software-properties && sudo apt-get update
+
+  sudo apt install php7.4-common php7.4-mysql php7.4-xml php7.4-xmlrpc php7.4-curl php7.4-gd php7.4-imagick php7.4-cli php7.4-dev php7.4-imap php7.4-mbstring php7.4-opcache php7.4-soap php7.4-zip php7.4-intl -y
+
+  ##  tried https://www.digitalocean.com/community/questions/how-to-upgrade-php-7-0-33-to-7-4-7-on-ubuntu-16-04-nginx
+
+  ## tried
+  sudo chown -R $USER:www-data vendor/ && sudo apt install php7.4-gd php7.4-zip && composer update
+
+  sudo add-apt-repository ppa:ondrej/php && sudo apt-get update
+
+}
+
+function sourcesListToUpdateLines()
+{
+
+  # edit sources.list
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal main restricted
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal-updates main restricted
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal universe
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal-updates universe
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal multiverse
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal-updates multiverse
+#  deb http://us.archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
+#  deb http://security.ubuntu.com/ubuntu focal-security main restricted
+#  deb http://security.ubuntu.com/ubuntu focal-security universe
+#  deb http://security.ubuntu.com/ubuntu focal-security multiverse
+
+  sudo apt install -f -y
+
+  ##Restarting services possibly affected by the upgrade:
+  ##cron: restarting...done.
+  ##snmpd: restarting...done.
+  ##postfix: restarting...done.
+  ##mysql: restarting...FAILED! (1)
+  ##atd: restarting...done.
+  ##apache2: restarting...done.
+
+  sudo apt install php7.4-gd php7.4-zip
+
+  ## fix mysql issue
+  sudo mkdir /var/run/mysqld
+  sudo touch /var/run/mysqld/mysqld.sock
+  sudo chown -R mysql /var/run/mysqld
+  sudo /etc/init.d/mysql restart
+
+  # reference: https://askubuntu.com/questions/1089310/how-to-resolve-service-start-limit-hit
+  sudo systemctl reset-failed mysql.service
+
+  sudo vim /lib/systemd/system/mysql.service
+  ## remove line Restart=on-failure
+  sudo systemctl daemon-reload
+
+  ## https://support.plesk.com/hc/en-us/articles/213939865
+
+  ## root backup mysql
+  # /root/etc-mysql-backup/mysql
+  # conf.d  debian.cnf  debian-start  my.cnf  my.cnf.bak  my.cnf.fallback  mysql.cnf  mysql.conf.d
+
+  ## https://askubuntu.com/questions/760724/16-04-upgrade-broke-mysql-server
+  sudo mv /etc/mysql/debian.cnf /etc/mysql/debian.cnf.bak
+  sudo apt purge mysql-server mysql-server-5.7 mysql-server-core-5.7
+  sudo apt purge mysql-server mysql-server-* mysql-server-core-*
+  sudo apt install mysql-server
+
+  sudo systemctl enable mysql.service
+  sudo apt install -f
+
+  mkdir /var/run/mysqld
+  chown mysql.mysql /var/run/mysqld
+  chmod 700 /var/run/mysqld
+
+  cd /root/downloads
+  wget https://dev.mysql.com/get/mysql-apt-config_0.8.17-1_all.deb
+  # pick the option ubuntu focal
+  # MySQL Server & Cluster (Currently selected: mysql-5.7)
+  # piuck mysql-8.0
+  sudo dpkg -i mysql-apt-config_0.8.17-1_all.deb && sudo apt update && sudo apt install mysql-server
+  # Use Strong Password Encryption (RECOMMENDED)                                                                                            │
+
+  ## this made it work again (restart systemd on the fly)
+  systemctl daemon-reexec
+
+  sudo apt-get purge php5*
+  # Perform upgrade on database for phpmyadmin with dbconfig-common?                                                                                                       │
+  # no
+  sudo apt-get install php-mbstring php-curl php-xml -y
+
+  # changed on composer.json
+  # "pusher/pusher-php-server": "^7.0",
+
+  composer require pusher/pusher-php-server
+  composer require milon/barcode
+  composer require tymon/jwt-auth --ignore-platform-reqs
+
+  composer clearcache
+  composer selfupdate
+  composer dumpautoload
+  composer update
+
+}
+
 function changingTheDatabase()
 {
   # reference: https://dev.to/kenfai/laravel-artisan-cache-commands-explained-41e1#:~:text=To%20clear%20your%20application%20cache,()%3B%20Facade%20method%20via%20code.

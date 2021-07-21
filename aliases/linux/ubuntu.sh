@@ -13,6 +13,27 @@ function check-network()
     sudo systemd-resolve --statistics
 }
 
+# ref: https://github.com/apache/incubator-mxnet/issues/5385
+function remove-nvidia-back-to-intel()
+{
+  sudo apt-get purge nvidia*
+  sudo apt-get install --reinstall xserver-xorg-video-intel libgl1-mesa-glx libgl1-mesa-dri xserver-xorg-core
+  sudo dpkg-reconfigure xserver-xorg
+
+  # crtl + alt + f1
+  # sudo service lightdm stop
+  # sudo init 3
+
+}
+
+function check-video() {
+  lspci -k | grep -EA3 'VGA|3D|Display'
+}
+
+function fix-video() {
+  LIBGL_ALWAYS_SOFTWARE=1 obs
+}
+
 function fix-network() {
 
     ## command to clean the dns cache
