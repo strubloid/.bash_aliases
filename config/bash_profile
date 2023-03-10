@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# This is the part that will get all the variables
+if [ -f ~/.bash_variables ]; then
+   . ~/.bash_variables
+fi
+
+## adding the .bash_aliases file
+if [ -f ~/.bash_aliases ]; then
+    echo "[Bash Alias 5]: enabled"
+    . ~/.bash_aliases
+fi
+
+# This will contain global things for bash
+if [ -f ~/.bash_global ]; then
+    . ~/.bash_global
+fi
+
+# this will load the basic alias file
+if [ -f ~/.bash_blocworx ]; then
+    echo "[Bash Blocworx 3]: enabled"
+  . ~/.bash_blocworx
+fi
+
+# This is the git completion shortcuts
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi
+
+# this will load the prompt that users will be getting when access the ssh
+if [ -f ~/.bash_prompt ]; then
+    . ~/.bash_prompt
+fi
+
+## adding the .bash_prompt file
+if [ -f ~/.zshrc ]; then
+    . ~/.zshrc
+fi

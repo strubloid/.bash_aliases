@@ -1,0 +1,28 @@
+# This will run the environment variables
+if [ -f ~/.cron/environment_variables ]; then
+    . ~/.cron/environment_variables
+fi
+
+# NVM installation
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# global variables
+export PATH="/home/strubloid/.npm-global/bin:/home/strubloid/.nvm/versions/node/v18.15.0/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/bin:/usr/local:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
+
+# blocworx alias folder
+export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
+
+# Server variables
+export BASH_ALIASES_PROJECT_FOLDER=/home/strubloid/rafael/tools/.bash_aliases
+export MACHINE_HOSTNAME=RAFAEL-SERVER
+
+export GOOGLE_APPLICATION_CREDENTIALS="/home/strubloid/rafael/Documents/Blocworx/client/blocworx-project.json"
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
+export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
+
+
+# Node configurations
+# export NODE_OPTIONS=--max-old-space-size=4096
+

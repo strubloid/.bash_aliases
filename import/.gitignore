@@ -1,0 +1,35 @@
+
+# this will ignore everything except my exceptions below
+/*
+/*/
+
+# [exceptions] files that i want to keep it
+!.bash_aliases
+!.gitignore
+!.bashrc
+!rafael/
+!aliases/
+!install.sh
+!upgrade.sh
+!config/
+
+#ignoring work aliases
+aliases/ignore/*
+
+# ignoring the exported file to be coppied
+.bash_aliases_export
+
+# removing all .swp files
+*.swp
+
+# ignoring git
+.gitconfig
+
+# Ignoring all enviroment files
+.env
+
+# Ignoring the node modules, that the server will be loading/updating later on
+node_modules
+
+# removing the .idea folder from the webstorm application configuration
+.idea
