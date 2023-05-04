@@ -126,18 +126,17 @@ commit-git() {
 # This will commit in git and push the code
 commit ()
 {
-
   # Getting the current branch name
   CURRENT_BRANCH=$(git branch --show-current)
 
   # Getting the current branch ID for the commit
   CURRENT_BRANCH_ID=$(git branch --show-current | grep -Po 'BLCXT?-[0-9]*')
 
-  # mounting the commit message in the format that jira accepts
+  # Commit message
   COMMIT_MESSAGE="$CURRENT_BRANCH_ID: $1"
 
   echo "-----------------------------------------------------------------------------"
-  echo "------------------------------ Blocworx Commit ------------------------------"
+  echo "------------------------------ Git Commit -----------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
   echo "[JIRA ID] - $CURRENT_BRANCH_ID"
