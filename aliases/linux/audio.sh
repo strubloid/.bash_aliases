@@ -2,25 +2,21 @@
 
 # Strubloid::linux::audio
 
-fix-installation()
-{
-  sudo apt-get install --reinstall alsa-base linux-image-`uname -r` libasound2 alsa-utils alsa-tools
-}
+# References
+# https://unix.stackexchange.com/questions/248991/alsa-not-detecting-the-good-sound-card
+# https://askubuntu.com/questions/1115671/blueman-protocol-not-available
+fix-audio(){
 
-fix-audio() {
+  echo "[Audio] Fixing the audio v2"
+
+  echo "[Purge] alsa-base pulseaudio pulseaudio-module-bluetooth  "
+  sudo apt purge alsa-base pulseaudio pulseaudio-module-bluetooth   -y
+
+  echo "[Re-innstall] alsa-base pulseaudio"
+  sudo apt install alsa-base pulseaudio pulseaudio-module-bluetooth  -y
 
   ALSABASE="/etc/modprobe.d/alsa-base.conf"
-  BLACKLIST="/etc/modprobe.d/blacklist.conf"
-
-
-  # https://unix.stackexchange.com/questions/248991/alsa-not-detecting-the-good-sound-card
-  #  options snd_hda_intel index=0
-  #options snd_hda_codec_hdmi index=1
-  #options snd_hda_intel index=2
-  #options snd_hda_codec_hdmi index=-2
-  #alias snd-card-0 snd-hda-intel
-  #alias sound-slot-0 snd-hda-intel
-  #alias sound-slot-0 snd-card-0
+  echo "[Configure]: $ALSABASE"
 
   LINE1="options snd-hda-intel model=generic"
   if ! grep -qF "$LINE1" "$ALSABASE"; then
@@ -46,6 +42,9 @@ fix-audio() {
       echo "[] - OK"
   fi
 
+  BLACKLIST="/etc/modprobe.d/blacklist.conf"
+  echo "[Configure]: $BLACKLIST"
+
   LINE4="blacklist snd_soc_skl"
   if ! grep -qF "$LINE4" "$BLACKLIST"; then
     echo "[+] Adding: $LINE4"
@@ -54,39 +53,22 @@ fix-audio() {
       echo "[] - OK"
   fi
 
-  pulseaudio -k && sudo alsa force-reload
+  echo "[Kill process]: pulseaudio"
+  pulseaudio -k
 
-#  sudo alsactl init 0
+  echo "[Reload]: alsa"
+  sudo alsa force-reload
 
+  echo "[Apply]: new alsa configuration"
   aplay -lL
 
+  echo "[Bluettoth]: Install/load module"
+  sudo apt-get install pulseaudio-module-bluetooth
+  pactl load-module module-bluetooth-discover
+
 }
-
-#reload-audio() {
-#  pulseaudio -k && sudo alsa force-reload
-#}
-
-reinstall-audio(){
-  sudo apt purge alsa-base pulseaudio -y
-  sudo apt install alsa-base pulseaudio -y
-}
-
-#fix-reload()
-#{
-#  pulseaudio --start
-#}
 
 test-sound()
 {
   sudo aplay /usr/share/sounds/alsa/Front_Center.wav
 }
-
-# Didnt work
-#asundfix()
-#{
-#  sudo mv /var/lib/alsa/asound.state /var/lib/alsa/asound.state.old
-#  sudo alsactl --file /var/lib/alsa/asound.state store
-#  sudo alsa force-reload
-#  mv  ~/.config/pulse/ ~/.config/pulse_old/
-#  pulseaudio -k
-#}
