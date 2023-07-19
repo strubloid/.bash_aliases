@@ -25,3 +25,5 @@ aliases/ignore/*
 !import/node/.gitignore
 !import/rafa.zsh-theme
 !import/sass/bin/
+
+config/global/search_words.txt
