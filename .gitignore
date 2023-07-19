@@ -26,4 +26,5 @@ aliases/ignore/*
 !import/rafa.zsh-theme
 !import/sass/bin/
 
+## have the file there is important to the function to work
 search/search_words.txt
