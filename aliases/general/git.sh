@@ -169,3 +169,23 @@ c-blocworx()
   echo "[push to]: git push origin $currentBranch\n"
   git push origin $currentBranch
 }
+
+## This will ignore files from pushing changes from them
+git-ignore-file-from-commit(){
+
+  if [ -z "$1" ]
+  then
+    read -p "What is the file to remove from git status? " fileToRemoveFromGitStatus
+
+    ## Making sure that the file exist before remove from the git status
+    while [ ! -f "$fileToRemoveFromGitStatus" ]; do
+        echo "[$fileToRemoveFromGitStatus]: does not exist"
+        read -p "What is the file to remove from git status? " fileToRemoveFromGitStatus
+    done
+
+  fi
+
+  # This will run the removal of the file
+  git update-index --assume-unchanged "$fileToRemoveFromGitStatus"
+
+}
