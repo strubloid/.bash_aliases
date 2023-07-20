@@ -28,3 +28,5 @@ aliases/ignore/*
 
 ## have the file there is important to the function to work
 search/search_words.txt
+search/found_elements.csv
+search/not_found_elements.csv

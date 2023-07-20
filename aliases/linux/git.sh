@@ -146,3 +146,49 @@ commit ()
   # commit of the thing
   git add . && git commit -m "$COMMIT_MESSAGE" && git push origin "$CURRENT_BRANCH"
 }
+
+
+## this is the action that you need to do to reset a branch
+# to a previous stage that was committed by mistake the other ones
+## afterwards.
+git-reset-hard(){
+
+  # Getting the current branch name
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  echo "[Reverting]: $CURRENT_BRANCH"
+  read -p "can we continue? [y/N]" canContinue
+
+  ## this will start only if a user is ok about what is the branch
+  ## to revert
+  if [[ "$canContinue" =~ ^(yes|y|Y|Yes|YES)$ ]]
+  then
+
+    # Loading the commit message
+    if [ -z "$1" ]
+    then
+        read -p "[Branch ID]: " GIT_BRANCH_REFERENCE
+    else
+        GIT_BRANCH_REFERENCE="$1"
+    fi
+
+    GIT_LOG=$(git log | grep -q "$GIT_BRANCH_REFERENCE"; echo $?)
+
+    ## checking if the log exist
+    if [ "$GIT_LOG" -eq 0 ]; then
+
+      ## git reset hard to that log id
+      git reset --hard "$GIT_BRANCH_REFERENCE"
+
+      ## git clean
+      git clean -f
+
+      ## update repository
+      git push -f origin "$CURRENT_BRANCH"
+
+    fi
+
+  fi
+
+
+}

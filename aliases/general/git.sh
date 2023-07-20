@@ -182,7 +182,8 @@ git-ignore-file-from-commit(){
         echo "[$fileToRemoveFromGitStatus]: does not exist"
         read -p "What is the file to remove from git status? " fileToRemoveFromGitStatus
     done
-
+  else
+    fileToRemoveFromGitStatus="$1"
   fi
 
   # This will run the removal of the file
