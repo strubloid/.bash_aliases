@@ -53,6 +53,9 @@ fix-audio(){
       echo "[] - OK"
   fi
 
+  echo "[HDMI FIX]: Remove previous setup on ~/config/pulse and ~/.pulse"
+  rm -rf ~/.config/pulse/* && rm -rf ~/.pulse*
+
   echo "[Kill process]: pulseaudio"
   pulseaudio -k
 
