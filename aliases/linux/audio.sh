@@ -2,6 +2,12 @@
 
 # Strubloid::linux::audio
 
+## this will fix the hdmi not found sometimes when sound isn't there, you must just run this command
+##  and it will be fixed.
+fix-hdmi(){
+  sudo killall pulseaudio; rm -rf ~/.config/pulse/* ; rm -rf ~/.pulse*
+}
+
 # References
 # https://unix.stackexchange.com/questions/248991/alsa-not-detecting-the-good-sound-card
 # https://askubuntu.com/questions/1115671/blueman-protocol-not-available
