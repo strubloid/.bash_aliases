@@ -11,6 +11,10 @@ function check-network() {
   sudo systemd-resolve --statistics
 }
 
+function whatIsMyIpOutside(){
+  curl ifconfig.me
+}
+
 # ref: https://github.com/apache/incubator-mxnet/issues/5385
 #      https://askubuntu.com/questions/893922/ubuntu-16-04-gives-x-error-of-failed-request-badvalue-integer-parameter-out-o
 function remove-nvidia-back-to-intel() {
