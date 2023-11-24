@@ -26,3 +26,5 @@ export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxalias
 # Node configurations
 # export NODE_OPTIONS=--max-old-space-size=4096
 
+##  flatpack update for a fix
+export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/strubloid/.local/share/flatpak/exports/share"
