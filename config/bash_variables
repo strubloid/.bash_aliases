@@ -28,6 +28,7 @@ export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxalias
 # wine configurations
 # export WINEARCH=win32
 export WINEARCH=win64
+export DISPLAY=:0
 
 # Node configurations
 # export NODE_OPTIONS=--max-old-space-size=4096
