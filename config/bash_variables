@@ -11,6 +11,9 @@ export NVM_DIR="$HOME/.nvm"
 # global variables
 export PATH="/home/strubloid/.npm-global/bin:/home/strubloid/.nvm/versions/node/v18.15.0/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/bin:/usr/local:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
 
+## adding qt 5.15 version
+export PATH="/home/strubloid/.local/share/flatpak/app/net.lutris.Lutris/x86_64/stable/2e580c2d27b44e1d2313ad7c73df33c2705aec8ef4b030e5a209278c0e0771e1/files/bin:$PATH"
+
 # blocworx alias folder
 export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
 
@@ -22,6 +25,9 @@ export GOOGLE_APPLICATION_CREDENTIALS="/home/strubloid/rafael/Documents/Blocworx
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
 
+# wine configurations
+# export WINEARCH=win32
+export WINEARCH=win64
 
 # Node configurations
 # export NODE_OPTIONS=--max-old-space-size=4096
