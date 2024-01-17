@@ -16,6 +16,15 @@ fi
 END
 )
 
+export BASH_VARIABLES_LINE=$(cat << END
+## installed by strubloid
+if [ -f ~/.bash_variables ]; then
+    . ~/.bash_variables
+fi
+END
+)
+
+
 export BASH_ALIASES_LINE=$(cat << END
 ## installed by strubloid
 if [ -f ~/.bash_aliases ]; then
