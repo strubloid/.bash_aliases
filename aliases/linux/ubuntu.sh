@@ -157,3 +157,12 @@ function add-user-to-www-data-group()
   sudo usermod -a -G www-data "$USER"
 }
 
+function system-check-errors()
+{
+  sudo dmesg -w
+}
+
+function watch-system()
+{
+  sudo dmesg -w
+}
