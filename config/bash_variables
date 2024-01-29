@@ -1,29 +1,19 @@
-# This will run the environment variables
-if [ -f ~/.cron/environment_variables ]; then
-    . ~/.cron/environment_variables
-fi
-
 # NVM installation
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # global variables
-export PATH="/home/strubloid/.npm-global/bin:/home/strubloid/.nvm/versions/node/v18.15.0/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/bin:/usr/local:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
+export PATH="$HOME/.npm-global/bin:$HOME/.nvm/versions/node/v18.15.0/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/bin:/usr/local:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
 
 ## adding qt 5.15 version
-export PATH="/home/strubloid/.local/share/flatpak/app/net.lutris.Lutris/x86_64/stable/2e580c2d27b44e1d2313ad7c73df33c2705aec8ef4b030e5a209278c0e0771e1/files/bin:$PATH"
+export PATH="$HOME/.local/share/flatpak/app/net.lutris.Lutris/x86_64/stable/2e580c2d27b44e1d2313ad7c73df33c2705aec8ef4b030e5a209278c0e0771e1/files/bin:$PATH"
 
 # blocworx alias folder
-export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
+export BLOCWORX_ALIAS_FOLDER='/media/games/apps/.bash_aliases/blocworxaliases'
 
 # Server variables
-export BASH_ALIASES_PROJECT_FOLDER=/home/strubloid/rafael/tools/.bash_aliases
-export MACHINE_HOSTNAME=RAFAEL-SERVER
-
-export GOOGLE_APPLICATION_CREDENTIALS="/home/strubloid/rafael/Documents/Blocworx/client/blocworx-project.json"
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
-export BLOCWORX_ALIAS_FOLDER='/home/strubloid/webroot/blocworx/box/blocworxaliases'
+export MACHINE_HOSTNAME=zero
 
 # wine configurations
 # export WINEARCH=win32
@@ -34,4 +24,4 @@ export DISPLAY=:1
 # export NODE_OPTIONS=--max-old-space-size=4096
 
 ##  flatpack update for a fix
-export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:/home/strubloid/.local/share/flatpak/exports/share"
+export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"

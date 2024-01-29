@@ -7,6 +7,7 @@ export HOME_VARIABLES="$HOME/.bash_variables"
 export HOME_PROMPT="$HOME/.bash_prompt"
 export BASHRC="$HOME/.bashrc"
 export BASH_TEMPORARY_F='bash_temp'
+export BASH_ALIASES_PROJECT_FOLDER=$(pwd)
 
 export BASH_GLOBAL_LINE=$(cat << END
 ## installed by strubloid

@@ -125,7 +125,7 @@ setupBashVariablesFile() {
 
 ## This will setup the bash prompt file
 setupBashPromptFile() {
-  echoHeader "[Setup Bash Prompt File]: "
+  echoHeader "[Setup Bash Prompt File]: $HOME_PROMPT"
 
   checkFileExists ${HOME_PROMPT}
   RETURN_CODE=$?
@@ -134,6 +134,9 @@ setupBashPromptFile() {
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
     echoLine "[]: Creating the ~/.bash_prompt file"
+    echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt"
+    echoLine "[]: to $HOME_PROMPT"
+
     touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
 
   else
