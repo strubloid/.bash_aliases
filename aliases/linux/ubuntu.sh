@@ -166,3 +166,30 @@ function watch-system()
 {
   sudo dmesg -w
 }
+
+## make sure to check how we can create a new shortcut for
+## be able to find using the window key search.
+function creatingShortcutUbuntu(){
+
+# Multiline variable sample
+SHORTCUT=$(cat << END
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IntelliJ IDEA Community Edition
+Comment=Develop with pleasure!
+Exec=/PATH/TO/IDEA/EXECUTABLE
+Icon=/PATH/TO/IDEA/ICON-FILE-SVG
+Terminal=false
+StartupNotify=true
+StartupWMClass=jetbrains-idea-ce
+Categories=Development;IDE;Java;
+
+
+END
+)
+  # configure the variables before run it
+  echo $SHORTCUT > ~/.local/share/applications/idea.desktop
+
+}
