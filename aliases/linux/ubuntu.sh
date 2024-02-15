@@ -169,18 +169,31 @@ function watch-system()
 
 ## make sure to check how we can create a new shortcut for
 ## be able to find using the window key search.
+## TODO: Double check this, feels needs add more functionality
 function creatingShortcutUbuntu(){
 
+    # getting name
+    read -p "What is the name of it? " name
+
+    # getting the path to binary
+    read -p "What is binary path? " path
+
+## /home/zero/programs/Linux_Unreal_Engine_5.3.2/Engine/Binaries/Linux
+
+    # getting the path to image
+    read -p "What is the path to the SVG file?" svg
+
+## /home/zero/programs/Linux_Unreal_Engine_5.3.2/unreal-engine.svg
 # Multiline variable sample
 SHORTCUT=$(cat << END
 
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=IntelliJ IDEA Community Edition
+Name=$name
 Comment=Develop with pleasure!
-Exec=/PATH/TO/IDEA/EXECUTABLE
-Icon=/PATH/TO/IDEA/ICON-FILE-SVG
+Exec=$path
+Icon=$svg
 Terminal=false
 StartupNotify=true
 StartupWMClass=jetbrains-idea-ce
@@ -190,6 +203,6 @@ Categories=Development;IDE;Java;
 END
 )
   # configure the variables before run it
-  echo $SHORTCUT > ~/.local/share/applications/idea.desktop
+  echo $SHORTCUT > ~/.local/share/applications/$name.desktop
 
 }

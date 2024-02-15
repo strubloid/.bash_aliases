@@ -41,6 +41,11 @@ alias linux-memory-clean-1="sudo echo 1 > /proc/sys/vm/drop_caches"        # cle
 alias linux-memory-clean-2="sudo echo 2 > /proc/sys/vm/drop_caches"        # cleaning Dentries and Inodes
 alias linux-memory-clean-3="sudo echo 3 > /proc/sys/vm/drop_caches"        # cleaninig page cache, dentries and Inodes
 
+function cleanAllMemories()
+{
+  sudo echo 3 > /proc/sys/vm/drop_caches && sudo swapoff -a && sudo swapon -a
+}
+
 # Trackpad #
 alias touchpad-off="synclient TouchpadOff=1"                               # Trackpad off on UBUNTU
 alias touchpad-on="synclient TouchpadOff=0"                                # Trackpad on on UBUNTU

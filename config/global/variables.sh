@@ -52,18 +52,18 @@ if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
 fi
 
 
-# Multiline variable sample
-EXAMPLE1=$(cat << END
-
-# You can add comments
-any.kind.of.variables=100
-
-END
-)
-
-read -r -d '' EXAMPLE1 << EOM
-This is line 1.
-This is line 2.
-Line 3.
-EOM
+## Multiline variable sample
+#EXAMPLE1=$(cat << END
+#
+## You can add comments
+#any.kind.of.variables=100
+#
+#END
+#)
+#
+#read -r -d '' EXAMPLE1 << EOM
+#This is line 1.
+#This is line 2.
+#Line 3.
+#EOM
 
