@@ -180,8 +180,12 @@ upgradeElementsOnBashProfile() {
     echoLine "[]: ~/.bash_global already exists, moving on"
   fi
 
+  ## checking if exist the ~/.bash_aliases into ~/.bash_profile
+  checkStringExistIntoFile "~/.bash_variables" ${HOME_PROFILE}
+  EXIST_VARIABLES=$?
+
   ## This will add if the result isn't on ~/.bash_profile
-  if [[ ${EXIST_ALIAS} -eq "0" ]]; then
+  if [[ ${EXIST_VARIABLES} -eq "0" ]]; then
     printf "\n" >>${HOME_PROFILE} && echo "${BASH_VARIABLES_LINE}" >>${HOME_PROFILE}
   else
     echoLine "[]: ~/.bash_variables already exists, moving on"
