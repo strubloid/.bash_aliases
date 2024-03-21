@@ -320,6 +320,11 @@ compress-file-ffmpeg()
         FILE_TO_COMPRESS_FFMPEG="$1"
     fi
 
-    echo "Generating the file: $compressed" "_" "$1"
+    ## creating the compress filename
+    COMPRESSED_FILE_NAME="compressed_$FILE_TO_COMPRESS_FFMPEG"
+
+    echo "Generating the file: $COMPRESSED_FILE_NAME"
+
+    ffmpeg -i "$FILE_TO_COMPRESS_FFMPEG" -vf "scale=1280:-2" -c:v libx264 -crf 28 -preset medium -c:a aac -b:a 128k "$COMPRESSED_FILE_NAME"
 }
 
