@@ -306,3 +306,20 @@ bazinga-remove-extension()
   find . -name "*.$fileExtension" -type f | xargs rm -rf
 
 }
+
+
+
+
+compress-file-ffmpeg()
+{
+    # Loading the file to compress
+    if [ -z "$1" ]
+    then
+        read -p "[file]: " FILE_TO_COMPRESS_FFMPEG
+    else
+        FILE_TO_COMPRESS_FFMPEG="$1"
+    fi
+
+    echo "Generating the file: $compressed" "_" "$1"
+}
+
