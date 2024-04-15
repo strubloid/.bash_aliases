@@ -328,3 +328,8 @@ compress-file-ffmpeg()
     ffmpeg -i "$FILE_TO_COMPRESS_FFMPEG" -vf "scale=1280:-2" -c:v libx264 -crf 28 -preset medium -c:a aac -b:a 128k "$COMPRESSED_FILE_NAME"
 }
 
+
+allFilesToWav()
+{
+  find . -type f -name "*.mp3" -print0 | xargs -0 -I {} ffmpeg -i {} -acodec pcm_s16le -ar 44100 {}.wav
+}

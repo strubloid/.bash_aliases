@@ -31,6 +31,13 @@ git-update-develop() {
   printf "OK\n"
 }
 
+# This will update the develop branch
+git-update-main() {
+  printf "[MAIN] - "
+  git checkout main -q && git pull origin main -q && git checkout . -q
+  printf "OK\n"
+}
+
 # This will update if you still have release branches in your local machine
 update-release() {
   CURRENT_RELEASE_BRANCH=$(git branch -l | grep -Po 'release.*')
@@ -108,6 +115,64 @@ commit-update-git() {
 ## 1 - add the new things
 ## 2 - add a message
 ## 3 - update the same branch on the remote
+## 4 - update the main
+commit-update-master-git() {
+
+  # Getting the current branch name
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  # Loading the commit message
+  if [ -z "$1" ]
+  then
+      read -p "[Commit Message]: " COMMIT_MESSAGE
+  else
+      # mounting the commit message in the format that jira accepts
+      COMMIT_MESSAGE="$1"
+  fi
+
+  # Loading should update the base code
+  if [ -z "$2" ]
+  then
+      read -p "Update Main [y/n] : " UPDATE_MAIN
+  else
+      # mounting the commit message in the format that jira accepts
+      UPDATE_MAIN="$1"
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Main Commit  ----------------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
+
+  # commit of the thing and push
+  printf "[COMMIT] - "
+  git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
+  printf "OK\n"
+
+  ## check if the update was passed with y/yes as an option
+  if [[ "$UPDATE_MAIN" =~ [yY](es)?$ ]]; then
+
+    # Update of the other branches if needed
+    mainBranch="main"
+
+    echo "[UPDATES] - Master & Develop "
+    if [[ "$CURRENT_BRANCH" != "$mainBranch" ]]; then
+      git-update-main
+    fi
+
+  fi
+
+  # this will be back to your current branch that you are working on
+  git checkout "$CURRENT_BRANCH" -q
+}
+
+
+## This will be the quick shortcut, to:
+## 1 - add the new things
+## 2 - add a message
+## 3 - update the same branch on the remote
 commit-git() {
 
   # Loading the commit message
@@ -120,6 +185,21 @@ commit-git() {
   fi
 
   commit-update-git "$COMMIT_MESSAGE" "No"
+
+}
+
+commit-main() {
+
+  # Loading the commit message
+  if [ -z "$1" ]
+  then
+      read -p "[Commit Message]: " COMMIT_MESSAGE
+  else
+      # mounting the commit message in the format that jira accepts
+      COMMIT_MESSAGE="$1"
+  fi
+
+  commit-update-master-git "$COMMIT_MESSAGE" "No"
 
 }
 
