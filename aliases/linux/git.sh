@@ -157,7 +157,7 @@ commit-update-master-git() {
     # Update of the other branches if needed
     mainBranch="main"
 
-    echo "[UPDATES] - Master & Develop "
+    echo "[UPDATES] - Main "
     if [[ "$CURRENT_BRANCH" != "$mainBranch" ]]; then
       git-update-main
     fi
