@@ -288,9 +288,29 @@ git-copy-status-changes() {
       GIT_STATUS_DESTINATION_FOLDER="$1"
   fi
 
+  ## echo "==> $GIT_STATUS_DESTINATION_FOLDER"
+
   ## copy each file to the destination folder
-  for file in "$GIT_STATUS_FILES"; do
-      cp "$file" "$GIT_STATUS_DESTINATION_FOLDER"
+  for file in $GIT_STATUS_FILES; do
+
+      ## loading the destination to be rebuilt on destination folder
+      RELATIVE_PATH=$(dirname "$file")
+
+      ## create of the folder
+      FOLDER_STRUCTURE_TO_REPLICATE="$GIT_STATUS_DESTINATION_FOLDER/$RELATIVE_PATH"
+#      mkdir -p -q "$FOLDER_STRUCTURE_TO_REPLICATE"
+
+      ## copy over the file to the destination
+      cp "$file" "$FOLDER_STRUCTURE_TO_REPLICATE"
+
+#      echo "Copied $file to $FOLDER_STRUCTURE_TO_REPLICATE"
+
+      # Debug area
+#      read -p "[Continue ?]: " CONTINUE_PROCESS
+#      if [[ "$CONTINUE_PROCESS" =~ [nN](o)?$ ]]; then
+#        break
+#      fi
+
   done
 
 }
