@@ -272,3 +272,25 @@ git-reset-hard(){
 
 
 }
+
+## This wil copy over files from the git status changes
+git-copy-status-changes() {
+
+  ## Loading new git status files
+  GIT_STATUS_FILES=$(git status --porcelain | grep '^??' | cut -d ' ' -f 2)
+
+  # Loading Destination folder
+  if [ -z "$1" ]
+  then
+      read -p "[Destination Folder]: " GIT_STATUS_DESTINATION_FOLDER
+  else
+      # mounting the commit message in the format that jira accepts
+      GIT_STATUS_DESTINATION_FOLDER="$1"
+  fi
+
+  ## copy each file to the destination folder
+  for file in GIT_STATUS_FILES; do
+      cp "$file" "$GIT_STATUS_DESTINATION_FOLDER"
+  done
+
+}
