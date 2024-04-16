@@ -289,7 +289,7 @@ git-copy-status-changes() {
   fi
 
   ## copy each file to the destination folder
-  for file in GIT_STATUS_FILES; do
+  for file in "$GIT_STATUS_FILES"; do
       cp "$file" "$GIT_STATUS_DESTINATION_FOLDER"
   done
 
