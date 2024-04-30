@@ -319,10 +319,16 @@ compress-mkv-to-mp4()
       FILE_TO_COMPRESS_MKV="$1"
   fi
 
+  echo "[FILE_TO_COMPRESS_MKV] $FILE_TO_COMPRESS_MKV"
+
   ## creating the compress filename
   COMPRESSED_FILENAME="compressed_$FILE_TO_COMPRESS_MKV"
+  COMPRESSED_FILENAME=$(echo "$COMPRESSED_FILENAME" | sed "s/\.mkv//g")
+  COMPRESSED_FILENAME="$COMPRESSED_FILENAME.mp4"
 
-  ffmpeg -i "$FILE_TO_COMPRESS_MKV".mkv -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$COMPRESSED_FILENAME".mp4
+  echo "[COMPRESSED_FILE_NAME] $COMPRESSED_FILENAME"
+
+  ## ffmpeg -i "$FILE_TO_COMPRESS_MKV" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$COMPRESSED_FILENAME"
 
 }
 
