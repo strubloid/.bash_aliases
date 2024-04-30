@@ -307,8 +307,24 @@ bazinga-remove-extension()
 
 }
 
+## This will take a mkv to mp4 in a compressed way
+compress-mkv-to-mp4()
+{
 
+  # Loading the file to compress
+  if [ -z "$1" ]
+  then
+      read -p "[file]: " FILE_TO_COMPRESS_MKV
+  else
+      FILE_TO_COMPRESS_MKV="$1"
+  fi
 
+  ## creating the compress filename
+  COMPRESSED_FILENAME="compressed_$FILE_TO_COMPRESS_MKV"
+
+  ffmpeg -i "$FILE_TO_COMPRESS_MKV".mkv -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 128k "$COMPRESSED_FILENAME".mp4
+
+}
 
 compress-file-ffmpeg()
 {
