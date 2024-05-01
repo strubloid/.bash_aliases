@@ -22,11 +22,6 @@ function cockroach-download-certificate()
   curl --create-dirs -o "$HOME"/.postgresql/root.crt -O https://cockroachlabs.cloud/clusters/92b2110e-3d79-4ab9-af50-88c0b1dd5466/cert
 }
 
-# Check for the instruction of DATABASE_BILLS_URL on ~/.bashrc
-## passwords
-## 1 - tUCY6irv1PL09XuASN5NhQ
-## 2 - MhG6t991OfJaKUjuGZMo0A
-# cockroach sql --url "postgresql://rafael:MhG6t991OfJaKUjuGZMo0A@hungry-bird-923.8nj.cockroachlabs.cloud:26257/bills?sslmode=verify-full&sslrootcert=$HOME/.postgresql/root.crt"
 function cockroach-login()
 {
   cockroach sql --url "$DATABASE_BILLS_URL"

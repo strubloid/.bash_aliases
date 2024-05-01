@@ -10,92 +10,94 @@ start-python-local(){
   source /media/games/apps/pyhtonEnvironment/myenv/bin/activate  # Activate the virtual environment
 }
 
-#sum-gpt(){
+gptLocal()
+{
+  ## getting the current environment
+  python_output=$(python3 -c "import sys; print(sys.prefix)")
 
-#  ## getting the file to read
-#  read -p "[Share the path to the file]: " CHECK_THIS_FILE_PATH
-#
-#  CHAT_GPT_FOLDER="/media/games/apps/gpt-summarizer/"
-#
-#
-#  python3 gpt-summarizer  $CHECK_THIS_FILE_PATH $1 $2 $3 $4
-#}
+  # Check if the output is equal to "/usr", so we need update to our own
+  if [ "$python_output" == "/usr" ]; then
+    start-python-local
+  fi
+
+  ## just making sure we have on terminal wide
+  export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts"
+  python3 "$BASH_ALIASES_SCRIPTS/chat-gpt.py" "$1"
+}
 
 sum-gpt()
 {
-    # Define the endpoint URL
-    ENDPOINT="https://api.openai.com/v1/chat/completions"
-
-    # Loading the file to compress
+    # loading first parameter of the function, if you forgot will have
+    ## the option to say what is the word or file
     if [ -z "$1" ]
     then
-        read -p "[file]: " USER_INPUT
+        read -p "[text or filepath]: " USER_INPUT
     else
-        USER_INPUT=$(cat $1)
+        USER_INPUT=$1
     fi
 
+    CURRENT_FOLDER=$(pwd)
+    SPLIT_FOLDER="$CURRENT_FOLDER/split"
+    GPT_FOLDER="$CURRENT_FOLDER/gpt"
+
+    echo "[]: $SPLIT_FOLDER"
+
+    ## Creating the export folder for the current folder exported knowledge
+    if [[ ! -d $SPLIT_FOLDER ]]; then
+        echo "[SPLIT_FOLDER]: CREATED"
+        mkdir -p "$SPLIT_FOLDER" > /dev/null 2>&1
+    else
+      echo "[SPLIT_FOLDER]: OK"
+    fi
+
+    ## Creating the export folder for the current folder exported knowledge
+    if [[ ! -d $GPT_FOLDER ]]; then
+        echo "[GPT_FOLDER]: CREATED"
+        mkdir -p "$GPT_FOLDER" > /dev/null 2>&1
+    else
+      echo "[GPT_FOLDER]: OK"
+    fi
+
+    ## This will check if the user input is a file
+    ##  throwing all the content of the file inside of the USER_INPUT
+    if [[ -f $USER_INPUT ]]; then
+        echo "[USER_INPUT]: FILE"
+        USER_INPUT=$(cat "$CURRENT_FOLDER/$USER_INPUT")
+    fi
     echo "[USER_INPUT]: OK"
 
-    # Create a temporary file to store the user input
-    TMP_INPUT_FILE=$(mktemp)
+    ## Split of the array in 1200 words on each index
+    IFS=$'\n' read -d '' -r -a USER_INPUT_ARRAY <<< "$(echo "$USER_INPUT" | tr ' ' '\n' | awk 'NR%1200==1{x++} {print > "split/user_input_part_" x".txt"} END {print x}')"
 
-    # Read user input from the input file and write it to the temporary file
-    cat $INPUT_FILE > $TMP_INPUT_FILE
+    ## Iterating though each file on split folder to normalize files
+    for splitFile in "$SPLIT_FOLDER"/*
+    do
+        ## normalizing file, creating a temp for this and later on move to the current file
+        tempFile=$(mktemp)
+        tr '\n' ' ' < "$splitFile" > "$tempFile"
+        mv -f "$tempFile" "$splitFile" > /dev/null 2>&1
+    done
 
+    ## Iterating though each file on export folder
+    index=0
+    for splitFile in "$SPLIT_FOLDER"/*
+    do
+      ## Building the question of summarizing it
+      ASK_QUESTION="tem como resumir essa historia? $(cat $splitFile)"
 
+      ## update the $splitFile (for debug purposes)
+      echo "$ASK_QUESTION" > $splitFile
 
-    # Define the prompt
-    PROMPT='{
-      "model": "gpt-3.5-turbo",
-      "messages": [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Tell me a joke."}
-      ]
-    }'
+      ## Running the chatgpt on python
+      CHAT_RESPONSE=$(gptLocal "$ASK_QUESTION")
 
-    # Make the API request using curl
-    RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/engines/davinci/completions" \
-      -H "Authorization: Bearer $OPENAI_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d "$PROMPT")
+      ## getting the response from chat-gpt and split to specific text file
+      echo "$CHAT_RESPONSE" > "$GPT_FOLDER/${index}-chat_gpt_reply.txt"
 
-    # Extract the response from the JSON
-    CHAT_RESPONSE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+      ((index++))
+    done
 
-    # Print the chat response
-    echo "ChatGPT says: $CHAT_RESPONSE"
-    echo $CHAT_RESPONSE > "chat_gpt_reply.txt"
+    echo "Delete Split Folder"
+    ## rm -Rf "$SPLIT_FOLDER"
 
-
-#    response=$(curl https://api.openai.com/v1/models \
-#            -H "Authorization: Bearer $OPENAI_API_KEY" \
-#            -H "OpenAI-Organization: $ORGANIZATION_ID" \
-#            -H "OpenAI-Project: $PROJECT_ID")
-    echo "[RESPONSE]: OK"
-
-## Send the user input to ChatGPT
-#response=$(curl -s -X POST \
-#    -H "Content-Type: application/json" \
-#    -H "Authorization: Bearer $API_KEY" \
-#    --data-binary @$TMP_INPUT_FILE \
-#    $ENDPOINT \
-#    <<EOF
-#{
-#  "model": "text-davinci-003",
-#  "max_tokens": 50
-#}
-#EOF
-#)
-
-
-#    # Clean up the temporary file
-#    echo "[TMP_FILE]: REMOVED"
-#    rm $TMP_INPUT_FILE
-
-#    # Parse the response and extract ChatGPT's reply
-#    reply=$(echo $response | jq -r '.choices[0].message.content')
-
-#    # Print ChatGPT's reply
-#    echo "[ChatGPT]: $reply"
-#    echo $reply > "chat_gpt_reply.txt"
 }

@@ -164,7 +164,6 @@ updateBashTerminal() {
   else
     echoLine "[ERR]: missing file ~/.bash_profile"
   fi
-
 }
 
 ## This will make sure that will exist on the ~/.bash_profile the lines:
