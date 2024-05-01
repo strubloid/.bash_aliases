@@ -25,6 +25,7 @@ aliases/ignore/*
 !import/node/.gitignore
 !import/rafa.zsh-theme
 !import/sass/bin/
+!scripts/
 
 ## have the file there is important to the function to work
 search/search_words.txt
