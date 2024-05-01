@@ -35,6 +35,16 @@ checkFileExists() {
   fi
 }
 
+## This will check if a folder exist
+checkFolderExists() {
+  if [[ -d $1 ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+
 ## Check if exist a string $1 inside of a file $2
 checkStringExistIntoFile() {
   EXISTLINE=$(grep -F "$1" $2)
@@ -293,5 +303,33 @@ setupEnvironmentVariable() {
   else
     echoLine "[]: BASH_ALIASES_PROJECT_FOLDER already exists, moving on"
   fi
+
+}
+
+## this will move the scripts from scripts folder to the correct
+## .bash_aliases_scripts
+moveScripts(){
+
+    echoHeader "[Move Scripts]:"
+
+    checkFolderExists "$BASH_ALIASES_SCRIPTS"
+    RETURN_CODE=$?
+
+    ## checking if folder doesn't exist
+    printf "  []: Exist Folder? "
+    if [[ ${RETURN_CODE} -eq "0" ]]; then
+      printf "No, creating a new one\n"
+      mkdir -p "$BASH_ALIASES_SCRIPTS"
+    else
+      printf "Yes\n"
+    fi
+
+    ## loading the scripts folder
+    BASH_PROJECT_SCRIPS_LOCAL="$BASH_ALIASES_PROJECT_FOLDER/scripts"
+
+    echoLine "[]: Copying"
+    echoLine "=> From: $BASH_PROJECT_SCRIPS_LOCAL"
+    echoLine "=> To: $BASH_ALIASES_SCRIPTS"
+    cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
 
 }

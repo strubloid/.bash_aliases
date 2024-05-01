@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ## .bash_aliases file path
+export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts/"
 export HOME_ALIASES="$HOME/.bash_aliases"
 export HOME_PROFILE="$HOME/.bash_profile"
 export HOME_VARIABLES="$HOME/.bash_variables"

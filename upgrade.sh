@@ -11,3 +11,6 @@ generateBashAlias
 
 # Step 3 Update the bash terminal
 updateBashTerminal
+
+## Step 4 Move usable scripts
+moveScripts
