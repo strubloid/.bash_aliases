@@ -10,6 +10,17 @@ start-python-local(){
   source /media/games/apps/pyhtonEnvironment/myenv/bin/activate  # Activate the virtual environment
 }
 
+limit-parameters-python()
+{
+  ulimit -s 8192
+}
+
+unlimit-parameters-python()
+{
+  ulimit -s 65536
+}
+
+
 gptLocal()
 {
   ## getting the current environment
@@ -67,37 +78,43 @@ sum-gpt()
     echo "[USER_INPUT]: OK"
 
     ## Split of the array in 1200 words on each index
-    IFS=$'\n' read -d '' -r -a USER_INPUT_ARRAY <<< "$(echo "$USER_INPUT" | tr ' ' '\n' | awk 'NR%1200==1{x++} {print > "split/user_input_part_" x".txt"} END {print x}')"
+#    IFS=$'\n' read -d '' -r -a USER_INPUT_ARRAY <<< "$(echo "$USER_INPUT" | tr ' ' '\n' | awk 'NR%1200==1{x++} {print > "split/user_input_part_" x".txt"} END {print x}')"
 
     ## Iterating though each file on split folder to normalize files
-    for splitFile in "$SPLIT_FOLDER"/*
-    do
-        ## normalizing file, creating a temp for this and later on move to the current file
-        tempFile=$(mktemp)
-        tr '\n' ' ' < "$splitFile" > "$tempFile"
-        mv -f "$tempFile" "$splitFile" > /dev/null 2>&1
-    done
+#    for splitFile in "$SPLIT_FOLDER"/*
+#    do
+#        ## normalizing file, creating a temp for this and later on move to the current file
+#        tempFile=$(mktemp)
+#        tr '\n' ' ' < "$splitFile" > "$tempFile"
+#        mv -f "$tempFile" "$splitFile" > /dev/null 2>&1
+#    done
+
+    ## tentativa de todo o texto
+
 
     ## Iterating though each file on export folder
-    index=0
-    for splitFile in "$SPLIT_FOLDER"/*
-    do
+#    index=0
+#    for splitFile in "$SPLIT_FOLDER"/*
+#    do
       ## Building the question of summarizing it
-      ASK_QUESTION="tem como resumir essa historia? $(cat $splitFile)"
+      ASK_QUESTION="tem como resumir essa historia? $(echo "$USER_INPUT")"
 
       ## update the $splitFile (for debug purposes)
-      echo "$ASK_QUESTION" > $splitFile
+#      echo "$ASK_QUESTION" > $splitFile
+
+    echo "ASKING GPT"
 
       ## Running the chatgpt on python
       CHAT_RESPONSE=$(gptLocal "$ASK_QUESTION")
-
+    echo "MAKING GPT FILE chat_gpt_reply.txt"
       ## getting the response from chat-gpt and split to specific text file
-      echo "$CHAT_RESPONSE" > "$GPT_FOLDER/${index}-chat_gpt_reply.txt"
+#      echo "$CHAT_RESPONSE" > "$GPT_FOLDER/${index}-chat_gpt_reply.txt"
+      echo "$CHAT_RESPONSE" > "chat_gpt_reply.txt"
 
-      ((index++))
-    done
+#      ((index++))
+#    done
 
-    echo "Delete Split Folder"
+#    echo "Delete Split Folder"
     ## rm -Rf "$SPLIT_FOLDER"
 
 }
