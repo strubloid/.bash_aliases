@@ -206,3 +206,14 @@ END
   echo $SHORTCUT > ~/.local/share/applications/$name.desktop
 
 }
+
+
+
+# How to open touch portal
+function touchportal-start()
+{
+  cd "/media/games/dev/TouchPortal"
+  chmod +x TouchPortal.AppImage
+  ./TouchPortal.AppImage
+}
+
