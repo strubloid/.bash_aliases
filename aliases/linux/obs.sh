@@ -6,9 +6,9 @@
 function loadObsPluginsRelations()
 {
   SOURCE_DIR="/usr/share/obs/obs-plugins"
-  TARGET_DIR="/home/zero/.var/app/com.obsproject.Studio/config/obs-studio/plugins"
+  TARGET_DIR="/home/$USER/.var/app/com.obsproject.Studio/config/obs-studio/plugins"
 
-  echo "[Started]: loadObsPluginsRelations"
+  echo "[Started]"
 
   # Check if the target directory exists; create it if not
   if [ ! -d "$TARGET_DIR" ]; then
@@ -25,10 +25,8 @@ function loadObsPluginsRelations()
       if [ ! -e "$TARGET_DIR/$plugin_name" ]; then
           ln -s "$plugin_folder" "$TARGET_DIR/$plugin_name" # Create a symbolic link
           echo "[$plugin_name]: Created "
-      else
-          echo "[$plugin_name]: Exist already"
       fi
   done
 
-  echo "[Finished] loadObsPluginsRelations"
+  echo "[Finished]"
 }
