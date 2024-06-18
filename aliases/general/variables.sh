@@ -11,3 +11,5 @@ export PATH=/usr/bin/openoffice4:$PATH
 
 
 export OBS_PLUGINS_PATH="/usr/share/obs/obs-plugins"
+export NV_CODEC_SDK_HOME="/home/zero/nvidia_driver/Video_Codec_SDK_12.2.72"
+
