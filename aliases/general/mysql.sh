@@ -5,7 +5,8 @@ databaseDate=$(date +"%Y-%m-%d")
 
 function dump-today() {
 
-  mysqldump -u root -proot blocworx $tablesList >${databaseDate}-exported-database.sql
+  schema="strubloid"
+  mysqldump -u root -proot $schema $tablesList >${databaseDate}-exported-database.sql
 
 }
 

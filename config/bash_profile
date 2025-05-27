@@ -16,12 +16,6 @@ if [ -f ~/.bash_global ]; then
     . ~/.bash_global
 fi
 
-# this will load the basic alias file
-if [ -f ~/.bash_blocworx ]; then
-    echo "[Bash Blocworx 3]: enabled"
-  . ~/.bash_blocworx
-fi
-
 # This is the git completion shortcuts
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
@@ -34,5 +28,6 @@ fi
 
 ## adding the .bash_prompt file
 if [ -f ~/.zshrc ]; then
+    echo "[Bash Mac 3]: enabled"
     . ~/.zshrc
 fi

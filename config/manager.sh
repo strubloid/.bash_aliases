@@ -158,13 +158,26 @@ setupBashPromptFile() {
 updateBashTerminal() {
   echoHeader "[Update Bash Terminal]: "
 
-  if [ -f ${HOME_PROFILE} ]; then
-    source "${HOME_PROFILE}"
-    echoLine "[]: updating terminal" ${HOME_PROFILE}
+  ## Checking the operational system
+  OS=$(getOperationalSystem)
+
+  if [ "$OS" = "mac" ]; then
+    if [ -f ~/.zshrc ]; then
+      source ~/.zshrc
+      echoLine "[]: updating terminal ~/.zshrc"
+    else
+      echoLine "[ERR]: missing file ~/.zshrc"
+    fi
   else
-    echoLine "[ERR]: missing file ~/.bash_profile"
+    if [ -f "${HOME_PROFILE}" ]; then
+      source "${HOME_PROFILE}"
+      echoLine "[]: updating terminal ${HOME_PROFILE}"
+    else
+      echoLine "[ERR]: missing file ${HOME_PROFILE}"
+    fi
   fi
 }
+
 
 ## This will make sure that will exist on the ~/.bash_profile the lines:
 ##

@@ -39,7 +39,7 @@ open-chrome-profile()
 # Work profile
 open-chrome-work()
 {
-    open-chrome-profile "profile_blocworx"
+    open-chrome-profile "profile_work"
 }
 
 # Bombcrypto 1

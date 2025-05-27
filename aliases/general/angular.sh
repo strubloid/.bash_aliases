@@ -99,7 +99,3 @@ webpack-count()
 {
   watch -n 1 "ls $1 | grep .js | wc -l"
 }
-
-angular-blocworx-count(){
-  webpack-count "src/build/"
-}

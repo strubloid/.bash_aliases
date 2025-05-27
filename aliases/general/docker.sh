@@ -35,10 +35,10 @@ alias dk-start="docker-sync start && docker-compose up -d"
 ## entering the docker
 function docker-enter(){
 
-  # dockerBlocworx=$(docker container ls  | grep 'blocworx-docker_web' | awk '{print $1}')
-  dockerBlocworxId=$(docker container ls  | grep 'blocworx' | awk '{print $1}')
+  # dockerWork=$(docker container ls  | grep 'work-docker_web' | awk '{print $1}')
+  dockerWorkId=$(docker container ls  | grep 'work' | awk '{print $1}')
 
-  docker exec -it "$dockerBlocworxId" /bin/bash
+  docker exec -it "$dockerWorkId" /bin/bash
 }
 
 # This will be checking all docker commands that list things

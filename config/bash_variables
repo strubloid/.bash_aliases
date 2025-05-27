@@ -9,9 +9,6 @@ export PATH="$HOME/.npm-global/bin:$HOME/.nvm/versions/node/v18.15.0/bin:/usr/sb
 ## adding qt 5.15 version
 export PATH="$HOME/.local/share/flatpak/app/net.lutris.Lutris/x86_64/stable/2e580c2d27b44e1d2313ad7c73df33c2705aec8ef4b030e5a209278c0e0771e1/files/bin:$PATH"
 
-# blocworx alias folder
-export BLOCWORX_ALIAS_FOLDER='/media/games/apps/.bash_aliases/blocworxaliases'
-
 # Server variables
 export MACHINE_HOSTNAME=zero
 

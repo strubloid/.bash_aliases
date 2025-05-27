@@ -136,25 +136,27 @@ function lv-export-tables() {
 
     printf "[]: Enter table names (separated by  space): "
     read tablesList
+    schema="strubloid"
 
     if [ -z "$tablesList" ]; then
         printf "[Err]: You must inform at least one table name\m"
     else
         databaseDate=$(date +'%m-%d-%Y')
-        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot blocworx $tablesList > ${databaseDate}-exported-database.sql"
+        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $schema $tablesList > ${databaseDate}-exported-database.sql"
     fi
 
 }
 
 
 function lv-export-all-tables() {
-
-    printf "[]: Inform the DBSchema (default: blocworx): "
+    
+    schema="strubloid"
+    printf "[]: Inform the DBSchema (default: $schema): "
     read dbSchema
     databaseDate=$(date +'%Y-%m-%d')
 
     if [ -z "$dbSchema" ]; then
-        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot blocworx > ${databaseDate}-exported-database.sql"
+        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $schema > ${databaseDate}-exported-database.sql"
     else
         vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $dbSchema > ${databaseDate}-exported-database.sql"
     fi

@@ -147,10 +147,10 @@ gitpush()
 
 }
 
-c-blocworx()
+c-c()
 {
   currentBranch=$(git branch --show-current)
-  branchTag=$( echo $currentBranch | grep -Eo 'BLCX-[0-9]{1,4}')
+  branchTag=$( echo $currentBranch | grep -Eo 'TIKET-[0-9]{1,4}')
 
   # Showing differences to help the build of the message
   git status
