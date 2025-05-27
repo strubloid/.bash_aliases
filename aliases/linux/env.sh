@@ -1,4 +1,7 @@
+#!/bin/bash
+
 # Strubloid::general::env
+
 loadEnvData()
 {
   envData=""
