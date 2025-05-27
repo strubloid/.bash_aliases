@@ -4,12 +4,30 @@ echoMainHeader() {
   echo -e "\n\033[1;30m🤘 $1\033[0m"
 }
 
+echoBasicHeader() {
+  echo -e "\033[1;37m $1\033[0m"
+}
+
+echoRockHeader() {
+  echo -e "\033[1;34m🤘 $1\033[0m"
+}
+
 echoPunchHeader() {
   echo -e "\n\033[1;12m👊 $1\033[0m"
 }
 echoHeader() {
   echo -e "\n\033[1;36m🚀 $1\033[0m"
 }
+
+echoOption() {
+  echo -e "\n\033[1;36m $1\033[0m"
+}
+
+echoCoolPink()
+{
+  echo -e "\033[1;35m $1\033[0m"
+}
+
 
 echoLine() {
   # Check if this is a DEBUG message
