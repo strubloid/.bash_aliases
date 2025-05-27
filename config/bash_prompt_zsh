@@ -1,0 +1,69 @@
+autoload -Uz vcs_info
+
+# Enable Git info
+precmd() {
+  vcs_info
+  build_zsh_prompt
+}
+
+# Color definitions (Zsh-compatible with %F and %K)
+autoload -Uz colors && colors
+
+# Custom function to build the prompt
+function build_zsh_prompt() {
+  local exit_status=$?
+  local user_color host_color cwd_color git_color
+  local indicator prompt_char
+
+  # Determine last exit color
+  if [[ $exit_status -eq 0 ]]; then
+    indicator="%F{white}>%f"
+    prompt_char="%F{white}$%f"
+  else
+    indicator="%F{red}>%f"
+    prompt_char="%F{red}$%f"
+  fi
+
+  # User color
+  if [[ $EUID -eq 0 ]]; then
+    user_color="%F{red}"
+  else
+    user_color="%F{white}"
+  fi
+
+  # Host color (no real way to check "insecure" SSH here)
+  if [[ -n "$SSH_CLIENT" ]]; then
+    host_color="%F{red}"
+  else
+    host_color="%F{white}"
+  fi
+
+  # CWD color
+  if [[ -w "$PWD" ]]; then
+    cwd_color="%F{white}"
+  else
+    cwd_color="%F{red}"
+  fi
+
+  # Git status
+  local git_status=""
+  if [[ -n ${vcs_info_msg_0_} ]]; then
+    if git diff --quiet 2>/dev/null; then
+      git_color="%F{green}"
+    else
+      git_color="%F{red}"
+    fi
+    git_status=" ${git_color}(${vcs_info_msg_0_})%f"
+  fi
+
+  # Format the full PS1
+  PROMPT="
+${indicator} ${user_color}%n%f${host_color}@%m%f ${cwd_color}[%~]%f${git_status} %F{cyan}[%D{%Y-%m-%d %H:%M:%S}]%f
+${prompt_char} "
+}
+
+# Git format for vcs_info
+zstyle ':vcs_info:git:*' formats 'git: %b'
+
+# Initialize on load
+build_zsh_prompt

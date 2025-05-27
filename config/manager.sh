@@ -174,13 +174,30 @@ setupBashPromptFile() {
 
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
-
-    echoLine "[]: Creating the ~/.bash_prompt file"
-    echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt"
-    echoLine "[]: to $HOME_PROMPT"
-
-    touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
-
+    # Get OS and shell info
+    OS=$(getOperationalSystem)
+    
+    if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
+      # For macOS with zsh
+      if [ -f "$BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh" ]; then
+        echoLine "[]: Creating the ~/.bash_prompt file"
+        echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh"
+        echoLine "[]: to $HOME_PROMPT"
+        touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh ${HOME_PROMPT}
+      else
+        # Fallback to regular prompt if zsh-specific one doesn't exist
+        echoLine "[]: Creating the ~/.bash_prompt file"
+        echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt (zsh-specific not found)"
+        echoLine "[]: to $HOME_PROMPT"
+        touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
+      fi
+    else
+      # For other OS or shells
+      echoLine "[]: Creating the ~/.bash_prompt file"
+      echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt"
+      echoLine "[]: to $HOME_PROMPT"
+      touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
+    fi
   else
     echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
@@ -280,74 +297,26 @@ upgradeElementsOnBashProfile() {
     echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
 
-      ## checking if exist the git completion in profile
-  # Handle git completion based on shell
-  OS=$(getOperationalSystem)
-  if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
-    # For zsh with Oh My Zsh, git completion is already handled
-    if grep -q "oh-my-zsh" ${PROFILE_FILE}; then
-      echoLine "[]: Using Oh My Zsh's git plugin for completion"
-      
-      # Remove the old git-completion.bash reference from bash_profile if it exists
-      if [ -f "${HOME_PROFILE}" ] && grep -q "git-completion.bash" "${HOME_PROFILE}"; then
-        # Create a temporary file without the git completion line
-        grep -v "git-completion.bash" "${HOME_PROFILE}" > "${HOME_PROFILE}.tmp" && mv "${HOME_PROFILE}.tmp" "${HOME_PROFILE}"
-        echoLine "[]: Removed git-completion.bash reference from ${HOME_PROFILE}"
-      fi
-    else
-      # For zsh without Oh My Zsh, add standard zsh completion
-      checkStringExistIntoFile "# Git completion for zsh" ${PROFILE_FILE}
-      EXIST_ZSH_GIT_COMPLETION=$?
-      
-      if [[ ${EXIST_ZSH_GIT_COMPLETION} -eq "0" ]]; then
-        # Add zsh-specific git completion configuration
-        printf "\n# Git completion for zsh\n" >> ${PROFILE_FILE}
-        printf "# Git completion is built into zsh\n" >> ${PROFILE_FILE}
-        printf "autoload -Uz compinit && compinit\n" >> ${PROFILE_FILE}
-      else
-        echoLine "[]: Git completion for zsh already exists"
-      fi
+  # Check if the bash_prompt file exists
+  if [ -f "${HOME_PROMPT}" ]; then
+    # Make sure OS is set
+    OS=$(getOperationalSystem)
+    
+    # File exists, update it regardless of content
+    echoLine "[]: ~/.bash_prompt updating"
+
+    # For macOS with zsh, copy the zsh-specific prompt
+    if [ "$OS" = "mac" ]; then
+      cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh ${HOME_PROMPT}
+    fi
+
+    # Linux conditional update of the bash_prompt
+    if [ "$OS" = "linux" ]; then
+      cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
     fi
   else
-    # For bash, use git-completion.bash
-    checkStringExistIntoFile "~/.git-completion.bash" ${PROFILE_FILE}
-    EXIST_GIT_COMPLETION=$?
-
-    ## This will add if the result isn't in profile
-    if [[ ${EXIST_GIT_COMPLETION} -eq "0" ]]; then
-      printf "\n" >>${PROFILE_FILE} && echo "${GIT_COMPLETION_LINE}" >>${PROFILE_FILE}
-    fi
-
-    gitCompletion=~/.git-completion.bash
-    if [ ! -f "$gitCompletion" ]; then
-      curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
-    else
-      echoLine "[]: ~/.git-completeon already exists, moving on"
-    fi
+    echoLine "[]: ~/.bash_prompt does not exist, skipping update"
   fi
-
-# fix the mac version of it
-#  operationalSystem=$(getOperationalSystem)
-#
-#  printf $operationalSystem;
-#  if [ ${operationalSysrtem} != "mac"  ]; then
-#    ## checking if exist the ~/.bash_prompt into ~/.bash_profile
-#      checkStringExistIntoFile "~/.git-completion.bash" ${HOME_PROFILE}
-#      EXIST_GIT_COMPLETION=$?
-#
-#      ## This will add if the result isnt on ~/.bash_profile
-#      if [[ ${EXIST_GIT_COMPLETION} -eq "0" ]]; then
-#        printf "\n" >>${HOME_PROFILE} && echo "${GIT_COMPLETION_LINE}" >>${HOME_PROFILE}
-#      fi
-#
-#      gitCompletion=~/.git-completion.bash
-#      if [ ! -f "$gitCompletion" ]; then
-#        curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
-#      else
-#        echoLine "[]: ~/.git-completeon already exists, moving on"
-#      fi
-#  fi
-
 }
 
 ## Generation/replacement of the .bash_aliases file
