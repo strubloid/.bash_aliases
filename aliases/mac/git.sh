@@ -97,11 +97,11 @@ commit-update-git() {
       read UPDATE_MASTER_DEVELOPER
   else
       # mounting the commit message in the format that jira accepts
-      UPDATE_MASTER_DEVELOPER="$1"
+      UPDATE_MASTER_DEVELOPER="$2"
   fi
 
   echoHeader "-----------------------------------------------------------------------------"
-  echoHeader "  🚀 GIT  Commit  🚀 --------------------------------------------------------"
+  echoHeader "  🚀 GIT  Commit 2.0  🚀 --------------------------------------------------------"
   echoHeader "-----------------------------------------------------------------------------"
   echoHeader "[CURRENT BRANCH] - $CURRENT_BRANCH"
   echoHeader "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
@@ -130,6 +130,7 @@ commit-update-git() {
   #   fi
 
   # fi
+  
 
   # this will be back to your current branch that you are working on
   git checkout "$CURRENT_BRANCH" -q
