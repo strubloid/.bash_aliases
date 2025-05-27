@@ -241,6 +241,10 @@ updateBashTerminal() {
 ##    . ~/.bash_prompt
 ## fi
 upgradeElementsOnBashProfile() {
+
+  echoMainHeader "Strubloid BashAliases v2.0 "
+  echoPunchHeader "I am here for ye! "
+
   echoHeader "[Upgrade Elements On Bash Profile]: "
   
   # Determine the correct profile file based on the shell
@@ -435,8 +439,8 @@ moveScripts(){
     BASH_PROJECT_SCRIPS_LOCAL="$BASH_ALIASES_PROJECT_FOLDER/scripts"
 
     echoLine "* Copying"
-    echoLine "=> From: $BASH_PROJECT_SCRIPS_LOCAL"
-    echoLine "=> To: $BASH_ALIASES_SCRIPTS"
+    echoLine "📤 From: $BASH_PROJECT_SCRIPS_LOCAL"
+    echoLine "📥 To: $BASH_ALIASES_SCRIPTS"
     cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
 
 }

@@ -34,7 +34,7 @@ git-clean-all()
 git-update-master() {
   printf "[MASTER] - "
   git checkout master -q && git pull origin master -q  && git checkout . -q
-  printf "OK\n"
+  printf "✅ \033[32mSuccess\033[0m\n"
 }
 
 # This will update the develop branch
@@ -43,7 +43,7 @@ git-update-master() {
 git-update-develop() {
   printf "[DEVELOP] - "
   git checkout develop -q && git pull origin develop -q && git checkout . -q
-  printf "OK\n"
+  printf "✅ \033[32mSuccess\033[0m\n"
 }
 
 # This will update the main branch
@@ -52,7 +52,7 @@ git-update-develop() {
 git-update-main() {
   printf "[MAIN] - "
   git checkout main -q && git pull origin main -q && git checkout . -q
-  printf "OK\n"
+  printf "✅ \033[32mSuccess\033[0m\n"
 }
 
 # This will update the release branch
@@ -63,7 +63,7 @@ update-release() {
   CURRENT_RELEASE_BRANCH=$(git branch -l | grep -Po 'release.*')
   if [[ ! -z "$CURRENT_RELEASE_BRANCH" ]]; then
     git checkout "$CURRENT_RELEASE_BRANCH" && git pull origin "$CURRENT_RELEASE_BRANCH"
-    echo "[$CURRENT_RELEASE_BRANCH] - UPDATED"
+    echo "[$CURRENT_RELEASE_BRANCH] - ✅ \033[32mUpdated\033[0m"
   fi
 }
 
@@ -99,7 +99,7 @@ commit-update-git() {
   fi
 
   echo "-----------------------------------------------------------------------------"
-  echo "  GIT  Commit  --------------------------------------------------------------"
+  echo "  🚀 GIT  Commit  🚀 --------------------------------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
   echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
@@ -108,7 +108,7 @@ commit-update-git() {
   # commit of the thing
   printf "[COMMIT] - "
   git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
-  printf "OK\n"
+  printf "✅ \033[32mSuccess\033[0m\n"
 
   ## check if the update was passed with y/yes as an option
   if [[ "$UPDATE_MASTER_DEVELOPER" =~ [yY](es)?$ ]]; then
@@ -164,7 +164,7 @@ commit-update-master-git() {
   fi
 
   echo "-----------------------------------------------------------------------------"
-  echo "  GIT  Main Commit  ----------------------------------------------------------"
+  echo "  🚀 GIT  Main Commit  🚀 ----------------------------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
   echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
@@ -173,7 +173,7 @@ commit-update-master-git() {
   # commit of the thing and push
   printf "[COMMIT] - "
   git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
-  printf "OK\n"
+  printf "✅ \033[32mSuccess\033[0m\n"
 
   ## check if the update was passed with y/yes as an option
   if [[ "$UPDATE_MAIN" =~ [yY](es)?$ ]]; then
@@ -242,15 +242,17 @@ commit ()
   COMMIT_MESSAGE="$CURRENT_BRANCH_ID: $1"
 
   echo "-----------------------------------------------------------------------------"
-  echo "------------------------------ Git Commit -----------------------------------"
+  echo "  🚀 Git Commit 🚀 ---------------------------------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
   echo "[JIRA ID] - $CURRENT_BRANCH_ID"
-  echo "[COMMIT_MESSAGE] - $COMMIT_MESSAGE"
+  echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
   echo "-----------------------------------------------------------------------------"
 
   # commit of the thing
+  printf "[COMMIT] - "
   git add . && git commit -m "$COMMIT_MESSAGE" && git push origin "$CURRENT_BRANCH"
+  printf "✅ \033[32mSuccess\033[0m\n"
 }
 
 
@@ -460,12 +462,14 @@ gittag()
 # Updating the tags action
 gitUpdateTags()
 {
-    printf "Update tags?\n[Y or N]: "
+    printf "\033[1;36mUpdate tags?\033[0m\n\033[1m[Y or N]:\033[0m "
     read updateTags
     if [ "$updateTags" == "Y" ] || [ "$updateTags" == "y" ]
     then
         # Git command to push all tags
+        printf "[UPDATING TAGS] - "
         git push origin --tags
+        printf "✅ \033[32mSuccess\033[0m\n"
     fi
 }
 
@@ -473,24 +477,34 @@ gitUpdateTags()
 # the content to the server
 gitpush()
 {
-    printf "Add Everything?\n[Y or N]: "
+    printf "\033[1;36mAdd Everything?\033[0m\n\033[1m[Y or N]:\033[0m "
     read addEverything
     if [ "$addEverything" == "Y" ] || [ "$addEverything" == "y" ]
     then
         git add . # Git command to add all tags
     fi
 
-    printf "Message (Mandatory):\n* "
+    printf "\033[1;36mMessage (Mandatory):\033[0m\n\033[1m*\033[0m "
     read commitMessage
 
     if [ -z "$commitMessage" ]
     then
-      printf "[ERR]: You must pass an argument to use this function"
+      printf "\033[1;31m❌ [ERR]: You must pass an argument to use this function\033[0m\n"
     else
-      printf "Git message: $commitMessage\n"
-      git commit -m "$commitMessage" && git push origin master
+      echo "-----------------------------------------------------------------------------"
+      echo "  🚀 Git Push 🚀 ----------------------------------------------------------"
+      echo "-----------------------------------------------------------------------------"
+      echo "[COMMIT MESSAGE] - $commitMessage"
+      echo "-----------------------------------------------------------------------------"
+      
+      printf "[COMMIT] - "
+      git commit -m "$commitMessage" 
+      printf "✅ \033[32mSuccess\033[0m\n"
+      
+      printf "[PUSH] - "
+      git push origin master
+      printf "✅ \033[32mSuccess\033[0m\n"
     fi
-
 }
 
 c-c()
@@ -504,16 +518,26 @@ c-c()
   # Adding all files
   git add .
 
-  printf "Message (Mandatory):\n[type the commit message]: "
+  printf "\033[1;36mMessage (Mandatory):\033[0m\n\033[1m[type the commit message]:\033[0m "
   read commitMessage
 
   # Commit message
-  echo "[message]: $branchTag: $commitMessage\n"
+  echo "-----------------------------------------------------------------------------"
+  echo "  🚀 Quick Commit 🚀 -------------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[BRANCH] - $currentBranch"
+  echo "[JIRA TAG] - $branchTag"
+  echo "[MESSAGE] - $commitMessage"
+  echo "-----------------------------------------------------------------------------"
+  
+  printf "[COMMIT] - "
   git commit -m "$branchTag: $commitMessage"
+  printf "✅ \033[32mSuccess\033[0m\n"
 
   # Pushing to
-  echo "[push to]: git push origin $currentBranch\n"
+  printf "[PUSH] - "
   git push origin $currentBranch
+  printf "✅ \033[32mSuccess\033[0m\n"
 }
 
 
@@ -523,13 +547,13 @@ git-ignore-file-from-commit(){
 
   if [ -z "$1" ]
   then
-    echo -n "What is the file to remove from git status? "
+    echo -e "\033[1;36mWhat is the file to remove from git status?\033[0m "
     read fileToRemoveFromGitStatus
 
     ## Making sure that the file exist before remove from the git status
     while [ ! -f "$fileToRemoveFromGitStatus" ]; do
-        echo "[$fileToRemoveFromGitStatus]: does not exist"
-        echo -n "What is the file to remove from git status? "
+        echo -e "\033[1;31m❌ [$fileToRemoveFromGitStatus]: does not exist\033[0m"
+        echo -e "\033[1;36mWhat is the file to remove from git status?\033[0m "
         read fileToRemoveFromGitStatus
     done
   else
@@ -538,5 +562,5 @@ git-ignore-file-from-commit(){
 
   # This will run the removal of the file
   git update-index --assume-unchanged "$fileToRemoveFromGitStatus"
-
+  echo -e "\033[1;32m✅ File [$fileToRemoveFromGitStatus] will be ignored from git status\033[0m"
 }

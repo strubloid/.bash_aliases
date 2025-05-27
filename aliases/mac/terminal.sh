@@ -42,7 +42,7 @@ alias rcbashupdate="source ~/.bashrc"
 terminal-update() {
 
     CurrentFolder=$(pwd)
-    echo -e "[you are]: $CurrentFolder"
+    echo -e "\033[1;35m📍 Current Location:\033[0m \033[1m$CurrentFolder\033[0m"
     ProjectFolder=$(getProjectFolder)
 
     # move to the bash_aliases project folder and execute the upgrade function
