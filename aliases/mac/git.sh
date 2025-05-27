@@ -75,13 +75,15 @@ update-release() {
 ## 5 - update the develop
 commit-update-git() {
 
+  echoHeader "Git Commit Update"
+
   # Getting the current branch name
   CURRENT_BRANCH=$(git branch --show-current)
 
   # Loading the commit message
   if [ -z "$1" ]
   then
-      echo -n "[Commit Message]: "
+      echoLine "[Commit Message]: "
       read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
@@ -91,43 +93,43 @@ commit-update-git() {
   # Loading should update the base code
   if [ -z "$2" ]
   then
-      echo -n "Update Master/Develop [y/n] : "
+      echoLine "Update Master/Develop [y/n] : "
       read UPDATE_MASTER_DEVELOPER
   else
       # mounting the commit message in the format that jira accepts
       UPDATE_MASTER_DEVELOPER="$1"
   fi
 
-  echo "-----------------------------------------------------------------------------"
-  echo "  🚀 GIT  Commit  🚀 --------------------------------------------------------"
-  echo "-----------------------------------------------------------------------------"
-  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
-  echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
-  echo "-----------------------------------------------------------------------------"
+  echoHeader "-----------------------------------------------------------------------------"
+  echoHeader "  🚀 GIT  Commit  🚀 --------------------------------------------------------"
+  echoHeader "-----------------------------------------------------------------------------"
+  echoHeader "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echoHeader "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  echoHeader "-----------------------------------------------------------------------------"
 
   # commit of the thing
   printf "[COMMIT] - "
-  git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
+  # git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
   printf "✅ \033[32mSuccess\033[0m\n"
 
   ## check if the update was passed with y/yes as an option
-  if [[ "$UPDATE_MASTER_DEVELOPER" =~ [yY](es)?$ ]]; then
+  # if [[ "$UPDATE_MASTER_DEVELOPER" =~ [yY](es)?$ ]]; then
 
-    # Update of the other branches if needed
-    developBranch="develop"
-    masterBranch="master"
+  #   # Update of the other branches if needed
+  #   developBranch="develop"
+  #   masterBranch="master"
 
-    echo "[UPDATES] - Master & Develop "
-    if [[ "$CURRENT_BRANCH" == "$masterBranch" ]]; then
-      git-update-develop
-    elif [[ "$CURRENT_BRANCH" == "$developBranch" ]]; then
-      git-update-master
-    else
-        git-update-develop
-        git-update-master
-    fi
+  #   echo "[UPDATES] - Master & Develop "
+  #   if [[ "$CURRENT_BRANCH" == "$masterBranch" ]]; then
+  #     git-update-develop
+  #   elif [[ "$CURRENT_BRANCH" == "$developBranch" ]]; then
+  #     git-update-master
+  #   else
+  #       git-update-develop
+  #       git-update-master
+  #   fi
 
-  fi
+  # fi
 
   # this will be back to your current branch that you are working on
   git checkout "$CURRENT_BRANCH" -q
@@ -198,11 +200,12 @@ commit-update-master-git() {
 ## 2 - add a message
 ## 3 - update the same branch on the remote
 commit-git() {
-
-  # Loading the commit message
+  
+   echoMainHeader "Git Commit "
+   # Loading the commit message
   if [ -z "$1" ]
   then
-      echo -n "[Commit Message]: "
+      echoLine "[Commit Message]: "
       read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
