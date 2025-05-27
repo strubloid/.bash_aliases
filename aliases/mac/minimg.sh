@@ -1,23 +1,9 @@
 #!/bin/zsh
 
 # Strubloid::linux::mining
-RAFAEL_ETH=0x3B97FB923009Bd6A63d950FF359181C6Bd480995
-
-# references: https://www.youtube.com/watch?v=Covog93AweA
-i-amd-basic()
-{
-  # cd ~ && mkdir mining-amd && cd ~/mining-amd
-
-  # Download of the main driver
-  wget --referer=http://support.amd.com https://drivers.amd.com/drivers/linux/amdgpu-pro-21.30-1290604-ubuntu-20.04.tar.xz
-}
-
-# Reference: https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux
-i-intel-nvidia-basic()
-{
-  sudo apt update && sudo apt install nvidia-cuda-toolkit
-
-}
+SEND_MONEY_HERE_ETH=$(loadEnvData SEND_MONEY_HERE_ETH)
+OLD_WALLET_ETH=$(loadEnvData OLD_WALLET_ETH)
+NEW_WALLET_ETH=$SEND_MONEY_HERE_ETH
 
 # reference:https://linuxconfig.org/ethereum-mining-on-ubuntu-18-04-and-debian
 i-wallets()
@@ -37,7 +23,7 @@ i-wallets()
   cd ~/wallets/1.38
   chmod +x lolMiner && chmod +x *.sh
 
-  sed -i 's/0x155da78b788ab54bea1340c10a5422a8ae88142f/0x3B97FB923009Bd6A63d950FF359181C6Bd480995/g' mine_eth.sh
+  sed -i "s/${OLD_WALLET_ETH}/${NEW_WALLET_ETH}/g" mine_eth.sh
 
 }
 

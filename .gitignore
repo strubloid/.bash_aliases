@@ -31,3 +31,6 @@ aliases/ignore/*
 search/search_words.txt
 search/found_elements.csv
 search/not_found_elements.csv
+
+# ignoring the config file
+.env

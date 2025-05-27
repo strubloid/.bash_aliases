@@ -66,26 +66,30 @@ alias rcbashupdate="source ~/.bashrc"
 
 ## Function that will update the terminal
 terminal-update() {
+    
+    # Function to get the project folder
     CurrentFolder=$(pwd)
+
     echo -e "[you are]: $CurrentFolder"
     ProjectFolder=$(getProjectFolder)
 
     # move to the bash_aliases project folder and execute the upgrade function
     echo -e "[moving to]:$ProjectFolder \n"
-    cd "$ProjectFolder"
+    cd "$ProjectFolder" > /dev/null 2>&1
+
     echo -e "[git repository upgrade]: $ProjectFolder \n"
-    git pull origin master
+    git pull origin master > /dev/null 2>&1
 
     echo -e "[upgrade]: starting upgrade of data"
     ./upgrade.sh
 
     # this will update the bash
-    echo -e "\n[updating]:$HOME/.bash_profile"
-    source "$HOME/.bash_profile"
+    # echo -e "\n[updating]:$HOME/.bash_profile"
+    # source "$HOME/.bash_profile"
 
     # back to the previous folder that you're working
     echo -e "[back to]: $CurrentFolder"
-    cd "$CurrentFolder"
+    cd "$CurrentFolder" > /dev/null 2>&1
 
 }
 
@@ -166,7 +170,6 @@ alias ln='ln -i'                    # You need to say 'y' or 'n'
 alias edit='subl'                   # edit:         Opens any file in sublime editor
 alias which='type -all'             # which:        Find executables
 alias path='echo -e ${PATH//:/\\n}' # path:         Echo all executable Paths
-mcd() { mkdir -p "$1" && cd "$1"; } # mcd:          Makes new Dir and jumps inside
 
 # Colorize the grep command output for ease of use (good for log files)##
 alias grep='grep --color=auto'

@@ -2,15 +2,8 @@
 
 # Strubloid::mac::terminal
 
-# alias ls='ls -hp'
 alias ls='ls -FlGAH'
 alias ll='ls -FlGh'
-
-# Extra ls configurations for mac
-export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
-
-cd() { builtin cd "$@"; ls; }
 
 # get processes eating memory
 alias psmem='ps aux | sort -nr -k 4'
@@ -47,15 +40,17 @@ alias rcbashupdate="source ~/.bashrc"
 
 ## Function that will update the terminal
 terminal-update() {
+
     CurrentFolder=$(pwd)
     echo -e "[you are]: $CurrentFolder"
     ProjectFolder=$(getProjectFolder)
 
     # move to the bash_aliases project folder and execute the upgrade function
     echo -e "[moving to]:$ProjectFolder \n"
-    cd "$ProjectFolder"
+    cd "$ProjectFolder" > /dev/null 2>&1
+
     echo -e "[git repository upgrade]: $ProjectFolder \n"
-    git pull origin master
+    git pull origin master > /dev/null 2>&1
 
     echo -e "[upgrade]: starting upgrade of data"
     ./upgrade.sh
@@ -66,7 +61,7 @@ terminal-update() {
 
     # back to the previous folder that you're working
     echo -e "[back to]: $CurrentFolder"
-    cd "$CurrentFolder"
+    cd "$CurrentFolder" > /dev/null 2>&1
 
 }
 

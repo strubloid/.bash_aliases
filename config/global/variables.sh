@@ -1,10 +1,34 @@
 #!/bin/bash
 
+## This will check what is the operational system loaded
+function getOperationalSystem() {
+  case "$OSTYPE" in
+  linux*) echo "linux" ;;
+  darwin*) echo "mac" ;;
+  win*) echo "windows" ;;
+  msys*) echo "msys" ;;
+  cygwin*) echo "cygwin" ;;
+  bsd*) echo "bsd" ;;
+  solaris*) echo "solaris" ;;
+  *) echo "unknown" ;;
+  esac
+}
+
+# Operational System
+OS=$(getOperationalSystem)
+
 # Root folder for the bash_aliases project
 PWD_PROJECT_FOLDER=$(pwd)
 
 ## It will be adding variables to the bash_profile file
-BASHRC_FILE="$HOME/.bashrc"
+if [ "$OS" == "mac" ]; then
+  BASHRC_FILE="$HOME/.zshrc"
+else
+  BASHRC_FILE="$HOME/.bashrc"
+fi
+
+## It will be adding variables to the bash_profile file for zsh
+BASHZSHRC_FILE="$HOME/"
 
 ## Building how should be the line to write inside of bash_profile
 PATH_VARIABLE=$(cat << END
@@ -51,6 +75,23 @@ if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
   fi
 fi
 
+
+## Adding only if not exist that line for mac
+if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
+
+  BASH_PROFILE_LINE_CHECK="if [ -f ~/.bash_profile ]; then"
+  if ! grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
+    echo -e ${BASH_PROFILE_CONFIGURATION_LINE} >> ${BASHRC_FILE}
+  else
+    BASH_PROFILE_UPGRADE_LINE=$(awk -v pattern="if.*.bash_profile.*then" \
+        -v line1="$SEPARATOR_BEFORE" -v line2="$PATH_VARIABLE" \
+        -v line3="$BASH_ALIASES_PROJECT_FOLDER_LINE" \
+        -v line4="$SEPARATOR_AFTER" \
+        "\$0 ~ pattern {print \"\"; print line1; print line2; print line3; print line4; print \"\"; print; next} 1" "$BASHRC_FILE")
+
+    echo -e "$BASH_PROFILE_UPGRADE_LINE" > "$BASHRC_FILE"
+  fi
+fi
 
 ## Multiline variable sample
 #EXAMPLE1=$(cat << END
