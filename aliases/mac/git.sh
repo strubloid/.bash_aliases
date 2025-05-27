@@ -1,27 +1,36 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Strubloid::linux::git
 
+# Protected branches that should not be automatically deleted
+PROTECTED_BRANCHES="main|master|dev"
+
 # git aliases
 alias git-revert="git clean -d -f -f"
-alias gitup-master="git checkout master && git pull origin master && git fetch --all"
 
+# This will remove all the branches that are merged with master
+# and not the master or develop branches
 git-clean-merged(){
-  git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
+  git branch --merged | egrep -v "(^\*|$PROTECTED_BRANCHES)" | xargs git branch -d
 }
 
+# This will remove all the branches that are unmerged with master
+# and not the master or develop branches
 git-clean-unmerged()
 {
-  git branch --no-merged | egrep -v "(^\*|master|dev)" | xargs git branch -D
+  git branch --no-merged | egrep -v "(^\*|$PROTECTED_BRANCHES)" | xargs git branch -D
 }
 
+# This will remove all the branches that are not merged with master
+# and not the master or develop branches
 git-clean-all()
 {
-  git branch | egrep -v "(^\*|master|dev)" | xargs git branch -D
+  git branch | egrep -v "(^\*|$PROTECTED_BRANCHES)" | xargs git branch -D
 }
 
-
 # This will update the master branch
+# it will checkout the master branch, pull the latest changes
+# and checkout the current branch again
 git-update-master() {
   printf "[MASTER] - "
   git checkout master -q && git pull origin master -q  && git checkout . -q
@@ -29,19 +38,26 @@ git-update-master() {
 }
 
 # This will update the develop branch
+# it will checkout the develop branch, pull the latest changes
+# and checkout the current branch again
 git-update-develop() {
   printf "[DEVELOP] - "
   git checkout develop -q && git pull origin develop -q && git checkout . -q
   printf "OK\n"
 }
 
-# This will update the develop branch
+# This will update the main branch
+# it will checkout the main branch, pull the latest changes
+# and checkout the current branch again
 git-update-main() {
   printf "[MAIN] - "
   git checkout main -q && git pull origin main -q && git checkout . -q
   printf "OK\n"
 }
 
+# This will update the release branch
+# it will checkout the release branch, pull the latest changes
+# and checkout the current branch again
 # This will update if you still have release branches in your local machine
 update-release() {
   CURRENT_RELEASE_BRANCH=$(git branch -l | grep -Po 'release.*')
@@ -65,7 +81,8 @@ commit-update-git() {
   # Loading the commit message
   if [ -z "$1" ]
   then
-      read -p "[Commit Message]: " COMMIT_MESSAGE
+      echo -n "[Commit Message]: "
+      read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
       COMMIT_MESSAGE="$1"
@@ -74,7 +91,8 @@ commit-update-git() {
   # Loading should update the base code
   if [ -z "$2" ]
   then
-      read -p "Update Master/Develop [y/n] : " UPDATE_MASTER_DEVELOPER
+      echo -n "Update Master/Develop [y/n] : "
+      read UPDATE_MASTER_DEVELOPER
   else
       # mounting the commit message in the format that jira accepts
       UPDATE_MASTER_DEVELOPER="$1"
@@ -128,7 +146,8 @@ commit-update-master-git() {
   # Loading the commit message
   if [ -z "$1" ]
   then
-      read -p "[Commit Message]: " COMMIT_MESSAGE
+      echo -n "[Commit Message]: "
+      read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
       COMMIT_MESSAGE="$1"
@@ -137,7 +156,8 @@ commit-update-master-git() {
   # Loading should update the base code
   if [ -z "$2" ]
   then
-      read -p "Update Main [y/n] : " UPDATE_MAIN
+      echo -n "Update Main [y/n] : "
+      read UPDATE_MAIN
   else
       # mounting the commit message in the format that jira accepts
       UPDATE_MAIN="$1"
@@ -182,7 +202,8 @@ commit-git() {
   # Loading the commit message
   if [ -z "$1" ]
   then
-      read -p "[Commit Message]: " COMMIT_MESSAGE
+      echo -n "[Commit Message]: "
+      read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
       COMMIT_MESSAGE="$1"
@@ -197,7 +218,8 @@ commit-main() {
   # Loading the commit message
   if [ -z "$1" ]
   then
-      read -p "[Commit Message]: " COMMIT_MESSAGE
+      echo -n "[Commit Message]: "
+      read COMMIT_MESSAGE
   else
       # mounting the commit message in the format that jira accepts
       COMMIT_MESSAGE="$1"
@@ -241,7 +263,8 @@ git-reset-hard(){
   CURRENT_BRANCH=$(git branch --show-current)
 
   echo "[Reverting]: $CURRENT_BRANCH"
-  read -p "can we continue? [y/N]" canContinue
+  echo -n "can we continue? [y/N]"
+  read canContinue
 
   ## this will start only if a user is ok about what is the branch
   ## to revert
@@ -251,7 +274,8 @@ git-reset-hard(){
     # Loading the commit message
     if [ -z "$1" ]
     then
-        read -p "[Branch ID]: " GIT_BRANCH_REFERENCE
+        echo -n "[Branch ID]: "
+        read GIT_BRANCH_REFERENCE
     else
         GIT_BRANCH_REFERENCE="$1"
     fi
@@ -286,7 +310,8 @@ git-copy-status-changes() {
   # Loading Destination folder
   if [ -z "$1" ]
   then
-      read -p "[Destination Folder]: " GIT_STATUS_DESTINATION_FOLDER
+      echo -n "[Destination Folder]: "
+      read GIT_STATUS_DESTINATION_FOLDER
   else
       # mounting the commit message in the format that jira accepts
       GIT_STATUS_DESTINATION_FOLDER="$1"
@@ -302,18 +327,19 @@ git-copy-status-changes() {
 
       ## create of the folder
       FOLDER_STRUCTURE_TO_REPLICATE="$GIT_STATUS_DESTINATION_FOLDER/$RELATIVE_PATH"
-#      mkdir -p -q "$FOLDER_STRUCTURE_TO_REPLICATE"
+      #  mkdir -p -q "$FOLDER_STRUCTURE_TO_REPLICATE"
 
       ## copy over the file to the destination
       cp "$file" "$FOLDER_STRUCTURE_TO_REPLICATE"
 
-#      echo "Copied $file to $FOLDER_STRUCTURE_TO_REPLICATE"
+    # echo "Copied $file to $FOLDER_STRUCTURE_TO_REPLICATE"
 
-      # Debug area
-#      read -p "[Continue ?]: " CONTINUE_PROCESS
-#      if [[ "$CONTINUE_PROCESS" =~ [nN](o)?$ ]]; then
-#        break
-#      fi
+    # Debug area
+    # echo -n "[Continue ?]: "
+    # read CONTINUE_PROCESS
+    # if [[ "$CONTINUE_PROCESS" =~ [nN](o)?$ ]]; then
+    #   break
+    # fi
 
   done
 
@@ -322,7 +348,8 @@ git-copy-status-changes() {
 # A correct way to remove a hotfix branch on localhost after merged with master branch by a code reviewer
 gitflow-clean-hotfix()
 {
-    read -p "Hotfix Branch Name: " 
+    echo -n "Hotfix Branch Name: "
+    read hotfixBranchName
     if [ -z "$hotfixBranchName" ]
     then
         printf "[Err]: You must say what is the hotfix branch name to remove\m"
@@ -334,7 +361,8 @@ gitflow-clean-hotfix()
 # A correct way to remove a feature branch on localhost after merged with master branch by a code reviewer
 gitflow-clean-feature()
 {
-    read -p "Hotfix Branch Name: " 
+    echo -n "Feature Branch Name: "
+    read featureBranchName
     if [ -z "$featureBranchName" ]
     then
         printf "[Err]: You must say what is the feature branch name to remove\m"
@@ -376,9 +404,12 @@ gittag()
         a | add | -add | --add )
             printf "Now you will be passing: Message, Tag name and Git Id (Optional)\n"
             printf "(Optional)-> Means that will get the current commitID\n"
-            read -p "Message : " message
-            read -p "Tag Name : " tag
-            read -p "Git Hash : " hash
+            echo -n "Message : "
+            read message
+            echo -n "Tag Name : "
+            read tag
+            echo -n "Git Hash : "
+            read hash
 
             printf "You said: $message | $tag | $hash | "
 
@@ -392,7 +423,8 @@ gittag()
         ;;
         d | del | -del | --del )
             git tag --list
-            read -p "Tag Name to delete : " tag
+            echo -n "Tag Name to delete : "
+            read tag
             git tag --delete $tag
 
             # Git command to delete a tag into the server
@@ -491,12 +523,14 @@ git-ignore-file-from-commit(){
 
   if [ -z "$1" ]
   then
-    read -p "What is the file to remove from git status? " fileToRemoveFromGitStatus
+    echo -n "What is the file to remove from git status? "
+    read fileToRemoveFromGitStatus
 
     ## Making sure that the file exist before remove from the git status
     while [ ! -f "$fileToRemoveFromGitStatus" ]; do
         echo "[$fileToRemoveFromGitStatus]: does not exist"
-        read -p "What is the file to remove from git status? " fileToRemoveFromGitStatus
+        echo -n "What is the file to remove from git status? "
+        read fileToRemoveFromGitStatus
     done
   else
     fileToRemoveFromGitStatus="$1"

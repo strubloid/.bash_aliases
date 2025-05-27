@@ -1,5 +1,19 @@
 # Strubloid::general::env
 
+## This will check what is the operational system loaded
+function getOperationalSystem() {
+  case "$OSTYPE" in
+  linux*) echo "linux" ;;
+  darwin*) echo "mac" ;;
+  win*) echo "windows" ;;
+  msys*) echo "msys" ;;
+  cygwin*) echo "cygwin" ;;
+  bsd*) echo "bsd" ;;
+  solaris*) echo "solaris" ;;
+  *) echo "unknown" ;;
+  esac
+}
+
 # This will return where is the project folder
 getProjectFolder()
 {
@@ -42,11 +56,20 @@ loadEnvData()
 {
   local envVariableName ENV_FILE envData
 
+  OS=$(getOperationalSystem)
+
   # First argument: variable name (required)
   if [[ -n "$1" ]]; then
     envVariableName="$1"
   else
-    read -p "It is missing the variable name, can you please type it? " envVariableName
+    echo -n "It is missing the variable name, can you please type it? "
+    if [ "$OS" = "linux" ]; then
+      read -p "It is missing the variable name, can you please type it? " envVariableName
+    else
+      # For other OS types, prompt for input
+      echo -n "It is missing the variable name, can you please type it? "
+      read envVariableName
+    fi
   fi
 
   # Second argument: env file (optional, default to .env)

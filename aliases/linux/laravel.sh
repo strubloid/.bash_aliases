@@ -4,7 +4,7 @@
 
 function lv-create-command() {
     if [ -z "$1" ]; then
-      printf "[]: Command Name "
+      printf "* Command Name "
       read commandName
 
       if [ -z "$commandName" ]; then
@@ -35,7 +35,7 @@ function lv-run-command() {
     printf "[Tip]: You must get whatever will be on the \$signature of the app/console/commands \n\n"
 
     if [ -z "$1" ]; then
-      printf "[]: Command Name "
+      printf "* Command Name "
       read commandName
 
       if [ -z "$commandName" ]; then
@@ -52,13 +52,13 @@ function lv-run-command() {
 
 
 function lv-create-migration-table() {
-    printf "[]: Task name: "
+    printf "* Task name: "
     read taskName
     if [ -z "$taskName" ]; then
         printf "[Err]: You must inform the task name\m"
     else
 
-        printf "[]: Table name: "
+        printf "* Table name: "
         read tableName
         if [ -z "$tableName" ]; then
             printf "[Err]: You must inform the table name\m"
@@ -69,7 +69,7 @@ function lv-create-migration-table() {
 }
 
 function lv-create-model() {
-    printf "[]: Model name: "
+    printf "* Model name: "
     read modelName
     if [ -z "$modelName" ]; then
         printf "[Err]: You must inform the Model name\m"
@@ -80,7 +80,7 @@ function lv-create-model() {
 }
 
 function lv-create-seeder() {
-    printf "[]: Seeder name: "
+    printf "* Seeder name: "
     read seederName
     if [ -z "$seederName" ]; then
         printf "[Err]: You must inform the Model name\m"
@@ -101,7 +101,7 @@ function lv-seedrun() {
     fi
 
     if [ -z "$seedToRun" ] ; then
-      printf "[]: Seed Object name: "
+      printf "* Seed Object name: "
       read seedToRun
     fi
 
@@ -129,7 +129,7 @@ function lv-re-run-migration() {
 
   if [ -z "$1" ]; then
 
-    printf "[]: Migration file name: "
+    printf "* Migration file name: "
     read migrationName
 
     if [ -z "$migrationName" ]; then
@@ -148,7 +148,7 @@ function lv-re-run-migration() {
 
 function lv-export-tables() {
 
-    printf "[]: Enter table names (separated by  space): "
+    printf "* Enter table names (separated by  space): "
     read tablesList
     schema="strubloid"
 
@@ -165,7 +165,7 @@ function lv-export-tables() {
 function lv-export-all-tables() {
     
     schema="strubloid"
-    printf "[]: Inform the DBSchema (default: $schema): "
+    printf "* Inform the DBSchema (default: $schema): "
     read dbSchema
     databaseDate=$(date +'%Y-%m-%d')
 
@@ -211,7 +211,7 @@ function lv-cc() {
 }
 
 function lv-new-service-provider() {
-    printf "[]: Service Provider name: "
+    printf "* Service Provider name: "
     read providerName
     if [ -z "$providerName" ]; then
         printf "[Err]: You must inform the Service Provider name\m"

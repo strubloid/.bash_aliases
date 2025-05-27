@@ -3,12 +3,12 @@
 # Strubloid::linux::Vagrant
 
 function vg-up() {
-    printf "[]: Debugging vagrant up command: "
+    printf "* Debugging vagrant up command: "
     VAGRANT_LOG=debug vagrant up
 }
 
 function vg-ssh-config() {
-    printf "[]: Checking ssh configs for a loaded box "
+    printf "* Checking ssh configs for a loaded box "
     vagrant ssh-config
 }
 

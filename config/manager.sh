@@ -118,11 +118,11 @@ setupBashAliasFile() {
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echoLine "[]: Creating the ~/.bash_alias file"
+    echoLine "* Creating the ~/.bash_alias file"
     touch ${HOME_ALIASES}
 
   else
-    echoLine "[]: ~/.bash_alias already exists, moving on"
+    echoLine "* ~/.bash_alias already exists, moving on"
   fi
 }
 
@@ -136,11 +136,11 @@ setupBashProfileFile() {
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echoLine "[]: Creating the ~/.bash_profile file"
+    echoLine "* Creating the ~/.bash_profile file"
     touch ${HOME_PROFILE} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_profile ${HOME_PROFILE}
 
   else
-    echoLine "[]: ~/.bash_profile already exists, moving on"
+    echoLine "* ~/.bash_profile already exists, moving on"
   fi
 
 }
@@ -156,11 +156,11 @@ setupBashVariablesFile() {
   ## checking if doesn't exist the file
   if [[ ${RETURN_CODE} -eq "0" ]]; then
 
-    echoLine "[]: Creating the ~/.bash_profile file"
+    echoLine "* Creating the ~/.bash_profile file"
     touch ${HOME_VARIABLES} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_variables ${HOME_PROFILE}
 
   else
-    echoLine "[]: ~/.bash_profile already exists, moving on"
+    echoLine "* ~/.bash_profile already exists, moving on"
   fi
 
 }
@@ -180,26 +180,26 @@ setupBashPromptFile() {
     if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
       # For macOS with zsh
       if [ -f "$BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh" ]; then
-        echoLine "[]: Creating the ~/.bash_prompt file"
-        echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh"
-        echoLine "[]: to $HOME_PROMPT"
+        echoLine "* Creating the ~/.bash_prompt file"
+        echoLine "* copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh"
+        echoLine "* to $HOME_PROMPT"
         touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt_zsh ${HOME_PROMPT}
       else
         # Fallback to regular prompt if zsh-specific one doesn't exist
-        echoLine "[]: Creating the ~/.bash_prompt file"
-        echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt (zsh-specific not found)"
-        echoLine "[]: to $HOME_PROMPT"
+        echoLine "* Creating the ~/.bash_prompt file"
+        echoLine "* copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt (zsh-specific not found)"
+        echoLine "* to $HOME_PROMPT"
         touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
       fi
     else
       # For other OS or shells
-      echoLine "[]: Creating the ~/.bash_prompt file"
-      echoLine "[]: copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt"
-      echoLine "[]: to $HOME_PROMPT"
+      echoLine "* Creating the ~/.bash_prompt file"
+      echoLine "* copying $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt"
+      echoLine "* to $HOME_PROMPT"
       touch ${HOME_PROMPT} && cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
     fi
   else
-    echoLine "[]: ~/.bash_prompt already exists, moving on"
+    echoLine "* ~/.bash_prompt already exists, moving on"
   fi
 }
 
@@ -213,7 +213,7 @@ updateBashTerminal() {
   if [ "$OS" = "mac" ]; then
     if [ -f ~/.zshrc ]; then
       # Instead of sourcing which can cause errors, just report success
-      echoLine "[]: updating terminal ~/.zshrc"
+      echoLine "* updating terminal ~/.zshrc"
       exec zsh
       # echoLine "[INFO]: Please run 'source ~/.zshrc' manually to apply changes"
     else
@@ -223,7 +223,7 @@ updateBashTerminal() {
   else
     if [ -f "${HOME_PROFILE}" ]; then
       source "${HOME_PROFILE}"
-      echoLine "[]: updating terminal ${HOME_PROFILE}"
+      echoLine "* updating terminal ${HOME_PROFILE}"
     else
       echoLine "[ERR]: missing file ${HOME_PROFILE}"
     fi
@@ -250,7 +250,7 @@ upgradeElementsOnBashProfile() {
   OS=$(getOperationalSystem)
   if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
     PROFILE_FILE="$HOME/.zshrc"
-    echoLine "[]: Using ~/.zshrc for macOS with zsh"
+    echoLine "* Using ~/.zshrc for macOS with zsh"
   fi
   
   ## checking if exist the ~/.bash_g into profile
@@ -261,7 +261,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_GLOBAL} -eq "0" ]]; then
     printf "\n" >>${PROFILE_FILE} && echo "${BASH_GLOBAL_LINE}" >>${PROFILE_FILE}
   else
-    echoLine "[]: ~/.bash_global already exists, moving on"
+    echoLine "* ~/.bash_global already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_aliases into profile
@@ -272,7 +272,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_VARIABLES} -eq "0" ]]; then
     printf "\n" >>${PROFILE_FILE} && echo "${BASH_VARIABLES_LINE}" >>${PROFILE_FILE}
   else
-    echoLine "[]: ~/.bash_variables already exists, moving on"
+    echoLine "* ~/.bash_variables already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_aliases into profile
@@ -283,7 +283,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_ALIAS} -eq "0" ]]; then
     printf "\n" >>${PROFILE_FILE} && echo "${BASH_ALIASES_LINE}" >>${PROFILE_FILE}
   else
-    echoLine "[]: ~/.bash_aliases already exists, moving on"
+    echoLine "* ~/.bash_aliases already exists, moving on"
   fi
 
   ## checking if exist the ~/.bash_prompt into profile
@@ -294,7 +294,7 @@ upgradeElementsOnBashProfile() {
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
     printf "\n" >>${PROFILE_FILE} && echo "${BASH_PROMPT_LINE}" >>${PROFILE_FILE}
   else
-    echoLine "[]: ~/.bash_prompt already exists, moving on"
+    echoLine "* ~/.bash_prompt already exists, moving on"
   fi
 
   # Check if the bash_prompt file exists
@@ -303,7 +303,7 @@ upgradeElementsOnBashProfile() {
     OS=$(getOperationalSystem)
     
     # File exists, update it regardless of content
-    echoLine "[]: ~/.bash_prompt updating"
+    echoLine "* ~/.bash_prompt updating"
 
     # For macOS with zsh, copy the zsh-specific prompt
     if [ "$OS" = "mac" ]; then
@@ -315,7 +315,7 @@ upgradeElementsOnBashProfile() {
       cp $BASH_ALIASES_PROJECT_FOLDER/config/bash_prompt ${HOME_PROMPT}
     fi
   else
-    echoLine "[]: ~/.bash_prompt does not exist, skipping update"
+    echoLine "* ~/.bash_prompt does not exist, skipping update"
   fi
 }
 
@@ -351,9 +351,9 @@ generateBashAlias() {
   
   # Display debug info about which folders we're using
   echoLine "[DEBUG]: Looking for aliases in folders:"
-  echoLine "        => $generalFolder"
+  echoLine "* $generalFolder"
   if [ -n "$osFolder" ]; then
-    echoLine "        => $osFolder"
+    echoLine "* $osFolder"
   fi
   
   # Process all aliases (general and OS-specific) in one loop
@@ -382,7 +382,7 @@ generateBashAlias() {
   # updating the file on the operational system
   if [ -s "${BASH_TEMPORARY_F}" ]; then
     cp ${BASH_TEMPORARY_F} ${HOME_ALIASES}
-    echoLine "[]: creating $HOME/.bash_aliases"
+    echoLine "* creating $HOME/.bash_aliases"
   else
     echo "# No aliases found" > ${HOME_ALIASES}
     echoLine "[WARN]: Created empty $HOME/.bash_aliases (no alias files found)"
@@ -391,7 +391,7 @@ generateBashAlias() {
   # removing the temp file bash_temp
   if [ -f "${BASH_TEMPORARY_F}" ]; then
     rm -f "${BASH_TEMPORARY_F}"
-    echoLine "[]: remove temp file ${BASH_TEMPORARY_F}"
+    echoLine "* remove temp file ${BASH_TEMPORARY_F}"
   fi
 }
 
@@ -408,7 +408,7 @@ setupEnvironmentVariable() {
     printf "\n" >>${HOME_PROFILE} && \
     echo "export BASH_ALIASES_PROJECT_FOLDER=$(pwd)" >> ${HOME_VARIABLES}
   else
-    echoLine "[]: BASH_ALIASES_PROJECT_FOLDER already exists, moving on"
+    echoLine "* BASH_ALIASES_PROJECT_FOLDER already exists, moving on"
   fi
 
 }
@@ -423,7 +423,7 @@ moveScripts(){
     RETURN_CODE=$?
 
     ## checking if folder doesn't exist
-    printf "  []: Exist Folder? "
+    printf "  * Exist Folder? "
     if [[ ${RETURN_CODE} -eq "0" ]]; then
       printf "No, creating a new one\n"
       mkdir -p "$BASH_ALIASES_SCRIPTS"
@@ -434,7 +434,7 @@ moveScripts(){
     ## loading the scripts folder
     BASH_PROJECT_SCRIPS_LOCAL="$BASH_ALIASES_PROJECT_FOLDER/scripts"
 
-    echoLine "[]: Copying"
+    echoLine "* Copying"
     echoLine "=> From: $BASH_PROJECT_SCRIPS_LOCAL"
     echoLine "=> To: $BASH_ALIASES_SCRIPTS"
     cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS

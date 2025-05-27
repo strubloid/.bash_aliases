@@ -28,7 +28,7 @@ heroku-node-new() {
         cd $1
 
         gitignore=$BASH_ALIASES_PROJECT_FOLDER/import/node/.gitignore
-        echo -e "[]: Copying $gitignore"
+        echo -e "* Copying $gitignore"
         cp "$gitignore" .
 
           until read -r -p "Git URL (Mandatory): " gitrepositoryurl && test "$gitrepositoryurl" != ""; do
@@ -46,7 +46,7 @@ heroku-node-new() {
     # creating a variable just to store where is the Server.js
     SERVERJS=$BASH_ALIASES_PROJECT_FOLDER/import/Server.js
 
-    echo -e "[]: Copying $SERVERJS"
+    echo -e "* Copying $SERVERJS"
     cp "$SERVERJS" .
 
     # configuring the express for the Server.js

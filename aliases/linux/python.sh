@@ -51,7 +51,7 @@ sum-gpt()
     SPLIT_FOLDER="$CURRENT_FOLDER/split"
     GPT_FOLDER="$CURRENT_FOLDER/gpt"
 
-    echo "[]: $SPLIT_FOLDER"
+    echo "* $SPLIT_FOLDER"
 
     ## Creating the export folder for the current folder exported knowledge
     if [[ ! -d $SPLIT_FOLDER ]]; then

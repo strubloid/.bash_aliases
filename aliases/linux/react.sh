@@ -32,7 +32,7 @@ react-install-sass(){
 
         # Copy to the src/App.scss base file
         ImportAppScss=$BASH_ALIASES_PROJECT_FOLDER/import/App.scss
-        echo -e "[]: Copying $ImportAppScss"
+        echo -e "* Copying $ImportAppScss"
         cp "$ImportAppScss" $AppScss
 
       else
@@ -43,7 +43,7 @@ react-install-sass(){
   # guarantee that we have binary folder
   binaryFolder="bin"
   if [ ! -d $binaryFolder ]; then
-    echo -e "[]: Creating $ImportAppScss"
+    echo -e "* Creating $ImportAppScss"
     mkdir $binaryFolder
   else
     echo -e "[$binaryFolder]: you have the binary folder already, moving on!"
@@ -53,7 +53,7 @@ react-install-sass(){
   projectBuildCssFile="bin/build-css"
   if [ ! -f $projectBuildCssFile ]; then
     ImportBuildCss=$BASH_ALIASES_PROJECT_FOLDER/import/sass/bin/build-css
-    echo -e "[]: Copying $ImportBuildCss"
+    echo -e "* Copying $ImportBuildCss"
     cp  "$ImportBuildCss" $projectBuildCssFile
   else
       echo -e "[$projectBuildCssFile]: you have it already, moving on!"
@@ -62,7 +62,7 @@ react-install-sass(){
   projectWatchCssFile="bin/watch-css"
   if [ ! -f $projectWatchCssFile ]; then
     ImportWatchCss=$BASH_ALIASES_PROJECT_FOLDER/import/sass/bin/watch-css
-    echo -e "[]: Copying $ImportWatchCss"
+    echo -e "* Copying $ImportWatchCss"
     cp  "$ImportWatchCss" $projectWatchCssFile
   else
       echo -e "[$projectWatchCssFile]: you have it already, moving on!"
@@ -77,7 +77,7 @@ react-install-sass(){
     regexSearch="import.*App.css'"
     regexReplace="import '.\/App.scss'"
     changeInFile "$regexSearch" "$regexReplace" "$srcApp"
-    echo -e "[]: Changing the $srcApp to have App.scss in it"
+    echo -e "* Changing the $srcApp to have App.scss in it"
   fi
 
   packageJson="package.json";
@@ -87,7 +87,7 @@ react-install-sass(){
   else
     buildCssLine='    "build-css": "./bin/build-css",'
     buildWatchLine='    "watch-css": "./bin/watch-css",'
-    echo -e "[]: Adding lines\n$buildCssLine\n$buildWatchLine"
+    echo -e "* Adding lines\n$buildCssLine\n$buildWatchLine"
 
     # Searching for the patter node serve.js to add binaries
     PACKAGEJSONUPDATED=$(awk -v pattern=".*node server.js" \
