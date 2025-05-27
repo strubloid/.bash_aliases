@@ -58,21 +58,53 @@ checkStringExistIntoFile() {
 # Creation of the temp file that we will be using
 # to build the new bash_alias
 function createTempFile() {
+  # Create a temporary file
+  rm -f ${BASH_TEMPORARY_F}
+  touch ${BASH_TEMPORARY_F}
+  
+  # Use absolute paths based on BASH_ALIASES_PROJECT_FOLDER
   # this folder will contain aliases that are common with all the OS
-  generalFolder="./aliases/general"
+  generalFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/general"
 
   # this is the folder that will contain the actual OS specifications
-  operationalSystemFolder="./aliases/$1"
+  operationalSystemFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/$1"
 
   # list of files to load the content
-  listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f ! -iname '*.swp')
+  listOfFilesToUpdate=$(find ${generalFolder} ${operationalSystemFolder} -type f -name "*.sh" ! -iname '*.swp' 2>/dev/null)
+
+  if [ -z "$listOfFilesToUpdate" ]; then
+    echoLine "[WARN]: No alias files found in $generalFolder or $operationalSystemFolder"
+    # Create an empty temporary file to avoid errors
+    echo "# No aliases found" > ${BASH_TEMPORARY_F}
+    return
+  fi
+
+  # Create a header for the file
+  echo "# Generated bash aliases by strubloid's bash_aliases project" > ${BASH_TEMPORARY_F}
+  echo "# $(date)" >> ${BASH_TEMPORARY_F}
+  echo "" >> ${BASH_TEMPORARY_F}
 
   for file in ${listOfFilesToUpdate}; do
-
-    printf '## (Strubloid::Start) FILE: ' >>${BASH_TEMPORARY_F} && printf $file >>${BASH_TEMPORARY_F} && printf '\n\n' >>${BASH_TEMPORARY_F}
-    tail -n +2 ${file} >>${BASH_TEMPORARY_F}
-    printf '\n## (Strubloid::End) ## FILE: ' >>${BASH_TEMPORARY_F} && printf $file >>${BASH_TEMPORARY_F} && printf '\n\n' >>${BASH_TEMPORARY_F}
-
+    # Add a comment with the source file path
+    echo "# Source from: $file" >> ${BASH_TEMPORARY_F}
+    
+    # Check if file is readable
+    if [ -r "$file" ]; then
+      # Skip the first line (shebang) if it exists and append the rest
+      awk '
+        BEGIN { skip_first = 0; }
+        /^#!/ && NR == 1 { skip_first = 1; next; }
+        { print; }
+      ' "$file" >> ${BASH_TEMPORARY_F}
+      
+      # Add a separator
+      echo "" >> ${BASH_TEMPORARY_F}
+      echo "# End of $file" >> ${BASH_TEMPORARY_F}
+      echo "" >> ${BASH_TEMPORARY_F}
+    else
+      echo "# Error: Could not read file $file" >> ${BASH_TEMPORARY_F}
+      echo "" >> ${BASH_TEMPORARY_F}
+    fi
   done
 }
 
@@ -159,19 +191,18 @@ updateBashTerminal() {
   echoHeader "[Update Bash Terminal]: "
 
   OS=$(getOperationalSystem)
-
+  
+  # For macOS with zsh
   if [ "$OS" = "mac" ]; then
-    # Only source .zshrc if already inside Zsh
-    if [ "$SHELL" = "/bin/zsh" ] || [ "$ZSH_VERSION" ]; then
-      if [ -f ~/.zshrc ]; then
-        source ~/.zshrc
-        echoLine "[]: updating terminal ~/.zshrc"
-      else
-        echoLine "[ERR]: missing file ~/.zshrc"
-      fi
+    if [ -f ~/.zshrc ]; then
+      # Instead of sourcing which can cause errors, just report success
+      echoLine "[]: updating terminal ~/.zshrc"
+      exec zsh
+      # echoLine "[INFO]: Please run 'source ~/.zshrc' manually to apply changes"
     else
-      echoLine "[WARN]: Detected macOS, but current shell is not Zsh. Skipping .zshrc sourcing."
+      echoLine "[ERR]: missing file ~/.zshrc"
     fi
+  # For other systems using bash
   else
     if [ -f "${HOME_PROFILE}" ]; then
       source "${HOME_PROFILE}"
@@ -183,7 +214,7 @@ updateBashTerminal() {
 }
 
 
-## This will make sure that will exist on the ~/.bash_profile the lines:
+## This will make sure that will exist on the ~/.bash_profile or ~/.zshrc the lines:
 ##
 ## if [ -f ~/.bash_aliases ]; then
 ##    . ~/.bash_aliases
@@ -194,65 +225,105 @@ updateBashTerminal() {
 ## fi
 upgradeElementsOnBashProfile() {
   echoHeader "[Upgrade Elements On Bash Profile]: "
-
-  ## checking if exist the ~/.bash_g into ~/.bash_profile
-  checkStringExistIntoFile "~/.bash_global" ${HOME_PROFILE}
+  
+  # Determine the correct profile file based on the shell
+  PROFILE_FILE=${HOME_PROFILE}
+  
+  # For macOS, check if we're using zsh
+  OS=$(getOperationalSystem)
+  if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
+    PROFILE_FILE="$HOME/.zshrc"
+    echoLine "[]: Using ~/.zshrc for macOS with zsh"
+  fi
+  
+  ## checking if exist the ~/.bash_g into profile
+  checkStringExistIntoFile "~/.bash_global" ${PROFILE_FILE}
   EXIST_GLOBAL=$?
 
-  ## This will add if the result isn't on ~/.bash_profile
+  ## This will add if the result isn't on profile
   if [[ ${EXIST_GLOBAL} -eq "0" ]]; then
-    printf "\n" >>${HOME_PROFILE} && echo "${BASH_GLOBAL_LINE}" >>${HOME_PROFILE}
+    printf "\n" >>${PROFILE_FILE} && echo "${BASH_GLOBAL_LINE}" >>${PROFILE_FILE}
   else
     echoLine "[]: ~/.bash_global already exists, moving on"
   fi
 
-  ## checking if exist the ~/.bash_aliases into ~/.bash_profile
-  checkStringExistIntoFile "~/.bash_variables" ${HOME_PROFILE}
+  ## checking if exist the ~/.bash_aliases into profile
+  checkStringExistIntoFile "~/.bash_variables" ${PROFILE_FILE}
   EXIST_VARIABLES=$?
 
-  ## This will add if the result isn't on ~/.bash_profile
+  ## This will add if the result isn't on profile
   if [[ ${EXIST_VARIABLES} -eq "0" ]]; then
-    printf "\n" >>${HOME_PROFILE} && echo "${BASH_VARIABLES_LINE}" >>${HOME_PROFILE}
+    printf "\n" >>${PROFILE_FILE} && echo "${BASH_VARIABLES_LINE}" >>${PROFILE_FILE}
   else
     echoLine "[]: ~/.bash_variables already exists, moving on"
   fi
 
-  ## checking if exist the ~/.bash_aliases into ~/.bash_profile
-  checkStringExistIntoFile "~/.bash_aliases" ${HOME_PROFILE}
+  ## checking if exist the ~/.bash_aliases into profile
+  checkStringExistIntoFile "~/.bash_aliases" ${PROFILE_FILE}
   EXIST_ALIAS=$?
 
-  ## This will add if the result isn't on ~/.bash_profile
+  ## This will add if the result isn't on profile
   if [[ ${EXIST_ALIAS} -eq "0" ]]; then
-    printf "\n" >>${HOME_PROFILE} && echo "${BASH_ALIASES_LINE}" >>${HOME_PROFILE}
+    printf "\n" >>${PROFILE_FILE} && echo "${BASH_ALIASES_LINE}" >>${PROFILE_FILE}
   else
     echoLine "[]: ~/.bash_aliases already exists, moving on"
   fi
 
-  ## checking if exist the ~/.bash_prompt into ~/.bash_profile
-  checkStringExistIntoFile "~/.bash_prompt" ${HOME_PROFILE}
+  ## checking if exist the ~/.bash_prompt into profile
+  checkStringExistIntoFile "~/.bash_prompt" ${PROFILE_FILE}
   EXIST_PROMPT=$?
 
-  ## This will add if the result isn't on ~/.bash_profile
+  ## This will add if the result isn't on profile
   if [[ ${EXIST_PROMPT} -eq "0" ]]; then
-    printf "\n" >>${HOME_PROFILE} && echo "${BASH_PROMPT_LINE}" >>${HOME_PROFILE}
+    printf "\n" >>${PROFILE_FILE} && echo "${BASH_PROMPT_LINE}" >>${PROFILE_FILE}
   else
     echoLine "[]: ~/.bash_prompt already exists, moving on"
   fi
 
-    ## checking if exist the ~/.bash_prompt into ~/.bash_profile
-  checkStringExistIntoFile "~/.git-completion.bash" ${HOME_PROFILE}
-  EXIST_GIT_COMPLETION=$?
-
-  ## This will add if the result isnt on ~/.bash_profile
-  if [[ ${EXIST_GIT_COMPLETION} -eq "0" ]]; then
-    printf "\n" >>${HOME_PROFILE} && echo "${GIT_COMPLETION_LINE}" >>${HOME_PROFILE}
-  fi
-
-  gitCompletion=~/.git-completion.bash
-  if [ ! -f "$gitCompletion" ]; then
-    curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
+      ## checking if exist the git completion in profile
+  # Handle git completion based on shell
+  OS=$(getOperationalSystem)
+  if [ "$OS" = "mac" ] && [ "$SHELL" = "/bin/zsh" -o -n "$ZSH_VERSION" ]; then
+    # For zsh with Oh My Zsh, git completion is already handled
+    if grep -q "oh-my-zsh" ${PROFILE_FILE}; then
+      echoLine "[]: Using Oh My Zsh's git plugin for completion"
+      
+      # Remove the old git-completion.bash reference from bash_profile if it exists
+      if [ -f "${HOME_PROFILE}" ] && grep -q "git-completion.bash" "${HOME_PROFILE}"; then
+        # Create a temporary file without the git completion line
+        grep -v "git-completion.bash" "${HOME_PROFILE}" > "${HOME_PROFILE}.tmp" && mv "${HOME_PROFILE}.tmp" "${HOME_PROFILE}"
+        echoLine "[]: Removed git-completion.bash reference from ${HOME_PROFILE}"
+      fi
+    else
+      # For zsh without Oh My Zsh, add standard zsh completion
+      checkStringExistIntoFile "# Git completion for zsh" ${PROFILE_FILE}
+      EXIST_ZSH_GIT_COMPLETION=$?
+      
+      if [[ ${EXIST_ZSH_GIT_COMPLETION} -eq "0" ]]; then
+        # Add zsh-specific git completion configuration
+        printf "\n# Git completion for zsh\n" >> ${PROFILE_FILE}
+        printf "# Git completion is built into zsh\n" >> ${PROFILE_FILE}
+        printf "autoload -Uz compinit && compinit\n" >> ${PROFILE_FILE}
+      else
+        echoLine "[]: Git completion for zsh already exists"
+      fi
+    fi
   else
-    echoLine "[]: ~/.git-completeon already exists, moving on"
+    # For bash, use git-completion.bash
+    checkStringExistIntoFile "~/.git-completion.bash" ${PROFILE_FILE}
+    EXIST_GIT_COMPLETION=$?
+
+    ## This will add if the result isn't in profile
+    if [[ ${EXIST_GIT_COMPLETION} -eq "0" ]]; then
+      printf "\n" >>${PROFILE_FILE} && echo "${GIT_COMPLETION_LINE}" >>${PROFILE_FILE}
+    fi
+
+    gitCompletion=~/.git-completion.bash
+    if [ ! -f "$gitCompletion" ]; then
+      curl "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash" -o ~/.git-completion.bash
+    else
+      echoLine "[]: ~/.git-completeon already exists, moving on"
+    fi
   fi
 
 # fix the mac version of it
@@ -279,29 +350,80 @@ upgradeElementsOnBashProfile() {
 
 }
 
-## Generation/replecament of the .bash_aliases file
+## Generation/replacement of the .bash_aliases file
 generateBashAlias() {
   echoHeader "[Generate Bash Alias]: "
 
   # getting what is the operational system
   operationalSystem=$(getOperationalSystem)
+  echoLine "[DEBUG]: Operating system detected: $operationalSystem"
 
-  # removing the temp file bash_temp
-  removeTempFile
+  # removing the temp file bash_temp if it exists
+  if [ -f "${BASH_TEMPORARY_F}" ]; then
+    rm -f "${BASH_TEMPORARY_F}"
+    echoLine "[DEBUG]: Removed existing temp file ${BASH_TEMPORARY_F}"
+  fi
 
-  # this folder will contain aliases that are common with all the OS
-  generalFolder="./aliases/general"
+  # Create a basic template for the aliases file
+  echo "# Generated bash aliases by strubloid's bash_aliases project" > ${BASH_TEMPORARY_F}
+  echo "# $(date)" >> ${BASH_TEMPORARY_F}
+  echo "" >> ${BASH_TEMPORARY_F}
 
-  # Creating the temp file bash_temp with all aliases
-  createTempFile ${operationalSystem}
+  # Define folders based on operational system
+  generalFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/general"
+  osFolder=""
+  
+  # Set the OS-specific folder
+  case "$operationalSystem" in
+    mac)    osFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/mac" ;;
+    linux)  osFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/linux" ;;
+    *)      echoLine "[WARN]: Unsupported OS: $operationalSystem, using only general aliases" ;;
+  esac
+  
+  # Display debug info about which folders we're using
+  echoLine "[DEBUG]: Looking for aliases in folders:"
+  echoLine "        => $generalFolder"
+  if [ -n "$osFolder" ]; then
+    echoLine "        => $osFolder"
+  fi
+  
+  # Process all aliases (general and OS-specific) in one loop
+  for folder in "$generalFolder" "$osFolder"; do
+    # Skip empty folders (in case OS folder wasn't set)
+    if [ -z "$folder" ] || [ ! -d "$folder" ]; then
+      continue
+    fi
+    
+    # Process all .sh files in the folder
+    for file in "$folder"/*.sh; do
+      if [ -f "$file" ]; then
+        echoLine "[DEBUG]: Processing $file"
+        echo "# Source from: $file" >> ${BASH_TEMPORARY_F}
+        
+        # Extract content excluding shebang
+        awk 'NR==1 && /^#!/ {next} {print}' "$file" >> ${BASH_TEMPORARY_F}
+        
+        echo "" >> ${BASH_TEMPORARY_F}
+        echo "# End of $file" >> ${BASH_TEMPORARY_F}
+        echo "" >> ${BASH_TEMPORARY_F}
+      fi
+    done
+  done
 
   # updating the file on the operational system
-  cp ${BASH_TEMPORARY_F} ${HOME_ALIASES}
-  echoLine "[]: creating $HOME/.bash_aliases"
+  if [ -s "${BASH_TEMPORARY_F}" ]; then
+    cp ${BASH_TEMPORARY_F} ${HOME_ALIASES}
+    echoLine "[]: creating $HOME/.bash_aliases"
+  else
+    echo "# No aliases found" > ${HOME_ALIASES}
+    echoLine "[WARN]: Created empty $HOME/.bash_aliases (no alias files found)"
+  fi
 
   # removing the temp file bash_temp
-  removeTempFile
-  echoLine "[]: remove temp file ${BASH_TEMPORARY_F}"
+  if [ -f "${BASH_TEMPORARY_F}" ]; then
+    rm -f "${BASH_TEMPORARY_F}"
+    echoLine "[]: remove temp file ${BASH_TEMPORARY_F}"
+  fi
 }
 
 # This will set the environment variable for this folder

@@ -1,4 +1,43 @@
 # Strubloid::general::env
+
+# This will return where is the project folder
+getProjectFolder()
+{
+  echo $BASH_ALIASES_PROJECT_FOLDER
+}
+
+# Toggle debug mode on/off
+toggleDebug()
+{
+  if [[ "$DEBUG" == "1" ]]; then
+    export DEBUG=0
+    echo "Debug mode OFF"
+  else
+    export DEBUG=1
+    echo "Debug mode ON"
+  fi
+  
+  # Add the DEBUG setting to .bash_variables to persist it
+  if grep -q "export DEBUG=" "$HOME/.bash_variables"; then
+    # Update existing DEBUG line
+    sed -i.bak "s/export DEBUG=./export DEBUG=$DEBUG/" "$HOME/.bash_variables"
+    rm -f "$HOME/.bash_variables.bak" 2>/dev/null
+  else
+    # Add DEBUG line if it doesn't exist
+    echo "export DEBUG=$DEBUG" >> "$HOME/.bash_variables"
+  fi
+}
+
+# Show current debug status
+debugStatus()
+{
+  if [[ "$DEBUG" == "1" ]]; then
+    echo "Debug mode is currently ON"
+  else
+    echo "Debug mode is currently OFF"
+  fi
+}
+
 loadEnvData()
 {
   local envVariableName ENV_FILE envData

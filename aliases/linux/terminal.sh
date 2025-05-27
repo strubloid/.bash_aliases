@@ -2,16 +2,12 @@
 
 # Strubloid::linux::terminal
 
-# Basic commands
-
 # Preferred 'ls' implementation
 alias ls='ls -FlAhp --color=auto'
 
 ls-watch(){
-watch -n 1 'stat -c "- %s %n" *'
+  watch -n 1 'stat -c "- %s %n" *'
 }
-
-
 
 #   lr:  Full Recursive Directory Listing
 alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
@@ -70,25 +66,31 @@ terminal-update() {
     # Function to get the project folder
     CurrentFolder=$(pwd)
 
-    echo -e "[you are]: $CurrentFolder"
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e "[you are]: $CurrentFolder"
+    fi
     ProjectFolder=$(getProjectFolder)
 
     # move to the bash_aliases project folder and execute the upgrade function
-    echo -e "[moving to]:$ProjectFolder \n"
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e "[moving to]:$ProjectFolder \n"
+    fi
     cd "$ProjectFolder" > /dev/null 2>&1
 
-    echo -e "[git repository upgrade]: $ProjectFolder \n"
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e "[git repository upgrade]: $ProjectFolder \n"
+    fi
     git pull origin master > /dev/null 2>&1
 
-    echo -e "[upgrade]: starting upgrade of data"
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e "[upgrade]: starting upgrade of data"
+    fi
     ./upgrade.sh
 
-    # this will update the bash
-    # echo -e "\n[updating]:$HOME/.bash_profile"
-    # source "$HOME/.bash_profile"
-
     # back to the previous folder that you're working
-    echo -e "[back to]: $CurrentFolder"
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e "[back to]: $CurrentFolder"
+    fi
     cd "$CurrentFolder" > /dev/null 2>&1
 
 }

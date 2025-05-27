@@ -21,14 +21,14 @@ OS=$(getOperationalSystem)
 PWD_PROJECT_FOLDER=$(pwd)
 
 ## It will be adding variables to the bash_profile file
-if [ "$OS" == "mac" ]; then
+if [ "$OS" = "mac" ]; then
   BASHRC_FILE="$HOME/.zshrc"
 else
   BASHRC_FILE="$HOME/.bashrc"
 fi
 
-## It will be adding variables to the bash_profile file for zsh
-BASHZSHRC_FILE="$HOME/"
+## It will be adding variables to the bash_profile file for zsh (if needed in future)
+# BASHZSHRC_FILE="$HOME/.zshrc"
 
 ## Building how should be the line to write inside of bash_profile
 PATH_VARIABLE=$(cat << END

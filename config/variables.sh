@@ -9,6 +9,7 @@ export HOME_PROMPT="$HOME/.bash_prompt"
 export BASHRC="$HOME/.bashrc"
 export BASH_TEMPORARY_F='bash_temp'
 export BASH_ALIASES_PROJECT_FOLDER=$(pwd)
+export DEBUG=0 # Set to 1 to enable debug messages, 0 to disable
 
 export BASH_GLOBAL_LINE=$(cat << END
 ## installed by strubloid
