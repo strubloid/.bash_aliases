@@ -158,15 +158,19 @@ setupBashPromptFile() {
 updateBashTerminal() {
   echoHeader "[Update Bash Terminal]: "
 
-  ## Checking the operational system
   OS=$(getOperationalSystem)
 
   if [ "$OS" = "mac" ]; then
-    if [ -f ~/.zshrc ]; then
-      source ~/.zshrc
-      echoLine "[]: updating terminal ~/.zshrc"
+    # Only source .zshrc if already inside Zsh
+    if [ "$SHELL" = "/bin/zsh" ] || [ "$ZSH_VERSION" ]; then
+      if [ -f ~/.zshrc ]; then
+        source ~/.zshrc
+        echoLine "[]: updating terminal ~/.zshrc"
+      else
+        echoLine "[ERR]: missing file ~/.zshrc"
+      fi
     else
-      echoLine "[ERR]: missing file ~/.zshrc"
+      echoLine "[WARN]: Detected macOS, but current shell is not Zsh. Skipping .zshrc sourcing."
     fi
   else
     if [ -f "${HOME_PROFILE}" ]; then

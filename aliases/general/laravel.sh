@@ -16,18 +16,18 @@ function lv-create-command() {
     command="$1"
   fi
 
-  vagrant ssh -c "cd /var/www/cartolytics && php artisan make:command $command"
+  vagrant ssh -c "cd /var/www/work && php artisan make:command $command"
 }
 
 
 function lv-scheduler-list() {
-    vagrant ssh -c "cd /var/www/cartolytics && php artisan schedule:list"
+    vagrant ssh -c "cd /var/www/work && php artisan schedule:list"
 }
 
 function lv-scheduler-run() {
 
     printf "[Tip]: This will run all scheduled commands on app/Console/Kernel.php\n\n"
-    vagrant ssh -c "cd /var/www/cartolytics && php artisan schedule:run"
+    vagrant ssh -c "cd /var/www/work && php artisan schedule:run"
 }
 
 function lv-command-run() {
@@ -47,7 +47,7 @@ function lv-command-run() {
     command="$1"
   fi
 
-  vagrant ssh -c "cd /var/www/cartolytics && php artisan $command"
+  vagrant ssh -c "cd /var/www/work && php artisan $command"
 }
 
 
@@ -74,7 +74,7 @@ function lv-create-model() {
     if [ -z "$modelName" ]; then
         printf "[Err]: You must inform the Model name\m"
     else
-        vagrant ssh -c "cd /var/www/cartolytics && php artisan make:model $modelName"
+        vagrant ssh -c "cd /var/www/work && php artisan make:model $modelName"
     fi
 
 }
@@ -102,13 +102,13 @@ function lv-seed-run() {
   echo "${seedToRun}" > /tmp/laravel_previous_seed.dat
 
   # running the thing
-  vagrant ssh -c "cd /var/www/cartolytics && && composer dump-autoload &&  php artisan db:seed --class=$seedToRun"
+  vagrant ssh -c "cd /var/www/work && && composer dump-autoload &&  php artisan db:seed --class=$seedToRun"
 
 }
 
 
 function lv-migrate() {
-  vagrant ssh -c "cd /var/www/cartolytics && php artisan migrate"
+  vagrant ssh -c "cd /var/www/work && php artisan migrate"
 }
 
 function lv-re-run-migration() {
@@ -128,7 +128,7 @@ function lv-re-run-migration() {
     path="/database/migrations/$1.php"
   fi
 
-  vagrant ssh -c "cd /var/www/cartolytics && php artisan migrate:refresh --path=$path"
+  vagrant ssh -c "cd /var/www/work && php artisan migrate:refresh --path=$path"
 
 }
 
@@ -142,7 +142,7 @@ function lv-export-tables() {
         printf "[Err]: You must inform at least one table name\m"
     else
         databaseDate=$(date +'%m-%d-%Y')
-        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $schema $tablesList > ${databaseDate}-exported-database.sql"
+        vagrant ssh -c "cd /var/www/work && mysqldump -u root -proot $schema $tablesList > ${databaseDate}-exported-database.sql"
     fi
 
 }
@@ -156,33 +156,33 @@ function lv-export-all-tables() {
     databaseDate=$(date +'%Y-%m-%d')
 
     if [ -z "$dbSchema" ]; then
-        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $schema > ${databaseDate}-exported-database.sql"
+        vagrant ssh -c "cd /var/www/work && mysqldump -u root -proot $schema > ${databaseDate}-exported-database.sql"
     else
-        vagrant ssh -c "cd /var/www/cartolytics && mysqldump -u root -proot $dbSchema > ${databaseDate}-exported-database.sql"
+        vagrant ssh -c "cd /var/www/work && mysqldump -u root -proot $dbSchema > ${databaseDate}-exported-database.sql"
     fi
 
 }
 
 function lv-publish-migration() {
-    vagrant ssh -c 'cd /var/www/cartolytics && php artisan migrate'
+    vagrant ssh -c 'cd /var/www/work && php artisan migrate'
 }
 
 function lv-rollback-migration() {
-    vagrant ssh -c 'cd /var/www/cartolytics && php artisan migrate:rollback'
+    vagrant ssh -c 'cd /var/www/work && php artisan migrate:rollback'
 }
 
 function lv-refresh() {
-    vagrant ssh -c 'cd /var/www/cartolytics && php artisan config:cache'
+    vagrant ssh -c 'cd /var/www/work && php artisan config:cache'
 }
 
 
 function vagrant-xdebug-enabled() {
-    vagrant ssh -c 'cd /var/www/cartolytics && php --info | grep xdebug'
+    vagrant ssh -c 'cd /var/www/work && php --info | grep xdebug'
 }
 
 
 function lv-cc() {
-    vagrant ssh -c 'cd /var/www/cartolytics && php artisan route:clear && php artisan config:clear && php artisan cache:clear'
+    vagrant ssh -c 'cd /var/www/work && php artisan route:clear && php artisan config:clear && php artisan cache:clear'
 }
 
 function lv-new-service-provider() {
@@ -191,7 +191,7 @@ function lv-new-service-provider() {
     if [ -z "$providerName" ]; then
         printf "[Err]: You must inform the Service Provider name\m"
     else
-        vagrant ssh -c "cd /var/www/cartolytics && php artisan make:provider $providerName"
+        vagrant ssh -c "cd /var/www/work && php artisan make:provider $providerName"
     fi
 
 }

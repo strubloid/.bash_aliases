@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Strubloid::linux::mining
 RAFAEL_ETH=0x3B97FB923009Bd6A63d950FF359181C6Bd480995
