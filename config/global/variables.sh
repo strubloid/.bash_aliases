@@ -27,9 +27,6 @@ else
   BASHRC_FILE="$HOME/.bashrc"
 fi
 
-## It will be adding variables to the bash_profile file for zsh (if needed in future)
-# BASHZSHRC_FILE="$HOME/.zshrc"
-
 ## Building how should be the line to write inside of bash_profile
 PATH_VARIABLE=$(cat << END
 export PATH="$PATH:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"

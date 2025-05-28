@@ -1,6 +1,7 @@
 #!/bin/zsh
 
-source $(pwd)/config/global/functions.sh
+# Use $BASH_ALIASES_PROJECT_FOLDER with proper variable expansion
+source "${BASH_ALIASES_PROJECT_FOLDER}/config/global/functions.sh"
 
 # Strubloid::linux::git
 
