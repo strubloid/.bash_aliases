@@ -22,3 +22,6 @@ export DISPLAY=:1
 
 ##  flatpack update for a fix
 export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+
+## Updating the docker buildkit
+export DOCKER_BUILDKIT=1
