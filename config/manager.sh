@@ -208,6 +208,7 @@ updateBashTerminal() {
   echoHeader "[Update Bash Terminal]: "
 
   OS=$(getOperationalSystem)
+  echoLine "* OS: $OS"
   
   # For macOS with zsh
   if [ "$OS" = "mac" ]; then
