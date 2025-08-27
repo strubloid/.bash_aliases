@@ -10,3 +10,4 @@ curl() {
   fi
   command curl "$url" "${@:2}"
 }
+
