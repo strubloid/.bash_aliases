@@ -18,7 +18,7 @@ git-compare-with-master(){
 git-compare-improved() {
   # Get current branch
   CURRENT_BRANCH=$(git branch --show-current)
-  echo "[2.0] Current branch: $CURRENT_BRANCH"
+  echo "[3.0] Current branch: $CURRENT_BRANCH"
   
   # Get all branches except current branch
   BRANCHES=($(git branch --format='%(refname:short)' | grep -v "^$CURRENT_BRANCH$"))
@@ -171,13 +171,13 @@ git-compare-improved() {
       1)
         # Just dump the file names and status directly to terminal
         git diff --name-status "$CURRENT_BRANCH".."$SELECTED_BRANCH"
-        break
         ;;
+      
       2)
-        # Run git diff directly for complete output
-        git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH"
-        break
+        # Run git diff directly for complete output and pipe to cat to avoid pager
+        git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" | cat
         ;;
+      
       3)
         # Get list of files that have changed
         CHANGED_FILES=($(git diff --name-only "$CURRENT_BRANCH".."$SELECTED_BRANCH"))
@@ -251,7 +251,7 @@ git-compare-improved() {
           clear
           echo "Showing diff for: $selected_file"
           echo "-------------------------------------------"
-          git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$selected_file"
+          git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$selected_file" | cat
           
           # Ask if user wants to see another file
           echo ""
