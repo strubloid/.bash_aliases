@@ -18,7 +18,7 @@ git-compare-with-master(){
 git-compare-improved() {
   # Get current branch
   CURRENT_BRANCH=$(git branch --show-current)
-  echo "[4.0]> Current branch: $CURRENT_BRANCH"
+  echo "[2.0] Current branch: $CURRENT_BRANCH"
   
   # Get all branches except current branch
   BRANCHES=($(git branch --format='%(refname:short)' | grep -v "^$CURRENT_BRANCH$"))
@@ -29,30 +29,145 @@ git-compare-improved() {
     return 1
   fi
   
-  # Show interactive branch selection
+  # Show interactive branch selection with improved UI
   echo "Select a branch to compare with $CURRENT_BRANCH:"
   
-  # Use select for interactive menu
-  select SELECTED_BRANCH in "${BRANCHES[@]}"; do
-    if [ -n "$SELECTED_BRANCH" ]; then
+  # Custom menu implementation for better branch selection UI
+  selected=0
+  key=""
+  
+  # Function to display the branch menu
+  display_branch_menu() {
+    clear
+    echo "Choose a branch to compare with $CURRENT_BRANCH:"
+    echo ""
+    
+    for i in "${!BRANCHES[@]}"; do
+      if [ "$i" -eq "$selected" ]; then
+        echo -e "▶ \033[1;36m${BRANCHES[$i]}\033[0m"
+      else
+        echo "  ${BRANCHES[$i]}"
+      fi
+    done
+    
+    echo ""
+    echo -e "\033[1;33mCompare $CURRENT_BRANCH with ${BRANCHES[$selected]}\033[0m"
+    echo ""
+    echo "Use ↑/↓ (k/j) to navigate, Enter to select, Esc to cancel"
+  }
+  
+  # Show the menu and handle key presses
+  while true; do
+    display_branch_menu
+    
+    # Read a single key press
+    read -s -n 1 key
+    
+    # Handle special keys
+    if [[ $key == $'\e' ]]; then
+      # ESC key or arrow key sequence
+      read -s -n 2 -t 0.1 key2
+      if [[ $key2 == "[A" ]] || [[ $key == "k" ]]; then
+        # Up arrow or k key
+        selected=$(( (selected - 1 + ${#BRANCHES[@]}) % ${#BRANCHES[@]} ))
+      elif [[ $key2 == "[B" ]] || [[ $key == "j" ]]; then
+        # Down arrow or j key
+        selected=$(( (selected + 1) % ${#BRANCHES[@]} ))
+      elif [[ -z $key2 ]]; then
+        # Just ESC key, exit
+        echo "Operation cancelled"
+        return
+      fi
+    elif [[ $key == "k" ]]; then
+      # k key (up)
+      selected=$(( (selected - 1 + ${#BRANCHES[@]}) % ${#BRANCHES[@]} ))
+    elif [[ $key == "j" ]]; then
+      # j key (down)
+      selected=$(( (selected + 1) % ${#BRANCHES[@]} ))
+    elif [[ $key == "" ]]; then
+      # Enter key, select current option
+      SELECTED_BRANCH="${BRANCHES[$selected]}"
       break
-    else
-      echo "Invalid selection. Please try again."
     fi
   done
   
   # Show comparison options
   echo ""
-  echo "Select comparison option:"
+  echo "Choose comparison option:"
   
+  # Define options and their descriptions
   OPTIONS=(
     "Show changed files (names only)"
-    "Show all differences (complete diff)"
+    "Show all differences (complete diff)" 
     "Show list of changed files"
   )
   
-  select OPTION in "${OPTIONS[@]}"; do
-    case $REPLY in
+  DESCRIPTIONS=(
+    "Lists modified files without showing their content"
+    "Shows complete diff output for all changed files"
+    "Interactive selection of individual files to view"
+  )
+  
+  # Custom menu implementation for better UI
+  selected=0
+  key=""
+  
+  # Function to display the menu
+  display_menu() {
+    clear
+    echo "Choose comparison option between $CURRENT_BRANCH and $SELECTED_BRANCH:"
+    echo ""
+    
+    for i in "${!OPTIONS[@]}"; do
+      if [ "$i" -eq "$selected" ]; then
+        echo -e "▶ \033[1;36m${OPTIONS[$i]}\033[0m"
+      else
+        echo "  ${OPTIONS[$i]}"
+      fi
+    done
+    
+    echo ""
+    echo -e "\033[1;33m${DESCRIPTIONS[$selected]}\033[0m"
+    echo ""
+    echo "Use ↑/↓ (k/j) to navigate, Enter to select, Esc to cancel"
+  }
+  
+  # Show the menu and handle key presses
+  while true; do
+    display_menu
+    
+    # Read a single key press
+    read -s -n 1 key
+    
+    # Handle special keys
+    if [[ $key == $'\e' ]]; then
+      # ESC key or arrow key sequence
+      read -s -n 2 -t 0.1 key2
+      if [[ $key2 == "[A" ]] || [[ $key == "k" ]]; then
+        # Up arrow or k key
+        selected=$(( (selected - 1 + ${#OPTIONS[@]}) % ${#OPTIONS[@]} ))
+      elif [[ $key2 == "[B" ]] || [[ $key == "j" ]]; then
+        # Down arrow or j key
+        selected=$(( (selected + 1) % ${#OPTIONS[@]} ))
+      elif [[ -z $key2 ]]; then
+        # Just ESC key, exit
+        echo "Operation cancelled"
+        return
+      fi
+    elif [[ $key == "k" ]]; then
+      # k key (up)
+      selected=$(( (selected - 1 + ${#OPTIONS[@]}) % ${#OPTIONS[@]} ))
+    elif [[ $key == "j" ]]; then
+      # j key (down)
+      selected=$(( (selected + 1) % ${#OPTIONS[@]} ))
+    elif [[ $key == "" ]]; then
+      # Enter key, select current option
+      break
+    fi
+  done
+  
+  # Process the selected option
+  case $((selected + 1)) in
       1)
         # Just dump the file names and status directly to terminal
         git diff --name-status "$CURRENT_BRANCH".."$SELECTED_BRANCH"
@@ -72,34 +187,85 @@ git-compare-improved() {
           return 0
         fi
         
-        # Interactive file selection loop
+        # Interactive file selection loop with improved UI
         while true; do
-          # Display list of changed files with numbers
-          echo "Changed files between $CURRENT_BRANCH and $SELECTED_BRANCH:"
-          select FILE in "${CHANGED_FILES[@]}"; do
-            if [ -n "$FILE" ]; then
-              # Show diff for selected file
-              git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$FILE"
+          # Custom menu implementation for file selection
+          file_selected=0
+          
+          # Function to display the file selection menu
+          display_file_menu() {
+            clear
+            echo "Choose a file to view diff:"
+            echo ""
+            
+            for i in "${!CHANGED_FILES[@]}"; do
+              if [ "$i" -eq "$file_selected" ]; then
+                echo -e "▶ \033[1;36m${CHANGED_FILES[$i]}\033[0m"
+              else
+                echo "  ${CHANGED_FILES[$i]}"
+              fi
+            done
+            
+            echo ""
+            # Show a preview of the file type or path
+            echo -e "\033[1;33mFile: ${CHANGED_FILES[$file_selected]}\033[0m"
+            echo ""
+            echo "Use ↑/↓ (k/j) to navigate, Enter to select, Esc to cancel"
+          }
+          
+          # Show the file menu and handle key presses
+          while true; do
+            display_file_menu
+            
+            # Read a single key press
+            read -s -n 1 key
+            
+            # Handle special keys
+            if [[ $key == $'\e' ]]; then
+              # ESC key or arrow key sequence
+              read -s -n 2 -t 0.1 key2
+              if [[ $key2 == "[A" ]] || [[ $key == "k" ]]; then
+                # Up arrow or k key
+                file_selected=$(( (file_selected - 1 + ${#CHANGED_FILES[@]}) % ${#CHANGED_FILES[@]} ))
+              elif [[ $key2 == "[B" ]] || [[ $key == "j" ]]; then
+                # Down arrow or j key
+                file_selected=$(( (file_selected + 1) % ${#CHANGED_FILES[@]} ))
+              elif [[ -z $key2 ]]; then
+                # Just ESC key, exit the file selection
+                return
+              fi
+            elif [[ $key == "k" ]]; then
+              # k key (up)
+              file_selected=$(( (file_selected - 1 + ${#CHANGED_FILES[@]}) % ${#CHANGED_FILES[@]} ))
+            elif [[ $key == "j" ]]; then
+              # j key (down)
+              file_selected=$(( (file_selected + 1) % ${#CHANGED_FILES[@]} ))
+            elif [[ $key == "" ]]; then
+              # Enter key, select current file
+              selected_file="${CHANGED_FILES[$file_selected]}"
               break
-            else
-              echo "Invalid selection. Please try again."
             fi
           done
           
+          # Show diff for selected file
+          clear
+          echo "Showing diff for: $selected_file"
+          echo "-------------------------------------------"
+          git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$selected_file"
+          
           # Ask if user wants to see another file
+          echo ""
           read -p "View another file? [Y/n]: " VIEW_ANOTHER
           # Default to yes if user just presses Enter
           if [[ "$VIEW_ANOTHER" =~ ^[Nn]$ ]]; then
             break
           fi
         done
-        break
         ;;
       *)
         echo "Invalid option. Please select 1, 2, or 3."
         ;;
     esac
-  done
 }
 
 git-clean-merged(){
