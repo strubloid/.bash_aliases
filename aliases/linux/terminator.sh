@@ -2,6 +2,10 @@
 
 # Strubloid::linux::terminator
 
+tw(){
+  terminator -l work &
+}
+
 terminator-work() {
   terminator -l work -p work &
 }

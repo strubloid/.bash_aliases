@@ -10,7 +10,6 @@ git-check-if-works-the-connection(){
   ssh -T git@github.com -v
 }
 
-
 git-clean-merged(){
   git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
 }
