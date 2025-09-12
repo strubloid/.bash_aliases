@@ -5,6 +5,25 @@
 # git aliases
 alias spec-basic-project="uvx --from git+https://github.com/github/spec-kit.git specify init basic-project"
 
+spec-install-requirements() {
+  
+  # Check if uv is already installed
+  if ! command -v uv &> /dev/null; then
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  else
+    echo "uv is already installed"
+  fi
+
+  # Check if claude-code is already installed
+  if ! npm list -g @anthropic-ai/claude-code &> /dev/null; then
+    echo "Installing @anthropic-ai/claude-code..."
+    npm install -g @anthropic-ai/claude-code
+  else
+    echo "@anthropic-ai/claude-code is already installed"
+  fi
+
+}
 
 spec-start-project() {
 

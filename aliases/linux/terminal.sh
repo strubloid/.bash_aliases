@@ -97,7 +97,7 @@ terminal-update() {
 
 ## Alias for the terminal update
 tu() {
-    terminal-update
+    terminal-update && source ~/.bashrc
 }
 
 #   -----------------------------------------------------
