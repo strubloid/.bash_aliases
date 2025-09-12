@@ -23,6 +23,14 @@ spec-install-requirements() {
     echo "@anthropic-ai/claude-code is already installed"
   fi
 
+  # Check if gemini-cli is already installed
+  if ! npm list -g @google/gemini-cli &> /dev/null; then
+    echo "Installing @google/gemini-cli..."
+    npm install -g @google/gemini-cli
+  else
+    echo "@google/gemini-cli is already installed"
+  fi
+
 }
 
 spec-start-project() {
