@@ -308,3 +308,27 @@ function touchportal-start()
   ./TouchPortal.AppImage
 }
 
+## Function to kill a process running on a specific port
+## Reference: https://www.baeldung.com/linux/kill-process-on-port
+kill-port() {
+  if [ -z "$1" ]; then
+    read -p "[Port Number]: " PortNumber
+  else
+    PortNumber="$1"
+  fi
+
+  # Validate port number
+  if ! [[ "$PortNumber" =~ ^[0-9]+$ ]] || [ "$PortNumber" -lt 1 ] || [ "$PortNumber" -gt 65535 ]; then
+    echo "Error: Invalid port number '$PortNumber'"
+    return 1
+  fi
+
+  # Search and kill
+  if lsof -Pi :$PortNumber -sTCP:LISTEN -t >/dev/null; then
+    echo "Found process on port $PortNumber, killing it..."
+    lsof -ti:$PortNumber | xargs kill -9
+    echo "Process killed."
+  else
+    echo "No process found on port $PortNumber."
+  fi
+}
