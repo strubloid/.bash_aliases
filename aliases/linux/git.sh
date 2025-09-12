@@ -18,7 +18,7 @@ git-compare-with-master(){
 git-compare-improved() {
   # Get current branch
   CURRENT_BRANCH=$(git branch --show-current)
-  echo "[3.0]> Current branch: $CURRENT_BRANCH"
+  echo "[4.0]> Current branch: $CURRENT_BRANCH"
   
   # Get all branches except current branch
   BRANCHES=($(git branch --format='%(refname:short)' | grep -v "^$CURRENT_BRANCH$"))
@@ -72,8 +72,27 @@ git-compare-improved() {
           return 0
         fi
         
-        # Display list of files
-        git diff --name-only "$CURRENT_BRANCH".."$SELECTED_BRANCH"
+        # Interactive file selection loop
+        while true; do
+          # Display list of changed files with numbers
+          echo "Changed files between $CURRENT_BRANCH and $SELECTED_BRANCH:"
+          select FILE in "${CHANGED_FILES[@]}"; do
+            if [ -n "$FILE" ]; then
+              # Show diff for selected file
+              git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$FILE"
+              break
+            else
+              echo "Invalid selection. Please try again."
+            fi
+          done
+          
+          # Ask if user wants to see another file
+          read -p "View another file? [Y/n]: " VIEW_ANOTHER
+          # Default to yes if user just presses Enter
+          if [[ "$VIEW_ANOTHER" =~ ^[Nn]$ ]]; then
+            break
+          fi
+        done
         break
         ;;
       *)
