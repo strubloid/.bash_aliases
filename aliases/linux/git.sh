@@ -169,13 +169,13 @@ git-compare-improved() {
   # Process the selected option
   case $((selected + 1)) in
       1)
-        # Just dump the file names and status directly to terminal
-        git diff --name-status "$CURRENT_BRANCH".."$SELECTED_BRANCH"
+        # Just dump the file names and status directly to terminal with color
+        git diff --name-status --color "$CURRENT_BRANCH".."$SELECTED_BRANCH"
         ;;
       
       2)
-        # Run git diff directly for complete output and pipe to cat to avoid pager
-        git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" | cat
+        # Run git diff with color and pipe to cat to avoid pager but maintain colors
+        git -c color.ui=always diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" | cat
         ;;
       
       3)
@@ -247,11 +247,11 @@ git-compare-improved() {
             fi
           done
           
-          # Show diff for selected file
+          # Show diff for selected file with color
           clear
           echo "Showing diff for: $selected_file"
           echo "-------------------------------------------"
-          git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$selected_file" | cat
+          git -c color.ui=always diff "$CURRENT_BRANCH".."$SELECTED_BRANCH" -- "$selected_file" | cat
           
           # Ask if user wants to see another file
           echo ""
