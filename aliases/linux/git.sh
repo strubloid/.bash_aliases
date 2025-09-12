@@ -10,6 +10,79 @@ git-check-if-works-the-connection(){
   ssh -T git@github.com -v
 }
 
+git-compare-with-master(){
+  git diff --name-status origin/master...HEAD
+}
+
+# Interactive git comparison tool with branch selection and diff options
+git-compare-improved() {
+  # Get current branch
+  CURRENT_BRANCH=$(git branch --show-current)
+  echo "[3.0]> Current branch: $CURRENT_BRANCH"
+  
+  # Get all branches except current branch
+  BRANCHES=($(git branch --format='%(refname:short)' | grep -v "^$CURRENT_BRANCH$"))
+  
+  # Check if there are other branches
+  if [ ${#BRANCHES[@]} -eq 0 ]; then
+    echo "No other branches available to compare with."
+    return 1
+  fi
+  
+  # Show interactive branch selection
+  echo "Select a branch to compare with $CURRENT_BRANCH:"
+  
+  # Use select for interactive menu
+  select SELECTED_BRANCH in "${BRANCHES[@]}"; do
+    if [ -n "$SELECTED_BRANCH" ]; then
+      break
+    else
+      echo "Invalid selection. Please try again."
+    fi
+  done
+  
+  # Show comparison options
+  echo ""
+  echo "Select comparison option:"
+  
+  OPTIONS=(
+    "Show changed files (names only)"
+    "Show all differences (complete diff)"
+    "Show list of changed files"
+  )
+  
+  select OPTION in "${OPTIONS[@]}"; do
+    case $REPLY in
+      1)
+        # Just dump the file names and status directly to terminal
+        git diff --name-status "$CURRENT_BRANCH".."$SELECTED_BRANCH"
+        break
+        ;;
+      2)
+        # Run git diff directly for complete output
+        git diff "$CURRENT_BRANCH".."$SELECTED_BRANCH"
+        break
+        ;;
+      3)
+        # Get list of files that have changed
+        CHANGED_FILES=($(git diff --name-only "$CURRENT_BRANCH".."$SELECTED_BRANCH"))
+        
+        if [ ${#CHANGED_FILES[@]} -eq 0 ]; then
+          echo "No changed files between $CURRENT_BRANCH and $SELECTED_BRANCH."
+          return 0
+        fi
+        
+        # Display list of files
+        git diff --name-only "$CURRENT_BRANCH".."$SELECTED_BRANCH"
+        break
+        ;;
+      *)
+        echo "Invalid option. Please select 1, 2, or 3."
+        ;;
+    esac
+  done
+}
+
 git-clean-merged(){
   git branch --merged | egrep -v "(^\*|master|dev)" | xargs git branch -d
 }
