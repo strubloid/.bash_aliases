@@ -223,7 +223,7 @@ updateBashTerminal() {
   # For other systems using bash
   else
     if [ -f "${HOME_PROFILE}" ]; then
-      source "${HOME_PROFILE}"
+      exec $SHELL
       echoLine "* updating terminal ${HOME_PROFILE}"
     else
       echoLine "[ERR]: missing file ${HOME_PROFILE}"
