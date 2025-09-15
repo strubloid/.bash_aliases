@@ -282,6 +282,12 @@ git-clean-all()
   git branch | egrep -v "(^\*|master|dev)" | xargs git branch -D
 }
 
+## This will update the develop branch after push code into the master
+git-update-develop-with-master(){
+
+  git checkout develop && git merge master && git push origin develop && git checkout master
+
+}
 
 # This will update the master branch
 git-update-master() {
