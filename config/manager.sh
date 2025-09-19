@@ -7,7 +7,14 @@ source $(pwd)/config/global/variables.sh
 ## This will check what is the operational system loaded
 function getOperationalSystem() {
   case "$OSTYPE" in
-  linux*) echo "linux" ;;
+  linux*) 
+    # Check if running in WSL
+    if grep -qi microsoft /proc/version 2>/dev/null || uname -r | grep -qi microsoft; then
+      echo "wsl"
+    else
+      echo "linux"
+    fi
+    ;;
   darwin*) echo "mac" ;;
   win*) echo "windows" ;;
   msys*) echo "msys" ;;
@@ -222,12 +229,12 @@ updateBashTerminal() {
     fi
   # For other systems using bash
   else
-    if [ -f "${HOME_PROFILE}" ]; then
+    if [ -f "${BASHRC}" ]; then
       # exec $SHELL   ## fix later 
-      source "${HOME_PROFILE}"
-      echoLine "* updating terminal ${HOME_PROFILE}"
+      source "${BASHRC}"
+      echoLine "* updating terminal ${BASHRC}"
     else
-      echoLine "[ERR]: missing file ${HOME_PROFILE}"
+      echoLine "[ERR]: missing file ${BASHRC}"
     fi
   fi
 }
@@ -348,22 +355,29 @@ generateBashAlias() {
   generalFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/general"
   osFolder=""
   
-  # Set the OS-specific folder
+  # Set the OS-specific folder(s)
+  osFolders=()
   case "$operationalSystem" in
-    mac)    osFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/mac" ;;
-    linux)  osFolder="$BASH_ALIASES_PROJECT_FOLDER/aliases/linux" ;;
+    mac)    osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/mac") ;;
+    linux)  osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/linux") ;;
+    wsl)    osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/linux" "$BASH_ALIASES_PROJECT_FOLDER/aliases/windows") ;;
     *)      echoLine "[WARN]: Unsupported OS: $operationalSystem, using only general aliases" ;;
   esac
   
   # Display debug info about which folders we're using
   echoLine "[DEBUG]: Looking for aliases in folders:"
   echoLine "* $generalFolder"
-  if [ -n "$osFolder" ]; then
-    echoLine "* $osFolder"
-  fi
+  for osFolder in "${osFolders[@]}"; do
+    if [ -n "$osFolder" ]; then
+      echoLine "* $osFolder"
+    fi
+  done
   
   # Process all aliases (general and OS-specific) in one loop
-  for folder in "$generalFolder" "$osFolder"; do
+  allFolders=("$generalFolder")
+  allFolders+=("${osFolders[@]}")
+  
+  for folder in "${allFolders[@]}"; do
     # Skip empty folders (in case OS folder wasn't set)
     if [ -z "$folder" ] || [ ! -d "$folder" ]; then
       continue
