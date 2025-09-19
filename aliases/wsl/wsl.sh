@@ -3,6 +3,9 @@ export WSL_HOST=$(ip route show | grep default | awk '{print $3}')
 
 # Function to automatically map localhost to Windows host for curl
 curl() {
+
+  echo "[Modified] curl function in wsl.sh"
+  
   local args=("$@")
   local mapped=false
   
