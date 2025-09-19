@@ -11,7 +11,7 @@ curl() {
     if [[ "${args[i]}" == *"localhost"* ]]; then
       args[i]="${args[i]/localhost/$WSL_HOST}"
       if [[ "$mapped" == false ]]; then
-        echo "WSL2: Mapping localhost to Windows host: $WSL_HOST"
+        echo "WSL: Mapping localhost to Windows host: $WSL_HOST"
         mapped=true
       fi
     fi
