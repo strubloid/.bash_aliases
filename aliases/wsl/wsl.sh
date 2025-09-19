@@ -1,8 +1,13 @@
 # WSL localhost mapping to Windows host
 export WSL_HOST=$(ip route show | grep default | awk '{print $3}')
 
+# Quick aliases for DNS troubleshooting
+alias dns-fix='wsl-dns-fix'
+alias dns-status='wsl-dns-status'
+alias dns-reset='wsl-dns-reset'
+
 # Function to automatically map localhost to Windows host for curl
-curl() {
+function curl() {
 
   echo "[Modified] curl function in wsl.sh"
   
@@ -81,7 +86,3 @@ function wsl-dns-reset() {
     fi
 }
 
-# Quick aliases for DNS troubleshooting
-alias dns-fix='wsl-dns-fix'
-alias dns-status='wsl-dns-status'
-alias dns-reset='wsl-dns-reset'
