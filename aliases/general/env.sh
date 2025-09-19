@@ -3,7 +3,14 @@
 ## This will check what is the operational system loaded
 function getOperationalSystem() {
   case "$OSTYPE" in
-  linux*) echo "linux" ;;
+  linux*) 
+    # Check if running in WSL
+    if grep -qi microsoft /proc/version 2>/dev/null || uname -r | grep -qi microsoft; then
+      echo "wsl"
+    else
+      echo "linux"
+    fi
+    ;;
   darwin*) echo "mac" ;;
   win*) echo "windows" ;;
   msys*) echo "msys" ;;

@@ -358,10 +358,11 @@ generateBashAlias() {
   # Set the OS-specific folder(s)
   osFolders=()
   case "$operationalSystem" in
-    mac)    osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/mac") ;;
-    linux)  osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/linux") ;;
-    wsl)    osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/linux" "$BASH_ALIASES_PROJECT_FOLDER/aliases/windows") ;;
-    *)      echoLine "[WARN]: Unsupported OS: $operationalSystem, using only general aliases" ;;
+    mac)        osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/mac") ;;
+    linux)      osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/linux") ;;
+    wsl)        osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/wsl") ;;
+    windows)    osFolders=("$BASH_ALIASES_PROJECT_FOLDER/aliases/wsl") ;;
+    *)          echoLine "[WARN]: Unsupported OS: $operationalSystem, using only general aliases" ;;
   esac
   
   # Display debug info about which folders we're using
