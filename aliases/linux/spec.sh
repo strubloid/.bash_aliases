@@ -2,9 +2,13 @@
 
 # Strubloid::linux::spec
 
-# git aliases
+# spec starter basic-project 
 alias spec-basic-project="uvx --from git+https://github.com/github/spec-kit.git specify init basic-project"
 
+# spec starter here project
+alias spec-here-project="uvx --from git+https://github.com/github/spec-kit.git specify init here"
+
+# spec install requirements
 spec-install-requirements() {
   
   # Check if uv is already installed
@@ -33,6 +37,7 @@ spec-install-requirements() {
 
 }
 
+# spec start project
 spec-start-project() {
 
   # Loading the commit message
