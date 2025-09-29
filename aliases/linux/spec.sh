@@ -6,7 +6,7 @@
 alias spec-basic-project="uvx --from git+https://github.com/github/spec-kit.git specify init basic-project"
 
 # spec starter here project
-alias spec-here-project="uvx --from git+https://github.com/github/spec-kit.git specify init here"
+alias spec-here-project="uvx --from git+https://github.com/github/spec-kit.git specify init --here"
 
 # spec install requirements
 spec-install-requirements() {
