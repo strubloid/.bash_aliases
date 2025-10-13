@@ -7,7 +7,7 @@ alias dns-status='wsl-dns-status'
 alias dns-reset='wsl-dns-reset'
 
 # Function to automatically map localhost to Windows host for curl
-function curl() {
+function curl2() {
 
   echo "[Modified] curl function in wsl.sh"
   
