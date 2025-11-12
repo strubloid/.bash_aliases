@@ -3,6 +3,10 @@
 # Strubloid::linux::Python
 
 # # alias gpt-summarizer='/media/games/apps/gpt-summarizer/main_cli.py'
+py-start-local(){
+  python3 -m venv venv
+  source venv/bin/activate
+}
 
 start-python-local(){
 
