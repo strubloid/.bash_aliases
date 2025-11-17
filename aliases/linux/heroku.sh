@@ -16,6 +16,11 @@ heroku-server-clean(){
   heroku repo:purge_cache -a $1
 }
 
+# Install heroku via curl
+heroku-curl-installation(){
+  curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+}
+
 # Basic steps to install heroku on ubuntu
 heroku-install() {
   sudo snap install --classic heroku
