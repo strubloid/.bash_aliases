@@ -25,6 +25,9 @@ py-local-run(){
   export FLASK_RUN_HOST=0.0.0.0
   export FLASK_RUN_PORT=5000
 
+  # uncomment the following line to set to development mode
+  # export FLASK_ENV=development
+
   # flask run --host=0.0.0.0 --port=5000
   flask run
 }
