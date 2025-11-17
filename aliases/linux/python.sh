@@ -3,8 +3,25 @@
 # Strubloid::linux::Python
 
 # # alias gpt-summarizer='/media/games/apps/gpt-summarizer/main_cli.py'
+py-start-local(){
+
+  # Check if python3-venv is installed
+  if ! dpkg -l | grep -q python3-venv; then
+    echo "python3-venv not found. Installing..."
+    sudo apt install python3-venv -y
+  fi
+  
+  python3 -m venv venv
+  source venv/bin/activate
+}
 
 start-python-local(){
+
+  # Check if python3-venv is installed
+  if ! dpkg -l | grep -q python3-venv; then
+    echo "python3-venv not found. Installing..."
+    sudo apt install python3-venv -y
+  fi
 
   python3 -m venv /media/games/apps/pyhtonEnvironment/myenv
   source /media/games/apps/pyhtonEnvironment/myenv/bin/activate  # Activate the virtual environment
