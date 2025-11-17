@@ -15,6 +15,20 @@ py-start-local(){
   source venv/bin/activate
 }
 
+## Start a local server that i can see in my local network
+py-local-run(){
+
+  py-start-local
+
+  # export FLASK_APP=app.py
+  export FLASK_DEBUG=1
+  export FLASK_RUN_HOST=0.0.0.0
+  export FLASK_RUN_PORT=5000
+
+  # flask run --host=0.0.0.0 --port=5000
+  flask run
+}
+
 start-python-local(){
 
   # Check if python3-venv is installed
