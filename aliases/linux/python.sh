@@ -126,43 +126,32 @@ py-install-requirements(){
     fi
   fi
 
-  # Get current directory
-  CURRENT_DIR=$(pwd)
-  DEFAULT_REQ_FILE="requirements.txt"
-
   # Check if requirements.txt exists in current directory
-  if [ -f "$CURRENT_DIR/$DEFAULT_REQ_FILE" ]; then
-    read -p "Use requirements.txt in current directory? [Y/n]: " USE_DEFAULT
-    USE_DEFAULT=${USE_DEFAULT:-Y}
-    
-    if [[ "$USE_DEFAULT" =~ ^[Yy]$ ]]; then
-      REQ_FILE="$DEFAULT_REQ_FILE"
+  if [ -f "requirements.txt" ]; then
+    echo "Installing packages from: requirements.txt"
+    if pip install -r requirements.txt; then
+      echo "Successfully installed requirements"
     else
-      read -p "Enter the requirements file name: " CUSTOM_REQ_FILE
-      if [ -z "$CUSTOM_REQ_FILE" ]; then
-        echo "No file specified, using default: $DEFAULT_REQ_FILE"
-        REQ_FILE="$DEFAULT_REQ_FILE"
-      else
-        REQ_FILE="$CUSTOM_REQ_FILE"
-      fi
+      echo "Error: Failed to install requirements"
+      return 1
     fi
   else
-    read -p "requirements.txt not found. Enter the requirements file name [requirements.txt]: " CUSTOM_REQ_FILE
-    REQ_FILE="${CUSTOM_REQ_FILE:-$DEFAULT_REQ_FILE}"
-  fi
-
-  # Check if the requirements file exists
-  if [ ! -f "$REQ_FILE" ]; then
-    echo "Error: File '$REQ_FILE' not found"
-    return 1
-  fi
-
-  echo "Installing packages from: $REQ_FILE"
-  if pip install -r "$REQ_FILE"; then
-    echo "Successfully installed requirements from $REQ_FILE"
-  else
-    echo "Error: Failed to install requirements"
-    return 1
+    # requirements.txt not found
+    read -p "requirements.txt not found. Install packages with 'pip install -e .'? [Y/n]: " USE_EDITABLE
+    USE_EDITABLE=${USE_EDITABLE:-Y}
+    
+    if [[ "$USE_EDITABLE" =~ ^[Yy]$ ]]; then
+      echo "Installing package in editable mode..."
+      if pip install -e .; then
+        echo "Successfully installed package"
+      else
+        echo "Error: Failed to install package"
+        return 1
+      fi
+    else
+      echo "Installation cancelled"
+      return 1
+    fi
   fi
 }
 
