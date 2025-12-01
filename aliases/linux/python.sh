@@ -32,7 +32,7 @@ py-local-run(){
   flask run
 }
 
-start-python-local(){
+py-local(){
 
   ## reference to keep
   ## python3 -m venv /media/games/apps/pyhtonEnvironment/myenv
