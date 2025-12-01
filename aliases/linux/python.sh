@@ -34,14 +34,82 @@ py-local-run(){
 
 start-python-local(){
 
+  ## reference to keep
+  ## python3 -m venv /media/games/apps/pyhtonEnvironment/myenv
+  ## source /media/games/apps/pyhtonEnvironment/myenv/bin/activate
+
   # Check if python3-venv is installed
   if ! dpkg -l | grep -q python3-venv; then
     echo "python3-venv not found. Installing..."
     sudo apt install python3-venv -y
   fi
 
-  python3 -m venv /media/games/apps/pyhtonEnvironment/myenv
-  source /media/games/apps/pyhtonEnvironment/myenv/bin/activate  # Activate the virtual environment
+  # Get current directory
+  CURRENT_DIR=$(pwd)
+  DEFAULT_VENV_PATH="$CURRENT_DIR/python-env/myenv"
+
+  # Check if python-env folder exists in current directory
+  if [ -d "$CURRENT_DIR/python-env" ]; then
+    read -p "Use existing python-env in current directory? [Y/n]: " USE_LOCAL
+    USE_LOCAL=${USE_LOCAL:-Y}  # Default to Y if user just presses enter
+    
+    if [[ "$USE_LOCAL" =~ ^[Yy]$ ]]; then
+      VENV_PATH="$DEFAULT_VENV_PATH"
+    else
+      read -p "Enter path for python environment (will create [path]/python-env/myenv): " CUSTOM_PATH
+      # Handle empty input - default to current directory
+      if [ -z "$CUSTOM_PATH" ]; then
+        VENV_PATH="$DEFAULT_VENV_PATH"
+      else
+        # Expand ~ and resolve to absolute path
+        CUSTOM_PATH="${CUSTOM_PATH/#\~/$HOME}"
+        CUSTOM_PATH=$(realpath -m "$CUSTOM_PATH")
+        VENV_PATH="$CUSTOM_PATH/python-env/myenv"
+      fi
+    fi
+  else
+    read -p "Create python environment at current directory? [Y/n]: " CREATE_LOCAL
+    CREATE_LOCAL=${CREATE_LOCAL:-Y}  # Default to Y if user just presses enter
+    
+    if [[ "$CREATE_LOCAL" =~ ^[Yy]$ ]]; then
+      VENV_PATH="$DEFAULT_VENV_PATH"
+    else
+      read -p "Enter path for python environment (will create [path]/python-env/myenv): " CUSTOM_PATH
+      # Handle empty input - default to current directory
+      if [ -z "$CUSTOM_PATH" ]; then
+        VENV_PATH="$DEFAULT_VENV_PATH"
+      else
+        # Expand ~ and resolve to absolute path
+        CUSTOM_PATH="${CUSTOM_PATH/#\~/$HOME}"
+        CUSTOM_PATH=$(realpath -m "$CUSTOM_PATH")
+        VENV_PATH="$CUSTOM_PATH/python-env/myenv"
+      fi
+    fi
+  fi
+
+  echo "Creating/using virtual environment at: $VENV_PATH"
+  
+  # Check if venv already exists
+  if [ -d "$VENV_PATH" ] && [ -f "$VENV_PATH/bin/activate" ]; then
+    echo "Virtual environment already exists, activating..."
+    source "$VENV_PATH/bin/activate"
+  else
+    # Create the directory if it doesn't exist
+    VENV_DIR=$(dirname "$VENV_PATH")
+    if [ ! -d "$VENV_DIR" ]; then
+      echo "Creating directory: $VENV_DIR"
+      mkdir -p "$VENV_DIR"
+    fi
+    
+    # Create virtual environment
+    if python3 -m venv "$VENV_PATH"; then
+      echo "Virtual environment created successfully"
+      source "$VENV_PATH/bin/activate"
+    else
+      echo "Error: Failed to create virtual environment"
+      return 1
+    fi
+  fi
 }
 
 limit-parameters-python()
