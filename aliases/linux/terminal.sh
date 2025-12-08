@@ -87,6 +87,11 @@ terminal-update() {
     fi
     ./upgrade.sh
 
+    if [[ "$DEBUG" == "1" ]]; then
+        echo -e  "[Update Bashrc]: OK!"
+    fi
+    source ~/.bashrc
+
     # back to the previous folder that you're working
     if [[ "$DEBUG" == "1" ]]; then
         echo -e "[back to]: $CurrentFolder"
@@ -97,7 +102,7 @@ terminal-update() {
 
 ## Alias for the terminal update
 tu() {
-    terminal-update && source ~/.bashrc
+    terminal-update
 }
 
 #   -----------------------------------------------------

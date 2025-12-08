@@ -1,27 +1,29 @@
-#!/bin/bash
+cd #!/bin/bash
 #
 # Author: bash_prompt@alphasocket.dev
 #
 # Format:
-#	Indicator user@host [cwd] (git/hg_branch) $
+#       Indicator user@host [cwd] (venv: name) (git/hg_branch) $
 # Example:
-#	> alphasocket@ASUS-K55VD [/home/user/Projects/subvProject] (feature/patch-123) $
+#       > alphasocket@ASUS-K55VD [/home/user/Projects/subvProject] (venv: myproject) (feature/patch-123) $
 #
 # Indicator: >
-#   	Blk bg	== Last command returned exit code != 0
-#   	Red bg  == last cmd returned exit code == 0
+#       Blk bg  == Last command returned exit code != 0
+#       Red bg  == last cmd returned exit code == 0
 # User:
-#   	Red     == Root(UID 0) Login shell (i.e. sudo bash)
-#   	White   == Normal user
+#       Red     == Root(UID 0) Login shell (i.e. sudo bash)
+#       White   == Normal user
 # Host:
-#   	Red     == Insecure remote connection
-#   	White   == Local session or SSH
+#       Red     == Insecure remote connection
+#       White   == Local session or SSH
 # Cwd:
-#   	Red     == Current user does not have write priviledges
-#   	Write   == Current user does have write priviledges
+#       Red     == Current user does not have write priviledges
+#       Write   == Current user does have write priviledges
+# Virtual Environment:
+#       Cyan    == Python virtual environment active
 # Git/Hg status:
-#	    Red	    == Dirty or uncommitted
-#	    Green	== Clean
+#           Red     == Dirty or uncommitted
+#           Green       == Clean
 #
 # Sources:
 #   https://krash.be/node/25
@@ -112,51 +114,51 @@ function build_bash_prompt {
         local last_exit_code_returned_0=1
     else
         local last_exit_code_returned_0=0
-	fi
+        fi
 
     # Reset PS1
     PS1="\n"
 
-	# Head is white bold char ">" if the last cmd returned 0
+        # Head is white bold char ">" if the last cmd returned 0
     if [ $last_exit_code_returned_0 = 1 ]
     then
             # 0 returned by last command
             PS1="${PS1}\[$BWhite\]>\[$Color_Off\]"
-		else
-			# != 0 returned by last command
-			PS1="${PS1}\[$BRed\]>\[$Color_Off\]"
-	fi
+                else
+                        # != 0 returned by last command
+                        PS1="${PS1}\[$BRed\]>\[$Color_Off\]"
+        fi
 
     # Space
     PS1="${PS1} "
 
-	# Bold, white/red username
-	if [[ $EUID == 0 ]]
-		then
-			# Root user
-			PS1="${PS1}\[$BRed\]\u\[$Color_Off\]"
-		else
-			# Non root user
-			PS1="${PS1}\[$BWhite\]\u\[$Color_Off\]"
-	fi
+        # Bold, white/red username
+        if [[ $EUID == 0 ]]
+                then
+                        # Root user
+                        PS1="${PS1}\[$BRed\]\u\[$Color_Off\]"
+                else
+                        # Non root user
+                        PS1="${PS1}\[$BWhite\]\u\[$Color_Off\]"
+        fi
 
     # White/red @
-	if [ -n "$http_proxy" ]
-		then
-			# Proxy setted
-			PS1="${PS1}\[$White\]@\[$Color_Off\]"
-		else
-			# Proxy not setted
-			PS1="${PS1}\[$Red\]@\[$Color_Off\]"
-	fi
+        if [ -n "$http_proxy" ]
+                then
+                        # Proxy setted
+                        PS1="${PS1}\[$White\]@\[$Color_Off\]"
+                else
+                        # Proxy not setted
+                        PS1="${PS1}\[$Red\]@\[$Color_Off\]"
+        fi
 
     # if shell is contained wrap hostname in graph parenthesis
     if [ ! $SHLVL == "1" ]; then
         PS1="${PS1}{"
     fi
 
-	# Bold, white/red hostname
-	if [[ "${SSH_CLIENT}" ]] || [[ "${SSH2_CLIENT}" ]] || [ "${SESS_SRC}" == "(:0.0)" ]
+        # Bold, white/red hostname
+        if [[ "${SSH_CLIENT}" ]] || [[ "${SSH2_CLIENT}" ]] || [ "${SESS_SRC}" == "(:0.0)" ]
         then
             # Using an unsecure shell
             PS1="${PS1}\[$BRed\]\H\[$Color_Off\]"
@@ -170,36 +172,55 @@ function build_bash_prompt {
         PS1="${PS1}}"
     fi
 
-	# Bold white pwd in [ ]
+        # Bold white pwd in [ ]
     PS1="${PS1} \[$BWhite\][\[$Color_Off\]"
-	if [ -w "$PWD" ]
-		then
-			# Writable pwd
-			PS1="${PS1}\[$BWhite\]${PWD}\[$Color_Off\]"
-		else
-			# Read only pwd
+        if [ -w "$PWD" ]
+                then
+                        # Writable pwd
+                        PS1="${PS1}\[$BWhite\]${PWD}\[$Color_Off\]"
+                else
+                        # Read only pwd
             PS1="${PS1}\[$BRed\]${PWD}\[$Color_Off\]"
-	fi
+        fi
     PS1="${PS1}\[$BWhite\]]\[$Color_Off\]"
+
+    # Python Virtual Environment Detection
+    if [ -z $BASH_PROMPT_DISABLE_VENV_STATUS ]; then
+        local _venv_name_
+        
+        # Check for standard Python venv (VIRTUAL_ENV)
+        if [ -n "$VIRTUAL_ENV" ]; then
+            _venv_name_=$(basename "$VIRTUAL_ENV")
+            PS1="${PS1} \[$BCyan\](venv: $_venv_name_)\[$Color_Off\]"
+        # Check for Conda environment (CONDA_DEFAULT_ENV)
+        elif [ -n "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+            _venv_name_="$CONDA_DEFAULT_ENV"
+            PS1="${PS1} \[$BCyan\](conda: $_venv_name_)\[$Color_Off\]"
+        # Check for Poetry environment (POETRY_ACTIVE)
+        elif [ -n "$POETRY_ACTIVE" ]; then
+            _venv_name_=$(basename "$VIRTUAL_ENV" 2>/dev/null || echo "poetry")
+            PS1="${PS1} \[$BCyan\](poetry: $_venv_name_)\[$Color_Off\]"
+        fi
+    fi
 
     if [ -z $BASH_PROMPT_DISABLE_REPO_STATUS ]; then
 
         if [ -z $BASH_PROMPT_DISABLE_GIT_STATUS ]; then
-        	# Git infos
+                # Git infos
             local _git_branch_
             # If is in a git repo
             if _git_branch_=$(git rev-parse --abbrev-ref HEAD 2> /dev/null);
-        	then
-        		# git status define color
-        		if [ -n "$(git status --short 2> /dev/null)" ]
-        		    then
+                then
+                        # git status define color
+                        if [ -n "$(git status --short 2> /dev/null)" ]
+                            then
                         # Dirty repo
                         PS1="${PS1} \[$Red\](git: $_git_branch_)\[$Color_Off\]"
-        		    else
+                            else
                         # Clean repo
                         PS1="${PS1} \[$Green\](git: $_git_branch_)\[$Color_Off\]"
-        		fi
-        	fi
+                        fi
+                fi
         fi
 
         if [ -z $BASH_PROMPT_DISABLE_HG_STATUS ]; then
@@ -207,17 +228,17 @@ function build_bash_prompt {
             local _hg_branch_
             # If is in a git repo
             if _hg_branch_=$(cat .hg/branch 2> /dev/null);
-        	then
-        		# git status define color
-        		if [ -n "$(hg st 2> /dev/null)" ]
-        		    then
+                then
+                        # git status define color
+                        if [ -n "$(hg st 2> /dev/null)" ]
+                            then
                         # Dirty repo
                         PS1="${PS1} \[$Red\](hg: $_hg_branch_)\[$Color_Off\]"
-        		    else
+                            else
                         # Clean repo
                         PS1="${PS1} \[$Green\](hg: $_hg_branch_)\[$Color_Off\]"
-        		fi
-        	fi
+                        fi
+                fi
         fi
     fi
 
@@ -226,13 +247,13 @@ function build_bash_prompt {
 
     if [ $LAST_COMMAND_START_TIME ]
     then
-    	# Compute the difference in dates in seconds
-	let "duration=`date +%s`-$LAST_COMMAND_START_TIME"
-	last_command_duration=`format_seconds $duration`
+        # Compute the difference in dates in seconds
+        let "duration=`date +%s`-$LAST_COMMAND_START_TIME"
+        last_command_duration=`format_seconds $duration`
 
-    	PS1="${PS1} ($last_command_duration)"
-    	LAST_COMMAND_START_TIME=""
-	fi
+        PS1="${PS1} ($last_command_duration)"
+        LAST_COMMAND_START_TIME=""
+        fi
 
     # Space
     PS1="${PS1} "
@@ -242,10 +263,10 @@ function build_bash_prompt {
     then
             # 0 returned by last command
             PS1="${PS1}\[$BWhite\]\$\n\[$Color_Off\]"
-		else
-			# != 0 returned by last command
-			PS1="${PS1}\[$BRed\]\$\n\[$Color_Off\]"
-	fi
+                else
+                        # != 0 returned by last command
+                        PS1="${PS1}\[$BRed\]\$\n\[$Color_Off\]"
+        fi
 
     # Print PS1
     export PS1="${PS1}"

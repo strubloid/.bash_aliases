@@ -428,20 +428,20 @@ moveScripts(){
     RETURN_CODE=$?
 
     ## checking if folder doesn't exist
-    printf "  * Exist Folder? "
+    echoLine " Exist Folder? "
     if [[ ${RETURN_CODE} -eq "0" ]]; then
-      printf "No, creating a new one\n"
+      echoLine " No, creating a new one"
       mkdir -p "$BASH_ALIASES_SCRIPTS"
     else
-      printf "Yes\n"
+      echoLine " Yes"
     fi
 
     ## loading the scripts folder
     BASH_PROJECT_SCRIPS_LOCAL="$BASH_ALIASES_PROJECT_FOLDER/scripts"
 
-    echoLine "* Copying"
-    echoLine "📤 From: $BASH_PROJECT_SCRIPS_LOCAL"
-    echoLine "📥 To: $BASH_ALIASES_SCRIPTS"
+    echoHeader " Copying "
+    echoLine " From: $BASH_PROJECT_SCRIPS_LOCAL"
+    echoLine " To: $BASH_ALIASES_SCRIPTS"
     cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
 
 }
