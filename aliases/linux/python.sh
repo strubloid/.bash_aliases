@@ -46,17 +46,17 @@ py-local(){
 
   # Get current directory
   CURRENT_DIR=$(pwd)
-  DEFAULT_VENV_PATH="$CURRENT_DIR/python-env/myenv"
+  DEFAULT_VENV_PATH="$CURRENT_DIR/venv/myenv"
 
-  # Check if python-env folder exists in current directory
-  if [ -d "$CURRENT_DIR/python-env" ]; then
-    read -p "Use existing python-env in current directory? [Y/n]: " USE_LOCAL
+  # Check if venv folder exists in current directory
+  if [ -d "$CURRENT_DIR/venv" ]; then
+    read -p "Use existing venv in current directory? [Y/n]: " USE_LOCAL
     USE_LOCAL=${USE_LOCAL:-Y}  # Default to Y if user just presses enter
     
     if [[ "$USE_LOCAL" =~ ^[Yy]$ ]]; then
       VENV_PATH="$DEFAULT_VENV_PATH"
     else
-      read -p "Enter path for python environment (will create [path]/python-env/myenv): " CUSTOM_PATH
+      read -p "Enter path for python environment (will create [path]/venv/myenv): " CUSTOM_PATH
       # Handle empty input - default to current directory
       if [ -z "$CUSTOM_PATH" ]; then
         VENV_PATH="$DEFAULT_VENV_PATH"
@@ -64,7 +64,7 @@ py-local(){
         # Expand ~ and resolve to absolute path
         CUSTOM_PATH="${CUSTOM_PATH/#\~/$HOME}"
         CUSTOM_PATH=$(realpath -m "$CUSTOM_PATH")
-        VENV_PATH="$CUSTOM_PATH/python-env/myenv"
+        VENV_PATH="$CUSTOM_PATH/venv/myenv"
       fi
     fi
   else
@@ -74,7 +74,7 @@ py-local(){
     if [[ "$CREATE_LOCAL" =~ ^[Yy]$ ]]; then
       VENV_PATH="$DEFAULT_VENV_PATH"
     else
-      read -p "Enter path for python environment (will create [path]/python-env/myenv): " CUSTOM_PATH
+      read -p "Enter path for python environment (will create [path]/venv/myenv): " CUSTOM_PATH
       # Handle empty input - default to current directory
       if [ -z "$CUSTOM_PATH" ]; then
         VENV_PATH="$DEFAULT_VENV_PATH"
@@ -82,7 +82,7 @@ py-local(){
         # Expand ~ and resolve to absolute path
         CUSTOM_PATH="${CUSTOM_PATH/#\~/$HOME}"
         CUSTOM_PATH=$(realpath -m "$CUSTOM_PATH")
-        VENV_PATH="$CUSTOM_PATH/python-env/myenv"
+        VENV_PATH="$CUSTOM_PATH/venv/myenv"
       fi
     fi
   fi
