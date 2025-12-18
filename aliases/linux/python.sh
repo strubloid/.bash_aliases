@@ -32,6 +32,11 @@ py-local-run(){
   flask run
 }
 
+## Remove python cache files
+py-remove-cache(){
+  find . \( -name "__pycache__" -o -name "*.pyc" -o -name "*.pyo" \) -exec rm -rf {} +
+}
+
 py-local(){
 
   ## reference to keep
