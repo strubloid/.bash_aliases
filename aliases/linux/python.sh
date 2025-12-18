@@ -32,6 +32,11 @@ py-local-run(){
   flask run
 }
 
+# Kill all python app.py processes
+py-kill-all-app-python(){
+  pkill -f "python.*app.py"
+}
+
 ## Remove python cache files
 py-remove-cache(){
   find . \( -name "__pycache__" -o -name "*.pyc" -o -name "*.pyo" \) -exec rm -rf {} +
