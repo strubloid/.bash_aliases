@@ -303,7 +303,7 @@ git-update-develop() {
   printf "OK\n"
 }
 
-# This will update the develop branch
+# This will update the main branch
 git-update-main() {
   printf "[MAIN] - "
   git checkout main -q && git pull origin main -q && git checkout . -q
@@ -460,6 +460,77 @@ commit-git() {
 
 }
 
+## This will be the quick shortcut, to:
+## 1 - add the new things
+## 2 - add a message
+## 3 - update the same branch on the remote
+## 4 - update the update-system branch
+commit-site() {
+
+  # Loading the commit message
+  if [ -z "$1" ]
+  then
+      read -p "[Commit Message]: " COMMIT_MESSAGE
+  else
+      # mounting the commit message in the format that jira accepts
+      COMMIT_MESSAGE="$1"
+  fi
+
+  commit-update-site "$COMMIT_MESSAGE" "yes"
+
+}
+
+## This will get the current branch and save a commit message
+## then it will commit and push the code to the server and after that
+## it will update the update-system branch if the user want to do that
+commit-update-site() {
+
+  # Getting the current branch name
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  # Loading the commit message
+  if [ -z "$1" ]
+  then
+      read -p "[Commit Message]: " COMMIT_MESSAGE
+  else
+      # mounting the commit message in the format that jira accepts
+      COMMIT_MESSAGE="$1"
+  fi
+
+  # Loading should update the base code
+  if [ -z "$2" ]
+  then
+      read -p "Update the update-system branch? [y/n] : " UPDATE_SYSTEM_BRANCH
+  else
+      # mounting the commit message in the format that jira accepts
+      UPDATE_SYSTEM_BRANCH="$2"
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Commit  --------------------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
+
+  # commit of the thing
+  printf "[COMMIT] - "
+  git add . && git commit -m "$COMMIT_MESSAGE" -q && git push origin "$CURRENT_BRANCH" -q
+
+  printf "OK\n"
+
+  ## check if the update was passed with y/yes as an option
+  if [[ "$UPDATE_SYSTEM_BRANCH" =~ [yY](es)?$ ]]; then
+      
+      echo "[UPDATES] - Update System Branch "
+      git checkout update-system -q && git pull origin update-system -q && git merge "$CURRENT_BRANCH" -q && git push origin update-system -q 
+  fi
+
+  # this will be back to your current branch that you are working on
+  git checkout "$CURRENT_BRANCH" -q
+}
+
+
 commit-main() {
 
   # Loading the commit message
@@ -476,7 +547,7 @@ commit-main() {
 }
 
 # This will commit in git and push the code
-commit ()
+commit()
 {
   # Getting the current branch name
   CURRENT_BRANCH=$(git branch --show-current)
