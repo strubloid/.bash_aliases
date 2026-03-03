@@ -62,6 +62,21 @@ function docker-reset(){
   docker system prune -f
 }
 
+## removes only resources tied to the current project's docker-compose
+function docker-reset-local(){
+
+  if [ ! -f "docker-compose.yml" ] && [ ! -f "docker-compose.yaml" ]; then
+    echo "No docker-compose.yml found in $(pwd)"
+    return 1
+  fi
+
+  ## stops containers, removes networks, volumes, and all images used by this project
+  docker-compose down --rmi all --volumes --remove-orphans
+
+  ## clean up any dangling images left behind
+  docker image prune -f
+}
+
 ## this will show the total space that docker is consuming
 function docker-total-used-space(){
   docker system df
