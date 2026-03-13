@@ -1,10 +1,9 @@
 #!/bin/bash
 
 ## This will check what is the operational system loaded
-## This will check what is the operational system loaded
 function getOperationalSystem() {
   case "$OSTYPE" in
-  linux*) 
+  linux*)
     # Check if running in WSL
     if grep -qi microsoft /proc/version 2>/dev/null || uname -r | grep -qi microsoft; then
       echo "wsl"
@@ -35,81 +34,112 @@ else
   BASHRC_FILE="$HOME/.bashrc"
 fi
 
-## Building how should be the line to write inside of bash_profile
-PATH_VARIABLE=$(cat << END
-export PATH="$PATH:/usr/games:/usr/local/games:/snap/bin:/usr/local/git/bin:/usr/local/sbin:/usr/local/mysql/bin"
-END
-)
+# Project separator lines
+SEPARATOR_BEGIN="#strubloid# .bash_aliases project global variables"
+SEPARATOR_END="#strubloid# .bash_aliases project global variables end"
 
+## Build PATH lines based on OS
+build_path_lines() {
+  local lines=""
 
-# Configuration of the bashAliasesProject folder
-BASH_ALIASES_PROJECT_FOLDER_LINE=$(cat << END
+  # Base PATH
+  lines+='export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'$'\n'
+
+  if [ "$OS" = "wsl" ]; then
+    # WSL-specific paths
+    lines+='export PATH="$PATH:/usr/lib/wsl/lib"'$'\n'
+
+    # Python
+    lines+='export PATH="$PATH:/mnt/c/Program Files/Python311/Scripts"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/Python311"'$'\n'
+
+    # Java
+    lines+='export PATH="$PATH:/mnt/c/Program Files/Common Files/Oracle/Java/javapath"'$'\n'
+
+    # NVIDIA / GPU
+    lines+='export PATH="$PATH:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.5/libnvvp"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/NVIDIA Corporation/Nsight Compute 2024.2.1"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR"'$'\n'
+
+    # Windows system
+    lines+='export PATH="$PATH:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/WINDOWS/System32/Wbem"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/WINDOWS/System32/OpenSSH"'$'\n'
+
+    # Development tools
+    lines+='export PATH="$PATH:/mnt/c/Program Files/nodejs"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Roaming/npm"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/docker"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/Git/cmd"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/ProgramData/chocolatey/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/usbipd-win"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/socialstream"'$'\n'
+
+    # Android
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Android/Sdk/platform-tools"'$'\n'
+
+    # Touch Portal
+    lines+='export PATH="$PATH:/mnt/c/Program Files (x86)/Touch Portal/plugins/adb/platform-tools"'$'\n'
+
+    # PyEnv
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/.pyenv/pyenv-win/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/.pyenv/pyenv-win/shims"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/.pyenv/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/.pyenv/shims"'$'\n'
+
+    # User apps
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Microsoft/WindowsApps"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Programs/Hyper/resources/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/.dotnet/tools"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Program Files/Microsoft VS Code/bin"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Programs/Python/Python311"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Programs/Python/Python311/Scripts"'$'\n'
+    lines+='export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand"'$'\n'
+
+  elif [ "$OS" = "linux" ]; then
+    # Linux-specific extras
+    lines+='export PATH="$PATH:/usr/games:/usr/local/games:/snap/bin"'$'\n'
+    lines+='export PATH="/usr/local/git/bin:/usr/local/mysql/bin:$PATH"'$'\n'
+
+  elif [ "$OS" = "mac" ]; then
+    # Mac-specific extras (add as needed)
+    lines+='export PATH="/usr/local/git/bin:$PATH"'$'\n'
+  fi
+
+  echo "$lines"
+}
+
+## Build the full block to insert
+VARIABLE_BLOCK="$SEPARATOR_BEGIN
+$(build_path_lines)
 export BASH_ALIASES_PROJECT_FOLDER=${PWD_PROJECT_FOLDER}
-END
-)
+$SEPARATOR_END"
 
-# Project separator line
-SEPARATOR_BEFORE="#strubloid# .bash_aliases project global variables"
-SEPARATOR_AFTER="#strubloid# .bash_aliases project global variables"
-
-# configuration that will be insert in the ~/.bashrc
-BASH_PROFILE_CONFIGURATION_LINE=$(cat << END
-\n
-$SEPARATOR_BEFORE\n
-$PATH_VARIABLE\n
-$BASH_ALIASES_PROJECT_FOLDER_LINE\n
-$SEPARATOR_AFTER\n
-
-END
-)
-
-## Adding only if not exist that line
-if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
-
+## Insert or update the block in bashrc
+if grep -q "$SEPARATOR_BEGIN" "$BASHRC_FILE" && grep -q "$SEPARATOR_END" "$BASHRC_FILE"; then
+  # Update: replace the first block, remove any duplicates
+  tmp_file=$(mktemp)
+  awk -v begin="$SEPARATOR_BEGIN" -v end="$SEPARATOR_END" -v block="$VARIABLE_BLOCK" '
+    $0 == begin && !replaced { print block; replaced=1; skip=1; next }
+    $0 == begin && replaced { skip=1; next }
+    $0 == end { skip=0; next }
+    !skip { print }
+  ' "$BASHRC_FILE" > "$tmp_file"
+  mv "$tmp_file" "$BASHRC_FILE"
+else
+  # First install: insert before bash_profile sourcing or append
   BASH_PROFILE_LINE_CHECK="if [ -f ~/.bash_profile ]; then"
-  if ! grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
-    echo -e ${BASH_PROFILE_CONFIGURATION_LINE} >> ${BASHRC_FILE}
+  if grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
+    tmp_file=$(mktemp)
+    awk -v pattern="if.*.bash_profile.*then" -v block="$VARIABLE_BLOCK" -v done=0 '
+      $0 ~ pattern && !done { print ""; print block; print ""; done=1 }
+      { print }
+    ' "$BASHRC_FILE" > "$tmp_file"
+    mv "$tmp_file" "$BASHRC_FILE"
   else
-    BASH_PROFILE_UPGRADE_LINE=$(awk -v pattern="if.*.bash_profile.*then" \
-        -v line1="$SEPARATOR_BEFORE" -v line2="$PATH_VARIABLE" \
-        -v line3="$BASH_ALIASES_PROJECT_FOLDER_LINE" \
-        -v line4="$SEPARATOR_AFTER" \
-        "\$0 ~ pattern {print \"\"; print line1; print line2; print line3; print line4; print \"\"; print; next} 1" "$BASHRC_FILE")
-
-    echo -e "$BASH_PROFILE_UPGRADE_LINE" > "$BASHRC_FILE"
+    printf "\n%s\n" "$VARIABLE_BLOCK" >> "$BASHRC_FILE"
   fi
 fi
-
-
-## Adding only if not exist that line for mac
-if ! grep -q "$SEPARATOR_BEFORE" "$BASHRC_FILE"; then
-
-  BASH_PROFILE_LINE_CHECK="if [ -f ~/.bash_profile ]; then"
-  if ! grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
-    echo -e ${BASH_PROFILE_CONFIGURATION_LINE} >> ${BASHRC_FILE}
-  else
-    BASH_PROFILE_UPGRADE_LINE=$(awk -v pattern="if.*.bash_profile.*then" \
-        -v line1="$SEPARATOR_BEFORE" -v line2="$PATH_VARIABLE" \
-        -v line3="$BASH_ALIASES_PROJECT_FOLDER_LINE" \
-        -v line4="$SEPARATOR_AFTER" \
-        "\$0 ~ pattern {print \"\"; print line1; print line2; print line3; print line4; print \"\"; print; next} 1" "$BASHRC_FILE")
-
-    echo -e "$BASH_PROFILE_UPGRADE_LINE" > "$BASHRC_FILE"
-  fi
-fi
-
-## Multiline variable sample
-#EXAMPLE1=$(cat << END
-#
-## You can add comments
-#any.kind.of.variables=100
-#
-#END
-#)
-#
-#read -r -d '' EXAMPLE1 << EOM
-#This is line 1.
-#This is line 2.
-#Line 3.
-#EOM
-
