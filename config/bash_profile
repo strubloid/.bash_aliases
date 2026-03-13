@@ -31,3 +31,6 @@ if [ -f ~/.zshrc ]; then
     echo "[Bash Mac 3]: enabled"
     . ~/.zshrc
 fi
+
+# node for wsl
+export PATH="$PATH:/mnt/c/Program Files/nodejs:/mnt/c/Users/strubloid/AppData/Roaming/npm"
