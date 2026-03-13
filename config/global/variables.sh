@@ -112,34 +112,49 @@ build_path_lines() {
   echo "$lines"
 }
 
-## Build the full block to insert
+## Build the full block to insert (includes _BASHRC_LOADED flag)
 VARIABLE_BLOCK="$SEPARATOR_BEGIN
+export _BASHRC_LOADED=1
 $(build_path_lines)
 export BASH_ALIASES_PROJECT_FOLDER=${PWD_PROJECT_FOLDER}
 $SEPARATOR_END"
 
-## Insert or update the block in bashrc
-if grep -q "$SEPARATOR_BEGIN" "$BASHRC_FILE" && grep -q "$SEPARATOR_END" "$BASHRC_FILE"; then
-  # Update: replace the first block, remove any duplicates
+## Clean up _BASH_PROFILE_LOADED guard from .bashrc (leftover from previous installer)
+## Only _BASHRC_LOADED is needed (set here, checked by .bash_profile)
+if grep -q '_BASH_PROFILE_LOADED' "$BASHRC_FILE"; then
+  sed -i 's|if \[ -z "\$_BASH_PROFILE_LOADED" \] && \[ -f ~/.bash_profile \]; then|if [ -f ~/.bash_profile ]; then|' "$BASHRC_FILE"
+fi
+
+## Remove old-style variable blocks (same begin/end marker, possibly with leading spaces)
+## and the new-style blocks — clean slate before inserting
+OLD_MARKER="#strubloid# .bash_aliases project global variables"
+if grep -q "$OLD_MARKER" "$BASHRC_FILE"; then
   tmp_file=$(mktemp)
-  awk -v begin="$SEPARATOR_BEGIN" -v end="$SEPARATOR_END" -v block="$VARIABLE_BLOCK" '
-    $0 == begin && !replaced { print block; replaced=1; skip=1; next }
-    $0 == begin && replaced { skip=1; next }
-    $0 == end { skip=0; next }
-    !skip { print }
+  awk -v marker="$OLD_MARKER" -v end_marker="$OLD_MARKER end" '
+    # Match new-style end marker (with "end" suffix)
+    $0 == end_marker || (match($0, /^[[:space:]]*/) && substr($0, RSTART+RLENGTH) == end_marker) {
+      skip=0; next
+    }
+    # Match begin marker (with or without leading spaces)
+    $0 == marker || (match($0, /^[[:space:]]*/) && substr($0, RSTART+RLENGTH) == marker) {
+      skip=1; next
+    }
+    skip { next }
+    { print }
+  ' "$BASHRC_FILE" > "$tmp_file"
+  mv "$tmp_file" "$BASHRC_FILE"
+fi
+
+## Insert the variable block before the bash_profile sourcing line, or append
+BASH_PROFILE_CHECK="if [ -f ~/.bash_profile ]; then"
+if grep -qF "$BASH_PROFILE_CHECK" "$BASHRC_FILE"; then
+  tmp_file=$(mktemp)
+  awk -v check="$BASH_PROFILE_CHECK" -v block="$VARIABLE_BLOCK" '
+    !done && index($0, check) { print block; print ""; done=1 }
+    { print }
   ' "$BASHRC_FILE" > "$tmp_file"
   mv "$tmp_file" "$BASHRC_FILE"
 else
-  # First install: insert before bash_profile sourcing or append
-  BASH_PROFILE_LINE_CHECK="if [ -f ~/.bash_profile ]; then"
-  if grep -qF "$BASH_PROFILE_LINE_CHECK" "$BASHRC_FILE"; then
-    tmp_file=$(mktemp)
-    awk -v pattern="if.*.bash_profile.*then" -v block="$VARIABLE_BLOCK" -v done=0 '
-      $0 ~ pattern && !done { print ""; print block; print ""; done=1 }
-      { print }
-    ' "$BASHRC_FILE" > "$tmp_file"
-    mv "$tmp_file" "$BASHRC_FILE"
-  else
-    printf "\n%s\n" "$VARIABLE_BLOCK" >> "$BASHRC_FILE"
-  fi
+  # No bash_profile sourcing — just append
+  printf "\n%s\n" "$VARIABLE_BLOCK" >> "$BASHRC_FILE"
 fi

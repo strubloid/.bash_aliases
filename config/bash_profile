@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Source .bashrc if not already loaded (ensures PATH loads in login shells)
+if [ -z "$_BASHRC_LOADED" ] && [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+fi
+
 # This is the part that will get all the variables
 if [ -f ~/.bash_variables ]; then
    . ~/.bash_variables
@@ -7,7 +12,6 @@ fi
 
 ## adding the .bash_aliases file
 if [ -f ~/.bash_aliases ]; then
-    echo "[Bash Alias 5]: enabled"
     . ~/.bash_aliases
 fi
 
@@ -28,9 +32,5 @@ fi
 
 ## adding the .bash_prompt file
 if [ -f ~/.zshrc ]; then
-    echo "[Bash Mac 3]: enabled"
     . ~/.zshrc
 fi
-
-# node for wsl
-export PATH="$PATH:/mnt/c/Program Files/nodejs:/mnt/c/Users/strubloid/AppData/Roaming/npm"

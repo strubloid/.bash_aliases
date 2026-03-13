@@ -97,7 +97,7 @@ terminal-update() {
 
 ## Alias for the terminal update
 tu() {
-    terminal-update && source ~/.bashrc
+    terminal-update && unset _BASHRC_LOADED NVM_BIN NVM_INC NVM_CD_FLAGS && source ~/.bashrc
 }
 
 #   -----------------------------------------------------

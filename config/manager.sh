@@ -302,6 +302,12 @@ upgradeElementsOnBashProfile() {
     echoLine "* ~/.bash_prompt already exists, moving on"
   fi
 
+  # Always update ~/.bash_variables from the project config
+  if [ -f "$BASH_ALIASES_PROJECT_FOLDER/config/bash_variables" ]; then
+    cp "$BASH_ALIASES_PROJECT_FOLDER/config/bash_variables" "${HOME_VARIABLES}"
+    echoLine "* ~/.bash_variables updated"
+  fi
+
   # Check if the bash_prompt file exists
   if [ -f "${HOME_PROMPT}" ]; then
     # Make sure OS is set
