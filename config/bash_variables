@@ -26,3 +26,17 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local
 
 ## Updating the docker buildkit
 export DOCKER_BUILDKIT=1
+
+# VSCode shell integration
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path bash)" 2>/dev/null
+
+# Local bin + Fly.io
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+[ -d "$HOME/.fly/bin" ] && export PATH="$HOME/.fly/bin:$PATH"
+
+# Angular CLI autocompletion
+command -v ng &>/dev/null && source <(ng completion script) 2>/dev/null
+
+# SDKMAN (must be at the end)
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
