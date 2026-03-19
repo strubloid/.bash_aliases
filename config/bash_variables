@@ -49,3 +49,6 @@ export ANTHROPIC_BASE_URL="http://localhost:11434"
 
 ## any token for the localhost
 export ANTHROPIC_AUTH_TOKEN="token"
+
+## adding some context to ollama
+export OLLAMA_NUM_CTX=8192
