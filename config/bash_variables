@@ -40,3 +40,12 @@ command -v ng &>/dev/null && source <(ng completion script) 2>/dev/null
 # SDKMAN (must be at the end)
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+## for running node on linux using WSL
+export PATH="$PATH:/mnt/c/Users/strubloid/AppData/Local/Programs/Microsoft VS Code/bin"
+
+## configuring the ollama to be the antropic
+export ANTHROPIC_BASE_URL="http://localhost:11434"
+
+## any token for the localhost
+export ANTHROPIC_AUTH_TOKEN="token"
