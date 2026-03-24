@@ -10,7 +10,7 @@ install-chat-gpt-local()
   then
       # shellcheck disable=SC2034
       # read -p "[Folder to install]: " FOLDER_TO_INSTALL
-      FOLDER_TO_INSTALL="/media/games/apps/gpt-ui"
+      FOLDER_TO_INSTALL="~/apps/gpt-ui"
   else
       FOLDER_TO_INSTALL=$1
   fi
