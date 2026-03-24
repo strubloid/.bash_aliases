@@ -112,6 +112,12 @@ build_path_lines() {
   echo "$lines"
 }
 
+# Check if the specific line exists in .bashrc
+if ! grep -q 'if \[ -f ~/.bash_profile \]; then' "$BASHRC_FILE"; then
+  # Append the line to .bashrc
+  echo "if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi" >> "$BASHRC_FILE"
+fi
+
 ## Build the full block to insert (includes _BASHRC_LOADED flag)
 VARIABLE_BLOCK="$SEPARATOR_BEGIN
 export _BASHRC_LOADED=1
