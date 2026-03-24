@@ -114,8 +114,8 @@ build_path_lines() {
 
 # Check if the specific line exists in .bashrc
 if ! grep -q 'if \[ -f ~/.bash_profile \]; then' "$BASHRC_FILE"; then
-  # Append the line to .bashrc
-  echo "if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi" >> "$BASHRC_FILE"
+  # Append the line with proper formatting to .bashrc
+  echo -e "\nif [ -f ~/.bash_profile ]; then\n    . ~/.bash_profile\nfi" >> "$BASHRC_FILE"
 fi
 
 ## Build the full block to insert (includes _BASHRC_LOADED flag)
