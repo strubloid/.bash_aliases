@@ -7,6 +7,32 @@ chat-gpt-gui(){
   docker start open-webui
 }
 
+chat-install-cuda(){
+    docker run -d \
+               -p 3000:8080 \
+              --name open-webui \
+              --add-host=host.docker.internal:host-gateway \
+              -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:cuda
+
+}
+
+chat-install-main(){
+    docker run -d \
+               -p 3000:8080 \
+              --name open-webui \
+              --add-host=host.docker.internal:host-gateway \
+              -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:main
+
+}
+
+pull-main-repo(){
+  docker pull ghcr.io/open-webui/open-webui:main
+}
+
+
+pull-cuda-repo(){
+  docker pull ghcr.io/open-webui/open-webui:cuda
+}
 # Function to start the chatGPT GUI locally with GPU support
 chat-gpt-gui-local()
 {
@@ -14,7 +40,7 @@ chat-gpt-gui-local()
     echo "Container exists. Starting..."
     docker start open-webui
   else
-    docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+    chat-install-cuda
   fi
 }
 
@@ -25,7 +51,7 @@ update-chat-gpt-gui-local(){
   docker pull ghcr.io/open-webui/open-webui:cuda  # 2. Pull the latest image
 
   # 3. Recreate the container
-  docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
+  chat-install-cuda
 }
 
 # Function to start the chatGPT GUI locally without GPU support
@@ -35,7 +61,7 @@ chat-gpt-gui-local-cpu()
     echo "Container exists. Starting..."
     docker start open-webui
   else
-    docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+    chat-install-main
   fi
   
 }
@@ -49,5 +75,5 @@ update-chat-gpt-gui-local-cpu(){
   docker pull ghcr.io/open-webui/open-webui:main
 
   # 3. Recreate the container
-  docker run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://127.0.0.1:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+  chat-install-main
 }
