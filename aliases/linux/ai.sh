@@ -33,7 +33,6 @@ pull-cuda-repo(){
   docker pull ghcr.io/open-webui/open-webui:cuda
 }
 
-
 # Function to start the chatGPT GUI locally with GPU support
 chat_start() {
   read -r -p "Do you want to start with CUDA? (y/n): " choice
