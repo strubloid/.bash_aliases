@@ -45,14 +45,11 @@ chat-start() {
     n|N|No|NO)
       docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
     *)
-
-    ## if you dont say yes or no, it will be back to the main nv
-    if nvidia-smi > /dev/null 2>&1; then
-      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
-    else
-      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
-    fi
-      
+      if nvidia-smi > /dev/null 2>&1; then
+        docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
+      else
+        docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
+      fi
       ;;
   esac
 
