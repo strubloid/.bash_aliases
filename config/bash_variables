@@ -52,3 +52,6 @@ export ANTHROPIC_AUTH_TOKEN="token"
 
 ## adding some context to ollama
 export OLLAMA_NUM_CTX=8192
+
+## addubg ollama host as 0.0.0.0 as an attemp to be able to use with docker machines
+export OLLAMA_HOST=0.0.0.0
