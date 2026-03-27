@@ -39,11 +39,12 @@ chat_start() {
   read -r -p "Do you want to start with CUDA? (y/n): " choice
   if [[ "$choice" =~ ^(yes|y|Y|Yes|YES)$ ]]
   then
-    docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
+    docker compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
   else 
-    docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
+    docker compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
   fi 
 }
+
 
 # Function to update the chatGPT GUI locally with GPU support
 update-chat-gpt-gui-local(){
