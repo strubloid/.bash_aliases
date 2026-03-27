@@ -6,32 +6,21 @@
 
 ## installing the chat cuda version
 chat-install-cuda(){
-
   if [ -d "$HOME/.bash_aliases_docker/" ]; then
-      docker-compose -f $HOME/.bash_aliases_docker/openwebui/docker-compose.yml up -d
+      docker-compose -f $HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml up -d
   else
       echo " [ERROR]: Docker-compose  file not found."
   fi  
-
 }
 
 ## installing the chat main version
 chat-install-main(){
 
-    # Internal Ollama docker
-    # docker run -d \
-    #            -p 3000:8080 \
-    #           --name open-webui \
-    #           --add-host=host.docker.internal:host-gateway \
-    #           -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:main
-
-    ## External Ollama (Your computer)
-    docker run -d \
-              --network=host \
-              --name open-webui \
-              -e OLLAMA_BASE_URL=http://localhost:11434 \
-              ghcr.io/open-webui/open-webui:main
-
+    if [ -d "$HOME/.bash_aliases_docker/" ]; then
+        docker-compose -f $HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml up -d
+    else
+        echo " [ERROR]: Docker-compose  file not found."
+    fi
 }
 
 # command to update the repo
@@ -45,9 +34,30 @@ pull-cuda-repo(){
 }
 
 # Function to start the chatGPT GUI locally with GPU support
-chat-start()
-{
-  docker start open-webui
+chat-start() {
+
+  read -p "Do you want to start with CUDA? (y/n): " choice
+
+  case "$choice" in
+    y|Y|yes|YES)
+      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
+      ;;
+    n|N|No|NO)
+      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
+    *)
+
+    ## if you dont say yes or no, it will be back to the main nv
+    if nvidia-smi > /dev/null 2>&1; then
+      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
+    else
+      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
+    fi
+      
+      ;;
+  esac
+
+  
+
 }
 
 # Function to update the chatGPT GUI locally with GPU support
