@@ -7,7 +7,7 @@
 ## installing the chat cuda version
 chat-install-cuda(){
   if [ -d "$HOME/.bash_aliases_docker/" ]; then
-      docker-compose -f $HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml up -d
+      docker compose -f $HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml up -d
   else
       echo " [ERROR]: Docker-compose  file not found."
   fi  
@@ -17,7 +17,7 @@ chat-install-cuda(){
 chat-install-main(){
 
     if [ -d "$HOME/.bash_aliases_docker/" ]; then
-        docker-compose -f $HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml up -d
+        docker compose -f $HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml up -d
     else
         echo " [ERROR]: Docker-compose  file not found."
     fi
