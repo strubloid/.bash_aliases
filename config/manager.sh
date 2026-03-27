@@ -451,3 +451,20 @@ moveScripts(){
     cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
 
 }
+
+# Function to move Docker Compose files from the project folder to the Docker directory
+moveDockerComposeIdeas(){
+    local source_folder="$BASH_ALIASES_PROJECT_FOLDER/docker"
+    local destination_folder="$BASH_ALIASES_DOCKER"
+
+    echoHeader " Copying Dockers "
+    echoLine " From: $source_folder"
+    echoLine " To: $destination_folder"
+
+    # Ensure the destination folder exists
+    echoHeader "Creating destination folder"
+    mkdir -p "$destination_folder"
+
+    # Copy all Docker-related files from the source folder to the destination folder
+    cp -Rf "$source_folder"/* "$destination_folder"
+}

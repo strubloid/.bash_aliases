@@ -2,6 +2,7 @@
 
 ## .bash_aliases file path
 export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts/"
+export BASH_ALIASES_DOCKER="$HOME/.bash_aliases_docker/"
 export HOME_ALIASES="$HOME/.bash_aliases"
 export HOME_PROFILE="$HOME/.bash_profile"
 export HOME_VARIABLES="$HOME/.bash_variables"

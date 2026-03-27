@@ -26,3 +26,6 @@ updateBashTerminal
 
 ## Step 4 Move usable scripts
 moveScripts
+
+## Step 5 move Docker compose ideas
+moveDockerComposeIdeas
