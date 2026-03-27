@@ -7,34 +7,38 @@
 ## installing the chat cuda version
 chat-install-cuda(){
 
-    # installing the cuda version
-    docker run -d \
-               -p 3000:8080 \
-              --name open-webui \
-              --add-host=host.docker.internal:host-gateway \
-              -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:cuda
+    # Internal Ollama docker
+    # docker run -d \
+    #            -p 3000:8080 \
+    #           --name open-webui \
+    #           --add-host=host.docker.internal:host-gateway \
+    #           -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:cuda
     
-    ## creating network
+    ## External Ollama (Your computer)
     docker run -d \
               --network=host \
-              -e OLLAMA_BASE_URL=http://localhost:11434 ghcr.io/open-webui/open-webui:cuda
+              --name open-webui \
+              -e OLLAMA_BASE_URL=http://localhost:11434 \
+              ghcr.io/open-webui/open-webui:cuda
 
 }
 
 ## installing the chat main version
 chat-install-main(){
 
-    # installing the main version
-    docker run -d \
-               -p 3000:8080 \
-              --name open-webui \
-              --add-host=host.docker.internal:host-gateway \
-              -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:main
+    # Internal Ollama docker
+    # docker run -d \
+    #            -p 3000:8080 \
+    #           --name open-webui \
+    #           --add-host=host.docker.internal:host-gateway \
+    #           -e OLLAMA_BASE_URL=http://host.docker.internal:11434 ghcr.io/open-webui/open-webui:main
 
-    ## creating network
+    ## External Ollama (Your computer)
     docker run -d \
               --network=host \
-              -e OLLAMA_BASE_URL=http://localhost:11434 ghcr.io/open-webui/open-webui:main
+              --name open-webui \
+              -e OLLAMA_BASE_URL=http://localhost:11434 \
+              ghcr.io/open-webui/open-webui:main
 
 }
 
