@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+    open-webui-cuda:
+        image: ghcr.io/open-webui/open-webui:cuda
+        container_name: open-webui
+        ports:
+            - "3000:8080"
+        environment:
+            - OLLAMA_BASE_URL=http://host.docker.internal:11434
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        volumes:
+            - open-webui-cuda:/app/backend/data
+        restart: unless-stopped
+
+volumes:
+    open-webui-cuda:
