@@ -33,28 +33,16 @@ pull-cuda-repo(){
   docker pull ghcr.io/open-webui/open-webui:cuda
 }
 
+
 # Function to start the chatGPT GUI locally with GPU support
-chat-start() {
-
-  read -p "Do you want to start with CUDA? (y/n): " choice
-
-  case "$choice" in
-    y|Y|yes|YES)
-      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
-      ;;
-    n|N|No|NO)
-      docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
-    *)
-      if nvidia-smi > /dev/null 2>&1; then
-        docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
-      else
-        docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
-      fi
-      ;;
-  esac
-
-  
-
+chat_start() {
+  read -r -p "Do you want to start with CUDA? (y/n): " choice
+  if [[ "$choice" =~ ^(yes|y|Y|Yes|YES)$ ]]
+  then
+    docker-compose -f "$HOME/.bash_aliases_docker/openwebui/cuda/docker-compose.yml" up -d open-webui-cuda
+  else 
+    docker-compose -f "$HOME/.bash_aliases_docker/openwebui/main/docker-compose.yml" up -d open-webui-main
+  fi 
 }
 
 # Function to update the chatGPT GUI locally with GPU support
