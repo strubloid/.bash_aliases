@@ -2,16 +2,56 @@
 
 # Strubloid::general::react
 
-## react js commands
-react-create(){
 
-  if [ -z "$1" ]
-    then
-        npx create-react-app .
-    else
-        npx create-react-app . $1
+## react js commands
+react-create() {
+  if [ -z "$1" ]; then
+    npx create-react-app .
+  else
+    npx create-react-app "$1"
   fi
 }
+
+## this will create with nextjs in it
+react-create-next() {
+  if [ -z "$1" ]; then
+    npx create-next-app@latest .
+  else
+    npx create-next-app@latest "$1"
+  fi
+}
+
+install-and-configure-jest(){
+  local IS_NEXT=$1
+
+  npm i -D jest ts-jest @types/jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom ts-node
+
+
+}
+
+starting-new-react-environment() {
+  echo -e "* Starting a new react environment"
+
+  read -p "NextJS website? (y/n) " -n 1 -r
+  echo
+
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    IS_NEXT=true
+    react-create-next
+  else
+    IS_NEXT=false
+    react-create
+  fi
+
+  # Ask about Jest
+  read -p "Install and configure Jest? (y/n) " -n 1 -r
+  echo
+
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    install-and-configure-jest $IS_NEXT
+  fi
+}
+
 
 react-install-sass(){
 
