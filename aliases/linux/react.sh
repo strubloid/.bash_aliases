@@ -21,12 +21,60 @@ react-create-next() {
   fi
 }
 
-install-and-configure-jest(){
+## This will configure the jest
+install-and-configure-jest() {
+  
   local IS_NEXT=$1
-
+  echo "* Installing Jest dependencies..."
+  
   npm i -D jest ts-jest @types/jest @testing-library/react @testing-library/jest-dom jest-environment-jsdom ts-node
 
+  if [ "$IS_NEXT" = true ]; then
+    echo "* Writing jest.config.ts..."
+    cat > jest.config.ts << 'EOF'
+import type { Config } from 'jest'
+import nextJest from 'next/jest.js'
 
+const createJestConfig = nextJest({ dir: './' })
+
+const config: Config = {
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
+  setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'],
+}
+
+export default createJestConfig(config)
+EOF
+
+  else
+    echo "* Writing jest.config.ts..."
+    cat > jest.config.ts << 'EOF'
+import type { Config } from 'jest'
+
+const config: Config = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
+}
+
+export default config
+EOF
+  fi
+
+  echo "* Writing jest.setup.ts..."
+  cat > jest.setup.ts << 'EOF'
+import '@testing-library/jest-dom'
+EOF
+
+  echo "* Adding test scripts to package.json..."
+  npx json -I -f package.json \
+    -e 'this.scripts.test="jest"' \
+    -e 'this.scripts["test:watch"]="jest --watch"' \
+    -e 'this.scripts["test:coverage"]="jest --coverage"'
+
+  echo "* Jest configured successfully!"
 }
 
 starting-new-react-environment() {

@@ -24,11 +24,10 @@ function getOperationalSystem() {
 # This will return where is the project folder
 getProjectFolder()
 {
-  echo "Loading project folder path... "
-
-    # First try: use the environment variable if it exists
+  # First try: use the environment variable if it exists
   if [[ -n "$BASH_ALIASES_PROJECT_FOLDER" ]]; then
     echo "$BASH_ALIASES_PROJECT_FOLDER"
+    return
   fi
   
   # Second try: read directly from ~/.bash_variables without sourcing

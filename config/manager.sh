@@ -22,7 +22,7 @@ function getOperationalSystem() {
 function removeTempFile() {
   ## removing the old one if exist
   if [ -f ${BASH_TEMPORARY_F} ]; then
-    rm ${BASH_TEMPORARY_F}
+    rm -f ${BASH_TEMPORARY_F}
   fi
 }
 
@@ -59,7 +59,7 @@ checkStringExistIntoFile() {
 # to build the new bash_alias
 function createTempFile() {
   # Create a temporary file
-  rm -f ${BASH_TEMPORARY_F}
+  removeTempFile
   touch ${BASH_TEMPORARY_F}
   
   # Use absolute paths based on BASH_ALIASES_PROJECT_FOLDER
@@ -401,7 +401,7 @@ generateBashAlias() {
 
   # removing the temp file bash_temp
   if [ -f "${BASH_TEMPORARY_F}" ]; then
-    rm -f "${BASH_TEMPORARY_F}"
+    removeTempFile
     echoLine "* remove temp file ${BASH_TEMPORARY_F}"
   fi
 }
