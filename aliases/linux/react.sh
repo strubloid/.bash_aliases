@@ -83,6 +83,44 @@ installing-styled-components() {
   npm i styled-components @types/styled-components
 }
 
+## This will add @components/* path alias to tsconfig.json and jest.config.ts
+configure-component-folder() {
+  local COMPONENT_DIR="${1:-app/components}"
+  local TSCONFIG="tsconfig.json"
+  local JEST_CONFIG="jest.config.ts"
+
+  # Update tsconfig.json
+  if [ -f "$TSCONFIG" ]; then
+    echo "* Updating $TSCONFIG..."
+    if grep -q '"@components/\*"' "$TSCONFIG"; then
+      echo "  [@components/*]: already configured in $TSCONFIG, skipping..."
+    else
+      sed -i \
+        -e '/"@\/\*":/ s/\]$/\],/' \
+        -e '/"@\/\*":/a\            "@components\/*": [".\/'"$COMPONENT_DIR"'\/*"]' \
+        "$TSCONFIG"
+      echo "  Added @components/* to $TSCONFIG"
+    fi
+  else
+    echo "  [$TSCONFIG]: not found, skipping..."
+  fi
+
+  # Update jest.config.ts
+  if [ -f "$JEST_CONFIG" ]; then
+    echo "* Updating $JEST_CONFIG..."
+    if grep -q '"^@components/' "$JEST_CONFIG"; then
+      echo "  [@components]: already configured in $JEST_CONFIG, skipping..."
+    else
+      sed -i '\|"^@/|i\        "^@components/(.*)$": "<rootDir>/'"$COMPONENT_DIR"'/$1",' "$JEST_CONFIG"
+      echo "  Added @components mapper to $JEST_CONFIG"
+    fi
+  else
+    echo "  [$JEST_CONFIG]: not found, skipping..."
+  fi
+
+  echo "* Component folder configured successfully!"
+}
+
 starting-new-react-environment() {
   echo -e "* Starting a new react environment"
 
@@ -107,7 +145,12 @@ starting-new-react-environment() {
 
   ## adding styling with styled-components
   installing-styled-components
+
+  ## adding @components/* path alias
+  configure-component-folder
 }
+
+
 
 
 react-install-sass(){
