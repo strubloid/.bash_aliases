@@ -77,6 +77,12 @@ EOF
   echo "* Jest configured successfully!"
 }
 
+## This will install styled-components and its types.
+installing-styled-components() {
+  echo "* Installing styled-components and its types..."
+  npm i styled-components @types/styled-components
+}
+
 starting-new-react-environment() {
   echo -e "* Starting a new react environment"
 
@@ -98,6 +104,9 @@ starting-new-react-environment() {
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     install-and-configure-jest $IS_NEXT
   fi
+
+  ## adding styling with styled-components
+  installing-styled-components
 }
 
 
