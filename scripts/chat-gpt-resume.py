@@ -63,69 +63,120 @@ if not transcription:
     print("Error: no transcription text found in the vtt file.")
     sys.exit(1)
 
-# Truncate to avoid token limits (~12000 chars ~ 3000 tokens, leaving room for response)
-MAX_CHARS = 12000
-if len(transcription) > MAX_CHARS:
-    transcription = transcription[:MAX_CHARS] + "..."
+# Split transcription into chunks so the full video is processed
+def ask(messages):
+    response = client.chat.completions.create(
+        messages=messages,
+        model="gpt-5.5",
+    )
+    return response.choices[0].message.content
 
-question = f"""The following is an auto-generated transcription from a YouTube video of a tabletop RPG session (Pathfinder).
+# Divide into exactly 3 equal parts (or fewer if very short)
+num_parts = 3
+part_length = len(transcription) // num_parts if len(transcription) >= num_parts else len(transcription)
+chunks = [transcription[i*part_length:(i+1)*part_length] for i in range(num_parts)]
+# Remove empty chunks (if transcription is short)
+chunks = [c for c in chunks if c.strip()]
+total_chunks = len(chunks)
+
+print(f"Processing {total_chunks} chunk(s) from the transcription...")
+
+chunk_summaries = []
+for idx, chunk in enumerate(chunks, start=1):
+    print(f"  Summarizing chunk {idx}/{total_chunks}...")
+    chunk_prompt = f"""
+You are processing part {idx} of {total_chunks} of an auto-generated transcription from a tabletop RPG session.
+
+IMPORTANT: Write in {language_name}.
+
+Your goal is NOT to simply summarize. Instead, extract structured story information that will later be used to build a full narrative recap.
+
+From this segment, identify and describe clearly:
+
+1. EVENTS (chronological)
+- What happens step by step
+
+2. CHARACTERS & ENTITIES
+- Player characters
+- NPCs
+- Enemies/monsters
+- Locations
+
+3. DECISIONS
+- Important player choices
+- Moral decisions (e.g., spare vs kill)
+
+4. COMBAT & ENCOUNTERS
+- Who fights whom
+- Outcomes (win/loss/escape/etc.)
+
+5. IMPORTANT MOMENTS
+- Dramatic, funny, or tense situations
+- Unexpected outcomes or failures
+
+6. CONTEXT FOR CONTINUITY
+- Anything that connects to previous or future events
+
+Rules:
+- Be thorough, do not skip events
+- Keep chronological order
+- Do NOT invent information
+- Do NOT write a story — keep it structured and factual
+
+Transcription segment:
+{chunk}
+"""
+    summary = ask([{"role": "user", "content": chunk_prompt}])
+    chunk_summaries.append(f"[Part {idx}]\n{summary}")
+
+combined_summaries = "\n\n".join(chunk_summaries)
+
+print("Generating final narrative recap...")
+
+question = f"""The following are sequential summaries covering the full content of a tabletop RPG session video, broken into {total_chunks} parts.
 
 IMPORTANT: Your entire response must be written in {language_name}. Do not respond in English unless the transcription is in English.
 
-Your goal is to generate a structured session recap that helps players quickly understand what happened and prepare for the next session.
+Your task is to create a human-friendly, story-like recap similar to a "Previously on..." segment from a TV series or anime.
 
-Please provide:
+Requirements:
 
-1. SESSION SUMMARY
-- A concise but clear overview (5-10 sentences max).
+1. NARRATIVE RECAP (MAIN OUTPUT)
+- Write a chronological, flowing story covering ALL parts from beginning to end.
+- Break it into short paragraphs (like scenes or moments).
+- Use natural storytelling language, not bullet points.
+- Do NOT skip any part — all {total_chunks} parts must be reflected in the story.
 
-2. TIMELINE OF EVENTS
-- Chronological bullet points of key events in order.
+2. IMPORTANT MOMENTS (EMBEDDED IN STORY)
+While writing the recap, clearly include:
+- Key player decisions (especially moral choices, like sparing or killing)
+- Combat encounters (include monster/enemy names when possible)
+- Major successes, failures, or unexpected outcomes
+- Important dialogue or interactions (summarized)
+- Any tension, funny moments, or dramatic turns
 
-3. KEY ENCOUNTERS
-- Combat, social, or exploration encounters.
-- Include enemies, locations, and outcomes.
+3. NAMING & CLARITY
+- Identify and name important characters, NPCs, locations, and enemies.
+- If names are unclear, infer carefully but do not invent major facts.
 
-4. PLAYER DECISIONS & ACTIONS
-- Important choices made by players.
-- Consequences (immediate or implied).
+4. ENDING SUMMARY (SHORT)
+At the end, add a brief "Where things left off" section:
+- Current situation
+- Immediate next objective or likely direction
 
-5. NPCs INTRODUCED OR INTERACTED WITH
-- Name + role + relevance.
+5. STYLE GUIDELINES
+- Write like a narrator telling the story to players before the next session
+- Keep it engaging but concise
+- Avoid rigid structure or technical formatting
+- Do NOT output bullet points except for the final short section
+- Respond entirely in {language_name}
 
-6. LOOT, REWARDS, OR IMPORTANT ITEMS
-- Items gained, used, or discussed.
+Session summaries:
+{combined_summaries}
+"""
 
-7. STORY DEVELOPMENTS
-- Plot progression, reveals, twists, or new objectives.
-
-8. UNRESOLVED THREADS / CLIFFHANGERS
-- Open questions, ongoing quests, mysteries.
-
-9. NEXT SESSION HOOKS
-- What is likely to happen next or what players should prepare for.
-
-Important:
-- Ignore transcription errors unless critical.
-- Infer context when necessary, but do not invent major events.
-- Keep it structured and easy to skim.
-- Respond entirely in {language_name}.
-
-Transcription:
-{transcription}"""
-
-response = client.chat.completions.create(
-    messages=[
-        {
-            "role": "user",
-            "content": question,
-        }
-    ],
-    model="gpt-3.5-turbo",
-)
-
-ai_response = response.choices[0].message.content
-# print(ai_response)
+ai_response = ask([{"role": "user", "content": question}])
+print(ai_response)
 
 output_file = "summary.txt"
 with open(output_file, "w", encoding="utf-8") as f:
