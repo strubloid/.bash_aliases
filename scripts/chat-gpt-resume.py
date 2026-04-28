@@ -1,3 +1,4 @@
+
 import os
 import sys
 import re
@@ -20,6 +21,9 @@ if not os.path.isfile(vtt_file):
 # Detect language from the vtt filename (e.g. "video.pt.vtt" -> "pt", "video.en.vtt" -> "en")
 lang_match = re.search(r"\.([a-z]{2}(?:-[A-Z]{2})?)\.vtt$", os.path.basename(vtt_file))
 detected_lang = lang_match.group(1) if lang_match else None
+
+## Names of the characters in the RPG session
+CHARACTER_NAMES = ["Phendrachion", "Elandor", "Baskkol", "Root", "Baltazar"]
 
 # Map language codes to full language names for the prompt
 LANG_NAMES = {
@@ -63,19 +67,19 @@ if not transcription:
     print("Error: no transcription text found in the vtt file.")
     sys.exit(1)
 
-# Split transcription into chunks so the full video is processed
-def ask(messages):
+
+
+# Use fewer, larger chunks, no overlap
+def ask(messages, model="gpt-3.5-turbo"):
     response = client.chat.completions.create(
         messages=messages,
-        model="gpt-5.5",
+        model=model,
     )
     return response.choices[0].message.content
 
-# Divide into exactly 3 equal parts (or fewer if very short)
-num_parts = 3
+num_parts = 4
 part_length = len(transcription) // num_parts if len(transcription) >= num_parts else len(transcription)
 chunks = [transcription[i*part_length:(i+1)*part_length] for i in range(num_parts)]
-# Remove empty chunks (if transcription is short)
 chunks = [c for c in chunks if c.strip()]
 total_chunks = len(chunks)
 
@@ -126,57 +130,42 @@ Rules:
 Transcription segment:
 {chunk}
 """
-    summary = ask([{"role": "user", "content": chunk_prompt}])
+    # Use gpt-3.5-turbo for chunk summaries to save tokens
+    summary = ask([{"role": "user", "content": chunk_prompt}], model="gpt-3.5-turbo")
     chunk_summaries.append(f"[Part {idx}]\n{summary}")
 
 combined_summaries = "\n\n".join(chunk_summaries)
 
 print("Generating final narrative recap...")
 
-question = f"""The following are sequential summaries covering the full content of a tabletop RPG session video, broken into {total_chunks} parts.
+# Compact, bullet-pointed prompt with restored key instructions
+character_names_clause = f"The valid main character names are: {', '.join(CHARACTER_NAMES)}. Always use these exact names in the recap."
 
-IMPORTANT: Your entire response must be written in {language_name}. Do not respond in English unless the transcription is in English.
+question = f"""The following are summaries of a tabletop RPG session, divided into {total_chunks} parts.
 
-Your task is to create a human-friendly, story-like recap similar to a "Previously on..." segment from a TV series or anime.
+{character_names_clause}
 
-Requirements:
+IMPORTANT: Write in {language_name}. Do not skip any event or detail, even minor ones. Do not invent facts.
 
-1. NARRATIVE RECAP (MAIN OUTPUT)
-- Write a chronological, flowing story covering ALL parts from beginning to end.
-- Break it into short paragraphs (like scenes or moments).
-- Use natural storytelling language, not bullet points.
-- Do NOT skip any part — all {total_chunks} parts must be reflected in the story.
-
-2. IMPORTANT MOMENTS (EMBEDDED IN STORY)
-While writing the recap, clearly include:
-- Key player decisions (especially moral choices, like sparing or killing)
-- Combat encounters (include monster/enemy names when possible)
-- Major successes, failures, or unexpected outcomes
-- Important dialogue or interactions (summarized)
-- Any tension, funny moments, or dramatic turns
-
-3. NAMING & CLARITY
-- Identify and name important characters, NPCs, locations, and enemies.
-- If names are unclear, infer carefully but do not invent major facts.
-
-4. ENDING SUMMARY (SHORT)
-At the end, add a brief "Where things left off" section:
-- Current situation
-- Immediate next objective or likely direction
-
-5. STYLE GUIDELINES
-- Write like a narrator telling the story to players before the next session
-- Keep it engaging but concise
-- Avoid rigid structure or technical formatting
-- Do NOT output bullet points except for the final short section
-- Respond entirely in {language_name}
+Your recap must:
+- Cover ALL events and details from the summaries, in chronological order
+- Include all key player decisions, especially moral choices
+- Describe all combat encounters (with monster/enemy names and outcomes)
+- Name all important characters, NPCs, monsters, and locations
+- Include important dialogue, dramatic, tense, or funny moments
+- Mention major successes, failures, and unexpected outcomes
+- Clearly show the consequences of actions and decisions
+- Write as a flowing, story-like narrative (not bullet points)
+- Break into short paragraphs for each scene or moment
+- At the end, add a short section: 'Where things left off' (current situation and next objective)
 
 Session summaries:
 {combined_summaries}
 """
 
-ai_response = ask([{"role": "user", "content": question}])
-print(ai_response)
+
+# Get AI response using gpt-4-turbo for the final recap
+ai_response = ask([{"role": "user", "content": question}], model="gpt-4-turbo")
 
 output_file = "summary.txt"
 with open(output_file, "w", encoding="utf-8") as f:
