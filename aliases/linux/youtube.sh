@@ -72,4 +72,5 @@ get-youtube-video-summary(){
   fi
 
   "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file"
+  
 }
