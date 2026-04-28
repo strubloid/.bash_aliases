@@ -54,8 +54,6 @@ for line in lines:
     cleaned = re.sub(r"<[^>]+>", "", line).strip()
     if cleaned:
         text_lines.append(cleaned)
-
-# Deduplicate consecutive identical lines (common in auto-subs)
 deduped = []
 for line in text_lines:
     if not deduped or line != deduped[-1]:
@@ -89,82 +87,115 @@ chunk_summaries = []
 for idx, chunk in enumerate(chunks, start=1):
     print(f"  Summarizing chunk {idx}/{total_chunks}...")
     chunk_prompt = f"""
-You are processing part {idx} of {total_chunks} of an auto-generated transcription from a tabletop RPG session.
+WARNING: You must not add, invent, expand, or synthesize any event, name, item, or action. Only use what is explicitly present in the input. If you are unsure, leave it out or say it is unclear.
 
 IMPORTANT: Write in {language_name}.
+
+The valid main character names are: {', '.join(CHARACTER_NAMES)}. You must use only these exact names. Never alter, abbreviate, or invent names. If a name is unclear, leave it out or mark as unclear.
 
 Your goal is NOT to simply summarize. Instead, extract structured story information that will later be used to build a full narrative recap.
 
 From this segment, identify and describe clearly:
 
 1. EVENTS (chronological)
-- What happens step by step
+- What happens step by step, with all investigative and mechanical details (e.g., technical break-in, Charlotte the spider, rival party Destruidores de Tornozelo, sword assignment, combat mechanics, clues, relationships, time pressure, and all party members present unless absent in the transcript).
 
 2. CHARACTERS & ENTITIES
-- Player characters
+- Player characters (use only canonical names, all present unless transcript says otherwise)
 - NPCs
 - Enemies/monsters
 - Locations
 
 3. DECISIONS
 - Important player choices
-- Moral decisions (e.g., spare vs kill)
+- Moral dilemmas (e.g., spare vs kill, emotional pressure, lies, promises, family, honor, legacy)
 
 4. COMBAT & ENCOUNTERS
 - Who fights whom
 - Outcomes (win/loss/escape/etc.)
+- Mechanics (leeching, attachment, weaknesses, critical contributions, Root’s fire-extinguishing wand, Basco’s athletic moment, Elandor’s critical hit, correct sword ownership: Root)
 
 5. IMPORTANT MOMENTS
 - Dramatic, funny, or tense situations
 - Unexpected outcomes or failures
+- Key clues, relationships, and lore (e.g., love letter, Rajani’s legacy, Volock impersonation, body-switching, walking swarm, Soul Gem, mercy kill by Fendren, Pharasma blessing, time pressure system, Root’s fire-extinguishing wand, rival party, all clues and relationships)
 
 6. CONTEXT FOR CONTINUITY
 - Anything that connects to previous or future events
 
 Rules:
-- Be thorough, do not skip events
-- Keep chronological order
-- Do NOT invent information
+- Be thorough, do not skip events, clues, or high-impact moments
+- Keep chronological order and cause-effect chains
+- Do NOT invent, expand, or synthesize information
 - Do NOT write a story — keep it structured and factual
+- Do NOT interpret, dramatize, or add meaning. Only state what is explicitly present in the transcription.
+- Always attribute actions to specific characters when possible. Do not use vague group references.
+- Keep language neutral and factual unless the transcript itself is dramatic or emotional.
+- If the cause or nature of an event is uncertain or ambiguous in the transcript, preserve that uncertainty. Use phrases like 'it is unclear', 'possibly', 'raising the hypothesis', or 'the group speculated'. Never turn speculation or ambiguity into a definitive statement.
+- Absolutely do NOT add any lore, names, or details that are not explicitly present in the transcript. If a detail is not present, do not mention it at all.
+- Do NOT expand on minor events, side activities, or interactions unless they are described in detail in the input. Do not add new scenes, actions, or dialogue.
+- Do NOT synthesize, combine, or infer connections between events unless they are explicitly stated.
+- If you are unsure of a name, leave it blank or say 'unclear'. Never guess or invent a name. Never abbreviate or alter names.
+- Do NOT add any lore, magic, or world details unless they are explicitly present in the input.
+- Use plain, neutral language. Do not use dramatic, poetic, or stylized adjectives unless they are directly quoted from the transcript. Describe events and characters factually, without embellishment.
+- Do NOT omit any key clues, mechanics, relationships, or high-impact narrative beats that are present in the input.
 
 Transcription segment:
 {chunk}
 """
-    # Use gpt-3.5-turbo for chunk summaries to save tokens
     summary = ask([{"role": "user", "content": chunk_prompt}], model="gpt-3.5-turbo")
-    chunk_summaries.append(f"[Part {idx}]\n{summary}")
+    chunk_summaries.append(f"[Parte {idx}]\n{summary}")
 
 combined_summaries = "\n\n".join(chunk_summaries)
 
 print("Generating final narrative recap...")
 
-# Compact, bullet-pointed prompt with restored key instructions
-character_names_clause = f"The valid main character names are: {', '.join(CHARACTER_NAMES)}. Always use these exact names in the recap."
 
-question = f"""The following are summaries of a tabletop RPG session, divided into {total_chunks} parts.
+character_names_clause = f"The valid main character names are: {', '.join(CHARACTER_NAMES)}. You must use only these exact names. Never alter, abbreviate, or invent names. If a name is unclear, leave it out or mark as unclear."
+
+question = f"""
+WARNING: You must not add, invent, expand, or synthesize any event, name, item, or action. Only use what is explicitly present in the input. If you are unsure, leave it out or say it is unclear.
+
+You are an expert RPG session chronicler. Your task is to assemble the following chunk summaries into a single, immersive, and strictly factual recap.
 
 {character_names_clause}
 
-IMPORTANT: Write in {language_name}. Do not skip any event or detail, even minor ones. Do not invent facts.
+IMPORTANT: Write in {language_name}.
 
 Your recap must:
 - Cover ALL events and details from the summaries, in chronological order
-- Include all key player decisions, especially moral choices
-- Describe all combat encounters (with monster/enemy names and outcomes)
-- Name all important characters, NPCs, monsters, and locations
+- Include all key investigative and mechanical details (e.g., technical break-in, Charlotte the spider, rival party, sword assignment, combat mechanics, clues, relationships, and time pressure)
+- Include all key player decisions, especially moral dilemmas, emotional pressure, lies, and promises
+- Describe all combat encounters (with monster/enemy names and outcomes, mechanics, weaknesses, and critical contributions)
+- Name all important characters, NPCs, monsters, and locations (use only canonical names)
 - Include important dialogue, dramatic, tense, or funny moments
 - Mention major successes, failures, and unexpected outcomes
 - Clearly show the consequences of actions and decisions
 - Write as a flowing, story-like narrative (not bullet points)
 - Break into short paragraphs for each scene or moment
-- At the end, add a short section: 'Where things left off' (current situation and next objective)
+- Divide the recap into labeled sections: [Parte 1], [Parte 2], etc., one for each chunk
+- For each part, write a focused, readable narrative paragraph or two, covering the main events, discoveries, and decisions from that chunk
+- Use all details from the summaries
+- Maintain continuity between parts, but do NOT merge, compress, or synthesize information across parts
+- Do NOT invent, reinterpret, dramatize, add, expand, or embellish any facts, dialogue, or events that are not present in the summaries
+- Do NOT interpret or add meaning. Only use what is explicitly present in the summaries.
+- Always attribute actions to specific characters when possible. Do not use vague group references.
+- Keep language neutral and factual unless the summaries themselves are dramatic or emotional.
+- If the cause or nature of an event is uncertain or ambiguous in the summaries, preserve that uncertainty. Use phrases like 'it is unclear', 'possibly', 'raising the hypothesis', or 'the group speculated'. Never turn speculation or ambiguity into a definitive statement.
+- Absolutely do NOT add any lore, names, or details that are not explicitly present in the summaries. If a detail is not present, do not mention it at all.
+- Do NOT expand on minor events, side activities, or interactions unless they are described in detail in the input. Do not add new scenes, actions, or dialogue.
+- Do NOT synthesize, combine, or infer connections between events unless they are explicitly stated.
+- If you are unsure of a name, leave it blank or say 'unclear'. Never guess or invent a name. Never abbreviate or alter names.
+- Do NOT add any lore, magic, or world details unless they are explicitly present in the input.
+- Use plain, neutral language. Do not use dramatic, poetic, or stylized adjectives unless they are directly quoted from the summaries. Describe events and characters factually, without embellishment.
+- Do NOT omit any key clues, mechanics, or relationships that are present in the input.
+- If something is unclear or missing, leave it out or say it is unclear
+- At the end, add a section labeled 'Onde As Coisas Pararam' summarizing the current situation and next objective
 
 Session summaries:
 {combined_summaries}
 """
 
-
-# Get AI response using gpt-4-turbo for the final recap
 ai_response = ask([{"role": "user", "content": question}], model="gpt-4-turbo")
 
 output_file = "summary.txt"
