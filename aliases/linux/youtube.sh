@@ -36,4 +36,40 @@ get-video-subtitle(){
   yt-dlp --write-auto-subs --sub-lang "$lang" --skip-download "$url"
 }
 
+# function to get the summary of a youtube video using the subtitle 
+# file and openai api
+# Usage: get-youtube-video-summary
+get-youtube-video-summary(){
 
+  echo "GET SUMMARY V1"
+
+  # Find the first .vtt file in the current folder
+  local vtt_file
+  vtt_file=$(find . -maxdepth 1 -name "*.vtt" | head -n 1)
+
+  if [[ -z "$vtt_file" ]]; then
+    echo "Error: no .vtt file found in the current directory."
+    echo "Run get-video-subtitle first to download subtitles."
+    return 1
+  fi
+
+  echo "Using subtitle file: $vtt_file"
+
+  if [[ -z "$OPENAI_API_KEY" ]]; then
+    echo "Error: OPENAI_API_KEY is not set."
+    echo "Export it first: export OPENAI_API_KEY='sk-...'"
+    return 1
+  fi
+
+  export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts"
+  local venv_path="$BASH_ALIASES_SCRIPTS/.venv"
+
+  # Create venv and install openai if not already set up
+  if [[ ! -f "$venv_path/bin/python3" ]]; then
+    echo "Creating virtual environment at $venv_path..."
+    python3 -m venv "$venv_path"
+    "$venv_path/bin/pip" install --quiet openai
+  fi
+
+  "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file"
+}
