@@ -41,7 +41,7 @@ get-video-subtitle(){
 # Usage: get-youtube-video-summary
 get-youtube-video-summary(){
 
-  echo "GET SUMMARY V1"
+  echo "GET SUMMARY V2"
 
   # Find the first .vtt file in the current folder
   local vtt_file

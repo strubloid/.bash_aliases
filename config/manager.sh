@@ -448,7 +448,7 @@ moveScripts(){
     echoHeader " Copying "
     echoLine " From: $BASH_PROJECT_SCRIPS_LOCAL"
     echoLine " To: $BASH_ALIASES_SCRIPTS"
-    cp $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
+    cp -r $BASH_ALIASES_PROJECT_FOLDER/scripts/* $BASH_ALIASES_SCRIPTS
 
 }
 
