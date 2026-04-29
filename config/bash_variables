@@ -49,3 +49,18 @@ export OLLAMA_NUM_CTX=8192
 
 ## addubg ollama host as 0.0.0.0 as an attemp to be able to use with docker machines
 export OLLAMA_HOST=0.0.0.0
+
+## configuring the openai api to work with ollama
+# export CLAUDE_CODE_USE_OPENAI=1
+
+## configuring the openai api to work with ollama
+# export OPENAI_BASE_URL="http://localhost:11434/v1"
+
+# To work requests from any service to open ai api
+export OPENAI_BASE_URL="https://api.openai.com/v1"
+
+## remove here to get a local key, this was made to work things with ollama without the need of a key
+# export OPENAI_API_KEY="ollama"
+
+## this is a good model that i am using for coding with opanclaude
+# export OPENAI_MODEL="gemma4:26b"

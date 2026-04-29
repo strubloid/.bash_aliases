@@ -71,6 +71,28 @@ get-youtube-video-summary(){
     "$venv_path/bin/pip" install --quiet openai
   fi
 
-  "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file"
+  # Check for --from argument in the input and extract only the value
+  local from_arg=""
+  local next_is_value=0
+  for arg in "$@"; do
+    if [[ $next_is_value -eq 1 ]]; then
+      from_arg="$arg"
+      break
+    fi
+    if [[ "$arg" == --from=* ]]; then
+      from_arg="${arg#--from=}"
+      break
+    elif [[ "$arg" == --from ]]; then
+      next_is_value=1
+    fi
+  done
+
+  echo "Running summary script with from_arg: $from_arg"
+
+  if [[ -n "$from_arg" ]]; then
+    "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file" --from "$from_arg"
+  else
+    "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file"
+  fi
   
 }
