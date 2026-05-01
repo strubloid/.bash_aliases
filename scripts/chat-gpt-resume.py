@@ -62,7 +62,7 @@ def main():
         prompt = PromptManager.get_chunk_prompt(chunk, language_name, previous_chunk)
         
         ## getting the summary from the AI
-        summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-4o-mini")
+        summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-4o")
         
         ## appending the summary to the list with a header for the chunk
         chunk_summaries.append(f"[Parte {idx}]\n{summary}")
