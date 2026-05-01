@@ -6,31 +6,45 @@ class VTTProcessor:
     @staticmethod
     def get_trimmed_transcription(vtt_file, from_time):
         """
-        Uses ffmpeg to trim the VTT file from the given time, saves to truncated.vtt, and returns the processed transcription.
+        Trims the VTT file from the given time (hh:mm:ss or mm:ss), returns the processed transcription.
         """
-        import subprocess
-        import os
-        debug = True
+        import re
+        debug = False
 
-        output_vtt = "truncated.vtt"
-        print(f"[NEW TRIMING] Trimming VTT from {from_time} and saving to {output_vtt}...")
-        # Build ffmpeg command
-        if from_time:
-            cmd = [
-                "ffmpeg", "-y", "-i", vtt_file, "-ss", from_time, "-c", "copy", output_vtt
-            ]
-            try:
-                subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            except subprocess.CalledProcessError as e:
-                print(f"Error running ffmpeg: {e.stderr.decode()}")
-                raise
-            vtt_to_process = output_vtt
-        else:
-            vtt_to_process = vtt_file
+        def time_to_seconds(t):
+            parts = t.split(":")
+            parts = [float(p) for p in parts]
+            if len(parts) == 3:
+                return parts[0]*3600 + parts[1]*60 + parts[2]
+            elif len(parts) == 2:
+                return parts[0]*60 + parts[1]
+            else:
+                return float(parts[0])
 
-        with open(vtt_to_process, "r", encoding="utf-8") as f:
-            trimmed_vtt_content = f.read()
+        start_sec = time_to_seconds(from_time)
+        with open(vtt_file, "r", encoding="utf-8") as f:
+            lines = f.readlines()
 
+        output_lines = []
+        keep = False
+        for line in lines:
+            # VTT cue: 00:01:23.456 --> 00:01:25.789 or 01.00.00.000 --> ...
+            match = re.match(r"^(\d{2}[:.]\d{2}[:.]\d{2}[.:]\d{3}) -->", line)
+            if match:
+                cue_start = match.group(1)
+                # Robustly split cue_start into h, m, s, ms regardless of separator
+                time_match = re.match(r"(\d{2})[:.](\d{2})[:.](\d{2})[.:](\d{3})", cue_start)
+                if time_match:
+                    h, m, s, ms = time_match.groups()
+                    cue_sec = int(h)*3600 + int(m)*60 + int(s) + int(ms)/1000
+                    keep = cue_sec >= start_sec
+                else:
+                    # If parsing fails, skip this cue
+                    keep = False
+            if keep or line.startswith("WEBVTT") or line.strip() == "":
+                output_lines.append(line)
+
+        trimmed_vtt_content = "".join(output_lines)
         if debug:
             print("\nFirst 500 characters of trimmed VTT:")
             print(trimmed_vtt_content[:500])
@@ -39,6 +53,7 @@ class VTTProcessor:
     
     @staticmethod
     def process(vtt_input):
+        debug = False
         """
         Accepts either a file path (str) or raw VTT content (str with newlines).
         If the input is a file path, reads the file. If it's a string with newlines, processes as content.
@@ -68,5 +83,12 @@ class VTTProcessor:
         transcription = " ".join(deduped)
         if not transcription:
             raise ValueError("No transcription text found in the vtt file.")
+        
+        if debug:
+            print("\nFirst 500 characters of trimmed VTT:")
+            print(transcription[:500])
 
         return transcription
+    
+
+    

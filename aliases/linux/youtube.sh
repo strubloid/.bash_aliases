@@ -41,7 +41,7 @@ get-video-subtitle(){
 # Usage: get-youtube-video-summary
 get-youtube-video-summary(){
 
-  echo "GET SUMMARY V2"
+  echo "[Youtube Video Summary]"
 
   # Find the first .vtt file in the current folder
   local vtt_file
@@ -53,7 +53,7 @@ get-youtube-video-summary(){
     return 1
   fi
 
-  echo "Using subtitle file: $vtt_file"
+  # echo "Using subtitle file: $vtt_file"
 
   if [[ -z "$OPENAI_API_KEY" ]]; then
     echo "Error: OPENAI_API_KEY is not set."
@@ -87,7 +87,7 @@ get-youtube-video-summary(){
     fi
   done
 
-  echo "Running summary script with from_arg: $from_arg"
+  # echo "Running summary script with from_arg: $from_arg"
 
   if [[ -n "$from_arg" ]]; then
     "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file" --from "$from_arg"

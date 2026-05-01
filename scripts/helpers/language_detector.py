@@ -22,6 +22,6 @@ class LanguageDetector:
         detected_lang = lang_match.group(1) if lang_match else None
         
         if not detected_lang:
-            return "the same language as the transcription"
+            return LanguageDetector.LANG_NAMES.get(detected_lang, LanguageDetector.LANG_NAMES["pt"])
             
         return LanguageDetector.LANG_NAMES.get(detected_lang, detected_lang)
