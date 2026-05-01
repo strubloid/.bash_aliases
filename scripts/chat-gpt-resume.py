@@ -9,6 +9,7 @@ from helpers.text_chunker import TextChunker
 from helpers.openai_service import OpenAIService
 from helpers.prompt_manager import PromptManager
 from helpers.time_extractor import TimeExtractor
+from helpers.file_handler import FileHandler
 from helpers.name_fixes import canonicalize_names
 
 def main():
@@ -17,22 +18,20 @@ def main():
     parser.add_argument("vtt_file")
     parser.add_argument("--from", dest="from_time", type=str, required=True)
     args = parser.parse_args()
-    ## printing all arguments for debugging
     # print(f"Arguments: {args}")
+    
     vtt_file = args.vtt_file
-    from_time = args.from_time
-    print(f"[VTT File]: {vtt_file}")
-    print(f"[From Time]: {from_time}")
+    from_time = args.from_time if args.from_time else "00:00"
+    print(f"[VTT File]: {vtt_file} \n[From Time]: {from_time}")
 
     # If you want to keep canonical_names, you can parse them from unknown or elsewhere as needed
-    canonical_names = ["Baltazar", "Elandor", "Root", "Baskkol", "Phendrachion"]
-    # canonical_names = []
+    # canonical_names = ["Baltazar", "Elandor", "Root", "Baskkol", "Phendrachion"]
 
     # 2. Detect Language
     language_name = LanguageDetector.detect(vtt_file)
-    print(f"[Detected language]: {language_name}")
 
     try:
+        ## we try to trim the transcription from the from_time provided by user
         transcription = VTTProcessor.get_trimmed_transcription(vtt_file, from_time)        
     except Exception as e:
         print(f"Error processing VTT: {e}")
@@ -40,7 +39,8 @@ def main():
     
 
     # 4. Chunk the transcription
-    chunks = TextChunker.chunk_text(transcription, num_parts=4)
+    num_parts = 4
+    chunks = TextChunker.chunk_text(transcription, num_parts)
     total_chunks = len(chunks)
     print(f"[Processing] [{total_chunks}] chunk(s) from the transcription...")
 
@@ -53,43 +53,37 @@ def main():
 
     # 6. Summarize each chunk
     chunk_summaries = []
+    previous_chunk = None
     for idx, chunk in enumerate(chunks, start=1):
-        print(f"  Summarizing chunk {idx}/{total_chunks}...")
-        prompt = PromptManager.get_chunk_prompt(chunk, language_name, canonical_names)
         
-        summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-3.5-turbo")
-        # summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-4o")
+        print(f"  Summarizing chunk {idx}/{total_chunks}...")
+        
+        ## loading the correct prompt for the chunk summarization
+        prompt = PromptManager.get_chunk_prompt(chunk, language_name, previous_chunk)
+        
+        ## getting the summary from the AI
+        summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-4o-mini")
+        
+        ## appending the summary to the list with a header for the chunk
         chunk_summaries.append(f"[Parte {idx}]\n{summary}")
+
+        # Update previous_chunk for the next iteration
+        previous_chunk = chunk
+
+        # Save each chunk summary to a file
+        FileHandler.save_summary(summary, ".", idx)
 
     # 7. Generate Final Narrative Recap
     print("[Generating]: Final narrative recap...")
     combined_summaries = "\n\n".join(chunk_summaries)
-    final_prompt = PromptManager.get_final_prompt(combined_summaries, language_name, canonical_names)
-
-    ## cleaning up names after chunking
-    # name_map = {
-    #     "Fendrachion": "Phendrachion",
-    #     "Fendren": "Phendrachion",
-    #     "Oneal": "Phendrachion",
-    #     "Dudu": "Elandor",
-    #     "Rafael": "Baltazar",
-    #     "Igor": "Root",
-    #     "Cassio": "Baskkol",
-    #     "Basco": "Baskkol",
-    #     "Karma": "Carman",
-    # }
-    # final_prompt = canonicalize_names(final_prompt, name_map)
+    final_prompt = PromptManager.get_final_prompt(combined_summaries, language_name)
     
-    ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4-turbo")
-    # ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4o")
+    # ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4-turbo")
+    ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4o")
     
-
     # 8. Save Output
     output_file = "summary.txt"
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(ai_response)
+    FileHandler.save_final_recap(ai_response, ".", filename=output_file)
     
-    print(f"\n[V3]Summary saved to {output_file}")
-
 if __name__ == "__main__":
     main()

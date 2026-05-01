@@ -1,108 +1,96 @@
 import os
+import json
 
 class PromptManager:
-    @staticmethod
-    def get_chunk_prompt(chunk, language_name, canonical_names):
-        return f"""
-WARNING: Use ONLY what is explicitly present in the input. Do NOT invent, infer, or replace missing information.
 
-IMPORTANT: Write in {language_name}.
+  @staticmethod
+  def get_chunk_prompt(chunk, language_name, previous_chunk=""):
+    if previous_chunk:
+        previous_context = (
+            "\nPREVIOUS CONTEXT (for consistency only, do not repeat; "
+            "use the previous chunk as context to ensure consistency and correct any discrepancies in the current chunk):\n"
+            f"{previous_chunk}\n"
+        )
+    else:
+      previous_context = ""
+    return f"""
+      You are extracting structured data from an RPG session.
 
-{f'VALID NAMES: {", ".join(canonical_names)}. You MUST use only these exact names. If a name differs, keep it as-is (do NOT replace or guess).' if canonical_names else ''}
+      IMPORTANT:
+      - Write in {language_name}
+      - DO NOT invent anything
 
-OBJECTIVE:
-Summarize this segment into ONE clear, natural paragraph preserving ALL key events.
+      {previous_context}
+      TASK:
+      Extract structured information.
 
-CRITICAL RULES:
+      OUTPUT FORMAT (JSON ONLY):
 
-- DO NOT invent any new information
-- DO NOT introduce mechanics (no "advantage", "roll", etc.)
-- DO NOT rename characters
-- DO NOT remove key events (fire, investigation, clues, Carman, dungeon, necromancy, combat)
-- DO NOT over-structure (no bullet points, no labels like "Eventos")
-- DO NOT generalize important details
+      {{
+        "events": ["..."],
+        "clues": ["..."],
+        "decisions": ["..."],
+        "interactions": ["..."],
+        "combat": ["..."],
+        "items": ["..."],
+        "entities": ["list of names exactly as written"],
+        "state": "current situation"
+      }}
 
-REQUIRED CONTENT (if present in the chunk):
-- What happened
-- Who was involved
-- Key discoveries or clues
-- Decisions made
-- Outcomes
+      RULES:
+      - Keep chronological order
+      - Keep exact names
+      - No interpretation
+      - No summarization
 
-STYLE:
-- Write as a natural session recap paragraph
-- Clear and readable
-- Neutral tone
-- Maintain chronological order
-- Keep cause → effect when present
+      TEXT:
+      {chunk}
+      """
 
-Transcription:
-{chunk}
-"""
+  ## This will generate the final prompt for the narrative recap, combining all chunk summaries 
+  # and providing clear instructions to the AI on how to structure the final output. 
+  # It emphasizes the importance of using only the provided data and maintaining a clear sequence 
+  # of events, cause and effect, and exact names. 
+  # The final section also guides the AI to summarize the current situation, next steps, and active
+  # risks based on the combined summaries.
+  @staticmethod
+  def get_final_prompt(merged_json, language_name):
+    return f"""
+      You are generating a final RPG recap.
 
-    @staticmethod
-    def get_final_prompt(combined_summaries, language_name, canonical_names):
-        return f"""
-WARNING: Use ONLY the information in the summaries. Do NOT add, infer, or modify facts.
+      IMPORTANT:
+      - Write in {language_name}
+      - Use ONLY provided data
+      - Do NOT invent anything
 
-IMPORTANT: Write in {language_name}.
+      TASK:
+      Convert structured data into a recap.
 
-{f'VALID NAMES: {", ".join(canonical_names)}. Use these names exactly. Do NOT change or replace names.' if canonical_names else ''}
+      RULES:
+      - Keep chronological order
+      - Keep cause → effect
+      - Keep names EXACT
+      - If missing info, OMIT
 
-OBJECTIVE:
-Produce a clean, natural RPG session recap similar to a narrated summary.
+      STRUCTURE:
 
-CRITICAL RULES:
+      [Parte 1]
+      Start and initial events
 
-- DO NOT invent events or details
-- DO NOT add game mechanics not explicitly stated
-- DO NOT rename characters
-- DO NOT remove important events
-- DO NOT restructure into lists or bullet points
-- DO NOT over-simplify key scenes
+      [Parte 2]
+      Investigation / development
 
-REQUIRED STRUCTURE:
+      [Parte 3]
+      Main event / decision
 
-- Divide into:
-  [Parte 1]
-  [Parte 2]
-  [Parte 3]
-  [Parte 4]
+      [Parte 4]
+      Final events / consequences
 
-- Each part must be ONE or TWO natural paragraphs
-- Maintain chronological order
-- Preserve narrative flow
+      Each part:
+      - 2–3 paragraphs
+      - Clear sequence
+      - No filler
 
-REQUIRED CONTENT (if present in summaries):
-
-- Fire and initial investigation
-- Clues (break-in, witnesses, spider, etc.)
-- Crook Snook and goblins
-- Carman interaction and resolution
-- Dungeon exploration
-- Necromancy lab and goblin assistant
-- Ethical decision (kill or spare)
-- Combat and outcome
-- Items discovered
-
-STYLE:
-
-- Natural storytelling recap (like a session narration)
-- Clear, readable, engaging
-- No bullet points
-- No technical/system language
-- No invented explanations
-- Keep cause → effect relationships
-
-FINAL SECTION:
-
-Add:
-
-Onde As Coisas Pararam:
-- Current situation
-- Immediate next step
-- Active risks or unresolved elements
-
-Summaries:
-{combined_summaries}
-"""
+      DATA:
+      {merged_json}
+      """
