@@ -36,6 +36,24 @@ get-video-subtitle(){
   yt-dlp --write-auto-subs --sub-lang "$lang" --skip-download "$url"
 }
 
+## same youtube subtitle function but for local video file
+get-local-video-subtitle(){
+  local file="$(pwd)/$1"
+  local lang="${2:-en}"
+
+  if [[ -z "$file" ]]; then
+    echo "Usage: get-local-video-subtitle <video-file> [lang]"
+    echo "  lang defaults to 'en'"
+    return 1
+  fi
+
+  ## creating the file
+  touch "transcribed.vtt"
+
+  ## populating with the transcription
+  "$BASH_ALIASES_VENV_BIN/whisper" "$file" --language "$lang" > "transcribed.vtt"
+}
+
 # function to get the summary of a youtube video using the subtitle 
 # file and openai api
 # Usage: get-youtube-video-summary

@@ -38,6 +38,9 @@ command -v ng &>/dev/null && source <(ng completion script) 2>/dev/null
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+## path for the virtual python environment
+export BASH_ALIASES_VENV_BIN="$HOME/.bash_aliases_scripts/.venv/bin"
+
 ## configuring the ollama to be the antropic
 export ANTHROPIC_BASE_URL="http://localhost:11434"
 

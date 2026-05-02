@@ -10,6 +10,7 @@ def fix_names(finalAiResponse):
         "Elando": "Elandor",
         "Elandorr": "Elandor",
 
+        "Pendraco" : "Phendrachion",
         "Fendrakion": "Phendrachion",
         "Fendracken": "Phendrachion",
         "Fendrack": "Phendrachion",

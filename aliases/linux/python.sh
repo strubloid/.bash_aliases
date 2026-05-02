@@ -58,6 +58,8 @@ py-local(){
   CURRENT_DIR=$(pwd)
   DEFAULT_VENV_PATH="$CURRENT_DIR/venv/myenv"
 
+  ## @Todo: update with $BASH_ALIASES_VENV_BIN later on
+
   # Check if venv folder exists in current directory
   if [ -d "$CURRENT_DIR/venv" ]; then
     read -p "Use existing venv in current directory? [Y/n]: " USE_LOCAL
