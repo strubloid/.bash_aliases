@@ -10,7 +10,7 @@ from helpers.openai_service import OpenAIService
 from helpers.prompt_manager import PromptManager
 from helpers.time_extractor import TimeExtractor
 from helpers.file_handler import FileHandler
-from helpers.name_fixes import canonicalize_names
+from helpers.name_fixes import  fix_names
 
 def main():
 
@@ -62,13 +62,13 @@ def main():
         prompt = PromptManager.get_chunk_prompt(chunk, language_name, previous_chunk)
         
         ## getting the summary from the AI
-        summary = openai_service.ask([{"role": "user", "content": prompt}],  model="gpt-4o")
+        summary = openai_service.ask([{"role": "user", "content": prompt}], model="gpt-4o")
         
         ## appending the summary to the list with a header for the chunk
         chunk_summaries.append(f"[Parte {idx}]\n{summary}")
 
         # Update previous_chunk for the next iteration
-        previous_chunk = chunk
+        previous_chunk = summary
 
         # Save each chunk summary to a file
         FileHandler.save_summary(summary, ".", idx)
@@ -79,7 +79,10 @@ def main():
     final_prompt = PromptManager.get_final_prompt(combined_summaries, language_name)
     
     # ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4-turbo")
-    ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-4o")
+    ai_response = openai_service.ask([{"role": "user", "content": final_prompt}], model="gpt-5.4-mini")
+    
+    ## fixing the names in the final AI response using the fix_names function
+    ai_response = fix_names(ai_response)
     
     # 8. Save Output
     output_file = "summary.txt"
