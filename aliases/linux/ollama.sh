@@ -42,14 +42,23 @@ ollama-tweak() {
   done
 
   read -p "Enter new model name: " new_model_name
-  read -p "num_ctx (default 32768): " num_ctx
+
+  # Set good defaults for parameters
+  # num_ctx: 32768 is high and safe for most modern models; increase if your hardware and model support it
+  read -p "num_ctx (default 32768, increase for max context): " num_ctx
   num_ctx=${num_ctx:-32768}
-  read -p "temperature (default 1.0): " temperature
-  temperature=${temperature:-1.0}
-  read -p "top_p (default 0.95): " top_p
-  top_p=${top_p:-0.95}
-  read -p "top_k (default 64): " top_k
-  top_k=${top_k:-64}
+
+  # temperature: 0.7 is a common balanced value (lower = more deterministic, higher = more creative)
+  read -p "temperature (default 0.7): " temperature
+  temperature=${temperature:-0.7}
+
+  # top_p: 0.9 is a common default for nucleus sampling
+  read -p "top_p (default 0.9): " top_p
+  top_p=${top_p:-0.9}
+
+  # top_k: 40 is a common default (higher = more randomness)
+  read -p "top_k (default 40): " top_k
+  top_k=${top_k:-40}
 
   tmp_modelfile=$(mktemp)
   cat > "$tmp_modelfile" <<EOF
@@ -63,6 +72,6 @@ EOF
   echo "Creating model $new_model_name from $selected_model with custom parameters..."
   ollama create "$new_model_name" -f "$tmp_modelfile"
   rm -f "$tmp_modelfile"
-  
+
 }
 
