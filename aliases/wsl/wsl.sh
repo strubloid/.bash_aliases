@@ -7,26 +7,26 @@ alias dns-status='wsl-dns-status'
 alias dns-reset='wsl-dns-reset'
 
 # Function to automatically map localhost to Windows host for curl
-function curl2() {
+# function curl2() {
 
-  echo "[Modified] curl function in wsl.sh"
+#   echo "[Modified] curl function in wsl.sh"
   
-  local args=("$@")
-  local mapped=false
+#   local args=("$@")
+#   local mapped=false
   
-  # Loop through all arguments to find and replace localhost URLs
-  for i in "${!args[@]}"; do
-    if [[ "${args[i]}" == *"localhost"* ]]; then
-      args[i]="${args[i]/localhost/$WSL_HOST}"
-      if [[ "$mapped" == false ]]; then
-        echo "WSL: Mapping localhost to Windows host: $WSL_HOST"
-        mapped=true
-      fi
-    fi
-  done
+#   # Loop through all arguments to find and replace localhost URLs
+#   for i in "${!args[@]}"; do
+#     if [[ "${args[i]}" == *"localhost"* ]]; then
+#       args[i]="${args[i]/localhost/$WSL_HOST}"
+#       if [[ "$mapped" == false ]]; then
+#         echo "WSL: Mapping localhost to Windows host: $WSL_HOST"
+#         mapped=true
+#       fi
+#     fi
+#   done
   
-  command curl "${args[@]}"
-}
+#   command curl "${args[@]}"
+# }
 
 # WSL DNS Fix Functions
 function wsl-dns-fix() {
