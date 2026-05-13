@@ -24,12 +24,12 @@ EOF
 )"
 # CoderFast: Fast code generation with good quality - larger context, deterministic
 OLLAMA_CONFIG_CODER_FAST="$(cat <<'EOF'
-PARAMETER num_ctx 12288
-PARAMETER num_predict 3072
-PARAMETER temperature 0.1
-PARAMETER top_p 0.85
-PARAMETER top_k 40
-PARAMETER repeat_penalty 1.08
+PARAMETER num_ctx 8192
+PARAMETER num_predict 1024
+PARAMETER temperature 0.05
+PARAMETER top_p 0.7
+PARAMETER top_k 20
+PARAMETER repeat_penalty 1.12
 PARAMETER num_thread 12
 PARAMETER num_batch 512
 EOF
@@ -321,7 +321,9 @@ EOF
 
 }
 
-ollama-tweak-advanced() {
+ollama-tweak-advanced2() {
+
+  echo "Bash Aliases Ollama Tweak Advanced"
 
   local model_list selected_model new_model_name num_ctx temperature top_p top_k tmp_modelfile
   model_list=$(ollama ls | awk 'NR>1 {print $1}')
