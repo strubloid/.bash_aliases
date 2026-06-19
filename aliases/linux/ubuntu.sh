@@ -327,7 +327,7 @@ function check-port() {
   fi
 
   ## step 3: we check if the port is in use
-  existPortInUse=$(sudo ss -lptn 'sport = :3000' | grep -oP 'pid=\K[0-9]+')
+  existPortInUse=$(sudo ss -lptn "sport = :$PortNumber" | grep -oP 'pid=\K[0-9]+')
 
   ## step 4: check if process id is found, if so we will print the process name and the pid
   if [ -n "$existPortInUse" ]; then
@@ -335,5 +335,32 @@ function check-port() {
     echo "$existPortInUse"
   else
     echo "free"
+  fi
+}
+
+## function that kills a process running on a specific port
+function killPort() {
+  local PortNumber
+
+  ## check 1: we check if a port number was provided as argument
+  if [ -z "$1" ]; then
+    read -p "[Port Number]: " PortNumber
+  else
+    PortNumber="$1"
+  fi
+
+  ## step 2: we check what is using the port (check-port handles validation)
+  processId=$(check-port "$PortNumber")
+
+  ## step 3: check if we found a process on that port
+  if [ "$processId" = "free" ]; then
+    echo "Port $PortNumber is free."
+  elif [[ "$processId" =~ ^[0-9]+$ ]]; then
+    processName=$(ps -p "$processId" -o comm= 2>/dev/null || echo "unknown")
+    echo "Killing process $processId ($processName) on port $PortNumber..."
+    kill -9 "$processId"
+    echo "Process killed."
+  else
+    echo "Could not determine process on port $PortNumber."
   fi
 }
