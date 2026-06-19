@@ -63,7 +63,7 @@ export OLLAMA_HOST=0.0.0.0
 export OPENAI_BASE_URL="https://api.openai.com/v1"
 
 ## remove here to get a local key, this was made to work things with ollama without the need of a key
-# export OPENAI_API_KEY="ollama"
+export OPENAI_API_KEY="ollama"
 
 ## this is a good model that i am using for coding with opanclaude
 # export OPENAI_MODEL="gemma4:26b"

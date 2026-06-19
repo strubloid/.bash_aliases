@@ -26,7 +26,7 @@ zrok-enable-env() {
 
 ## Step 3: configure the endpoint
 zrok-endpoint-configure() {
-  local endpointName="${1:-https://api-v1.zrok.io}"
+  local endpointName="${1:-https://api-v2.zrok.io}"
   zrok2 config set apiEndpoint "$endpointName"
   echo "[Zrok]: Endpoint configured: $endpointName"
 }
@@ -44,7 +44,10 @@ zrok-sharing-project() {
   local project="${1:-.}"
   local log_file="/tmp/zrok-last.log"
 
-  rm -f "$log_file"
+  ## checking if exist the log file before removing it
+  if [ -f "$log_file" ]; then
+    rm -f "$log_file"
+  fi
 
   echo "[Zrok]: Sharing project: $project..."
   echo "[Zrok]: Saving zrok output to: $log_file"
