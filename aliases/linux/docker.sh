@@ -77,6 +77,51 @@ function docker-reset-local(){
   docker image prune -f
 }
 
+## reset only the project
+function docker-clean(){
+  local project_dir="$(pwd)"
+
+  if [ ! -f "$project_dir/docker-compose.yml" ] && [ ! -f "$project_dir/docker-compose.yaml" ]; then
+    echo "No docker-compose.yml or docker-compose.yaml found in $project_dir"
+    return 1
+  fi
+
+  if ! docker compose version >/dev/null 2>&1; then
+    echo "Docker Compose v2 is required: sudo apt install docker-compose-v2"
+    return 1
+  fi
+
+  echo "1) Rebuild and preserve database/exports"
+  echo "2) Delete this project's containers, images, database, and exports"
+  echo "q) Cancel"
+  read -r -p "Choose [1/2/q]: " choice
+
+  case "$choice" in
+    1)
+      docker compose down --remove-orphans &&
+        docker compose build --no-cache &&
+        docker compose up -d
+      ;;
+    2)
+      read -r -p "Type DELETE to remove only this project's data: " confirmation
+      [ "$confirmation" = "DELETE" ] || { echo "Cancelled."; return 0; }
+      docker compose down --volumes --remove-orphans --rmi local &&
+        docker compose build --no-cache &&
+        docker compose up -d
+      ;;
+    q|Q|"")
+      echo "Cancelled."
+      return 0
+      ;;
+    *)
+      echo "Invalid option."
+      return 1
+      ;;
+  esac
+
+  docker compose ps
+}
+
 ## this will show the total space that docker is consuming
 function docker-total-used-space(){
   docker system df
