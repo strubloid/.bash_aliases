@@ -241,3 +241,131 @@ my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,start,time,bsdtime,command; }
 alias ports='netstat -tulanp'     # show open ports
 # alias ping='ping -c 5'            # Stop after sending count ECHO_REQUEST packets
 # alias fastping='ping -c 100 -s.2' # Do not wait interval 1 second, go fast
+
+
+rename-all-in-folder(){
+
+    if [ -z "$1" ]; then
+        read -p "type the name pattern to use (ex: videos): " pattern
+    else
+        pattern=$1
+    fi
+
+    # Get all files in the current folder (skips hidden files and directories)
+    files=( * )
+    count=0
+    for file in "${files[@]}"; do
+        [ -f "$file" ] && count=$((count + 1))
+    done
+
+    if [ "$count" -eq 0 ]; then
+        echo "No files found in the current folder"
+        return
+    fi
+
+    # Define the zero padding based on the amount of files
+    if [ "$count" -lt 10 ]; then
+        padding=2
+    else
+        padding=${#count}
+    fi
+
+    index=0
+    for file in "${files[@]}"; do
+        [ ! -f "$file" ] && continue
+
+        # Keep the extension when the file has one
+        extension=""
+        if [[ "$file" == *.* ]]; then
+            extension=".${file##*.}"
+        fi
+
+        newName=$(printf "%0${padding}d-%s%s" "$index" "$pattern" "$extension")
+
+        if [ "$file" != "$newName" ]; then
+            command mv "$file" "$newName"
+        fi
+        index=$((index + 1))
+    done
+
+    echo "$count files renamed to NN-$pattern"
+}
+
+change-date-all-in-folder(){
+
+    if [ -z "$1" ]; then
+        read -p "type the date to apply (ex: 2023-05-01 14:30): " dateToApply
+    else
+        dateToApply=$1
+    fi
+
+    # Make sure the date is valid
+    if ! date -d "$dateToApply" > /dev/null 2>&1; then
+        echo "[error]: '$dateToApply' is not a valid date"
+        return
+    fi
+
+    # Detect the filesystem of the current folder
+    fstype=$(df --output=fstype . | tail -n 1)
+
+    # On WSL Windows drives (9p/drvfs) debugfs and touch -a don't work,
+    # so set the times on the Windows side via PowerShell
+    if [[ "$fstype" == "9p" || "$fstype" == "drvfs" ]]; then
+        if command -v powershell.exe > /dev/null 2>&1; then
+            echo "Applying date '$dateToApply' via PowerShell (Windows drive)"
+
+            year=$(date -d "$dateToApply" +%Y)
+            month=$(date -d "$dateToApply" +%-m)
+            day=$(date -d "$dateToApply" +%-d)
+            hour=$(date -d "$dateToApply" +%-H)
+            minute=$(date -d "$dateToApply" +%-M)
+            second=$(date -d "$dateToApply" +%-S)
+
+            for file in *; do
+                [ ! -f "$file" ] && continue
+
+                winFile=$(wslpath -w "$PWD/$file")
+                winFile=${winFile//\'/\'\'}
+
+                psScript="\$d = Get-Date -Year $year -Month $month -Day $day -Hour $hour -Minute $minute -Second $second; \$f = Get-Item '$winFile'; \$f.CreationTime = \$d; \$f.LastWriteTime = \$d; \$f.LastAccessTime = \$d"
+                if powershell.exe -NoProfile -Command "$psScript"; then
+                    echo "[created/accessed/modified]: $file"
+                else
+                    echo "[failed for $file]"
+                fi
+            done
+
+            echo "Done"
+            return
+        fi
+    fi
+
+    # Regular Linux filesystem: use touch + debugfs
+    device=$(df --output=source . | tail -n 1)
+
+    echo "Applying date '$dateToApply' to files in the current folder"
+
+    for file in *; do
+        [ ! -f "$file" ] && continue
+
+        # Set access and modification times
+        touch -a -m -d "$dateToApply" "$file"
+
+        # Set the created (birth) time through debugfs (ext filesystems only)
+        if [[ "$fstype" == ext* ]] && command -v debugfs > /dev/null 2>&1; then
+            inode=$(stat -c %i "$file")
+            datetime=$(date -d "$dateToApply" +%Y%m%d%H%M%S)
+            if sudo debugfs -w -R "set_inode_field <$inode> crtime $datetime" "$device"; then
+                echo "[created]: $file"
+            else
+                echo "[created failed for $file]"
+            fi
+        else
+            echo "[created skipped - debugfs needs ext filesystem]: $file"
+        fi
+
+        echo "[modified/accessed]: $file"
+    done
+
+    echo "Done"
+}
