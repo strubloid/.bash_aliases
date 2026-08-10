@@ -7,14 +7,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/config/global/variables.sh"
 source "$SCRIPT_DIR/config/manager.sh"
 
-# Make sure alias scripts are executable
-if [[ "$DEBUG" == "1" ]]; then
-  echo "Ensuring alias scripts are executable..."
-  chmod -R +x "$SCRIPT_DIR"/aliases 2>/dev/null
-else
-  chmod -R +x "$SCRIPT_DIR"/aliases 2>/dev/null
-fi
-
 # Step 1: Configuration upgrades
 upgradeElementsOnBashProfile
 
