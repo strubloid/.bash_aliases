@@ -272,8 +272,11 @@ function build_bash_prompt {
     export PS1="${PS1}"
 }
 
-# Save history
-history -a
+# Save history (only when HISTFILE is set, e.g. interactive shells)
+# On a fresh install / non-interactive source (e.g. ./upgrade.sh),
+# HISTFILE may be unset and `history -a` would abort the source.
+HISTFILE="${HISTFILE:-$HOME/.bash_history}"
+[[ -n "$HISTFILE" ]] && history -a
 
 # Set function as prompt_command for buildin the same prompt in future
 PROMPT_COMMAND=build_bash_prompt
