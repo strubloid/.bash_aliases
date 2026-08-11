@@ -364,3 +364,51 @@ function killPort() {
     echo "Could not determine process on port $PortNumber."
   fi
 }
+
+
+function fixing-ubuntu-26-04-wayland-to-xorg(){
+
+
+  ## we start by updating the system packages
+  sudo apt update
+
+  ## we install a base Xorg
+  sudo apt install xorg -y
+
+  ## For a more complete X11 environment, consider installing additional utility packages:
+  sudo apt install x11-apps x11-utils -y
+
+  ## installing the plasma session for X11
+  sudo apt plasma-session-x11 -y
+
+  local valid=false
+  while [ "$valid" = false ]; do
+    echo "Which desktop environment would you like to install?"
+    echo "1) XFCE"
+    echo "2) MATE"
+    echo "3) Cinnamon"
+    read -p "Enter your choice [1-3]: " de_choice
+
+    case "$de_choice" in
+      1)
+        echo "Installing XFCE..."
+        sudo apt install xfce4 xfce4-goodies -y
+        valid=true
+        ;;
+      2)
+        echo "Installing MATE..."
+        sudo apt install ubuntu-mate-desktop -y
+        valid=true
+        ;;
+      3)
+        echo "Installing Cinnamon..."
+        sudo apt install cinnamon-desktop-environment -y
+        valid=true
+        ;;
+      *)
+        echo "Invalid option. Please enter 1, 2, or 3."
+        valid=false
+        ;;
+    esac
+  done
+}
