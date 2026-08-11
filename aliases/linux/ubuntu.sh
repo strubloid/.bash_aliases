@@ -379,7 +379,7 @@ function fixing-ubuntu-26-04-wayland-to-xorg(){
   sudo apt install x11-apps x11-utils -y
 
   ## installing the plasma session for X11
-  sudo apt plasma-session-x11 -y
+  sudo apt install plasma-session-x11 -y
 
   local valid=false
   while [ "$valid" = false ]; do
