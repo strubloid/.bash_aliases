@@ -42,6 +42,31 @@ cc-commit-run() {
   git commit -m "$COMMIT_MESSAGE"
 }
 
+# Helper: reads multiline input into the named variable
+# Usage: read-multiline VAR_NAME "prompt"
+# Terminates on an empty line (paste and the trailing newline acts as terminator)
+read-multiline() {
+  local varname="$1"
+  local prompt="$2"
+  local input=""
+  local line=""
+
+  echo "$prompt"
+
+  while IFS= read -r line; do
+    if [ -z "$line" ]; then
+      break
+    fi
+    if [ -z "$input" ]; then
+      input="$line"
+    else
+      input+=$'\n'"$line"
+    fi
+  done
+
+  printf -v "$varname" '%s' "$input"
+}
+
 # Internal helper: prompts the user for the conventional commit fields
 cc-prompt-and-run() {
   local TYPE="$1"
@@ -49,7 +74,7 @@ cc-prompt-and-run() {
   # Description (required) - can be passed as $2 to skip the prompt
   local DESCRIPTION="$2"
   if [ -z "$DESCRIPTION" ]; then
-    IFS= read -rp "[Description (paste lines, Ctrl+D to finish)]: " -d '' -s DESCRIPTION || true
+    read-multiline DESCRIPTION "[Description (paste lines, empty line to finish)]: "
   fi
 
   # Optional scope
@@ -62,12 +87,12 @@ cc-prompt-and-run() {
 
   # Optional body
   local BODY
-  IFS= read -rp "[Body - optional (paste lines, Ctrl+D to finish, empty to skip)]: " -d '' -s BODY || true
+  read-multiline BODY "[Body - optional (paste lines, empty line to finish, empty input to skip)]: "
 
   # Breaking change description (only if breaking)
   local BREAKING_DESC=""
   if [[ "$BREAKING" =~ [yY](es)?$ ]]; then
-    IFS= read -rp "[Breaking change description (paste lines, Ctrl+D to finish)]: " -d '' -s BREAKING_DESC || true
+    read-multiline BREAKING_DESC "[Breaking change description (paste lines, empty line to finish)]: "
   fi
 
   cc-commit-run "$TYPE" "$SCOPE" "$BREAKING" "$DESCRIPTION" "$BODY" "$BREAKING_DESC"

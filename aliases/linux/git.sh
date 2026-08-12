@@ -830,34 +830,54 @@ git-ignore-file-from-commit(){
 
 }
 
+## Helper: reads multiline input into the named variable
+## Usage: read-multiline VAR_NAME "prompt"
+## Terminates on an empty line (paste and the trailing newline acts as terminator)
+read-multiline() {
+  local varname="$1"
+  local prompt="$2"
+  local input=""
+  local line=""
+
+  echo "$prompt"
+
+  while IFS= read -r line; do
+    if [ -z "$line" ]; then
+      break
+    fi
+    if [ -z "$input" ]; then
+      input="$line"
+    else
+      input+=$'\n'"$line"
+    fi
+  done
+
+  printf -v "$varname" '%s' "$input"
+}
+
 ## This will rename the last commit message and force-push it to the remote
 git-rename-last-commit(){
 
   if [ -z "$1" ]
   then
-    IFS= read -rp "[New Commit Message (paste lines, Ctrl+D to finish)]: " -d '' -s COMMIT_MESSAGE || true
+    read-multiline COMMIT_MESSAGE "[New Commit Message (paste lines, empty line to finish)]: "
   else
     COMMIT_MESSAGE="$1"
   fi
 
-  echo $COMMIT_MESSAGE;
+  # Getting the current branch name
+  CURRENT_BRANCH=$(git branch --show-current)
 
-  return 1
-  
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Rename Last Commit  --------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[NEW COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
 
-  # # Getting the current branch name
-  # CURRENT_BRANCH=$(git branch --show-current)
+  # amend the last commit with the new message
+  git commit --amend -m "$COMMIT_MESSAGE"
 
-  # echo "-----------------------------------------------------------------------------"
-  # echo "  GIT  Rename Last Commit  --------------------------------------------------"
-  # echo "-----------------------------------------------------------------------------"
-  # echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
-  # echo "[NEW COMMIT MESSAGE] - $COMMIT_MESSAGE"
-  # echo "-----------------------------------------------------------------------------"
-
-  # # amend the last commit with the new message
-  # git commit --amend -m "$COMMIT_MESSAGE"
-
-  # # push with --force-with-lease to avoid overwriting others' work
-  # git push --force-with-lease origin "$CURRENT_BRANCH"
+  # push with --force-with-lease to avoid overwriting others' work
+  git push --force-with-lease origin "$CURRENT_BRANCH"
 }
