@@ -858,26 +858,33 @@ read-multiline() {
 ## This will rename the last commit message and force-push it to the remote
 git-rename-last-commit(){
 
-  if [ -z "$1" ]
-  then
-    read-multiline COMMIT_MESSAGE "[New Commit Message (paste lines, empty line to finish)]: "
-  else
-    COMMIT_MESSAGE="$1"
-  fi
-
-  # Getting the current branch name
+  # Get current branch and previous commit message
   CURRENT_BRANCH=$(git branch --show-current)
+  PREVIOUS_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 
   echo "-----------------------------------------------------------------------------"
   echo "  GIT  Rename Last Commit  --------------------------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
-  echo "[NEW COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
+  echo "[PREVIOUS COMMIT MESSAGE]"
+  echo "$PREVIOUS_COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
+  echo "[NEW COMMIT MESSAGE]"
+
+  if [ -z "$1" ]
+  then
+    read-multiline COMMIT_MESSAGE "[Paste new commit message (empty line to finish)]: "
+  else
+    COMMIT_MESSAGE="$1"
+    echo "$COMMIT_MESSAGE"
+  fi
+
   echo "-----------------------------------------------------------------------------"
 
   # amend the last commit with the new message
-  git commit --amend -m "$COMMIT_MESSAGE"
+  # git commit --amend -m "$COMMIT_MESSAGE"
 
   # push with --force-with-lease to avoid overwriting others' work
-  git push --force-with-lease origin "$CURRENT_BRANCH"
+  # git push --force-with-lease origin "$CURRENT_BRANCH"
 }
