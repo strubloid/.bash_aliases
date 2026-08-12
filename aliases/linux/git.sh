@@ -863,6 +863,14 @@ git-rename-last-commit(){
   CURRENT_BRANCH=$(git branch --show-current)
   PREVIOUS_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 
+  if [ -z "$1" ]
+  then
+    read-multiline COMMIT_MESSAGE "[Paste new commit message (type '.' on a line by itself to finish)]: "
+  else
+    COMMIT_MESSAGE="$1"
+    echo "$COMMIT_MESSAGE"
+  fi
+
   echo "-----------------------------------------------------------------------------"
   echo "  GIT  Rename Last Commit  --------------------------------------------------"
   echo "-----------------------------------------------------------------------------"
@@ -873,13 +881,6 @@ git-rename-last-commit(){
   echo "-----------------------------------------------------------------------------"
   echo "[NEW COMMIT MESSAGE]"
 
-  if [ -z "$1" ]
-  then
-    read-multiline COMMIT_MESSAGE "[Paste new commit message (type '.' on a line by itself to finish)]: "
-  else
-    COMMIT_MESSAGE="$1"
-    echo "$COMMIT_MESSAGE"
-  fi
 
   echo "-----------------------------------------------------------------------------"
 
