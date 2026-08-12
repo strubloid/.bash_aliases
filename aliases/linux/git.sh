@@ -835,24 +835,29 @@ git-rename-last-commit(){
 
   if [ -z "$1" ]
   then
-    read -p "[New Commit Message]: " COMMIT_MESSAGE
+    read -p "[New Commit Message (paste lines, Ctrl+D to finish)]: " -d '' COMMIT_MESSAGE || true
   else
     COMMIT_MESSAGE="$1"
   fi
 
-  # Getting the current branch name
-  CURRENT_BRANCH=$(git branch --show-current)
+  echo $COMMIT_MESSAGE;
 
-  echo "-----------------------------------------------------------------------------"
-  echo "  GIT  Rename Last Commit  --------------------------------------------------"
-  echo "-----------------------------------------------------------------------------"
-  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
-  echo "[NEW COMMIT MESSAGE] - $COMMIT_MESSAGE"
-  echo "-----------------------------------------------------------------------------"
+  return 1
+  
 
-  # amend the last commit with the new message
-  git commit --amend -m "$COMMIT_MESSAGE"
+  # # Getting the current branch name
+  # CURRENT_BRANCH=$(git branch --show-current)
 
-  # push with --force-with-lease to avoid overwriting others' work
-  git push --force-with-lease origin "$CURRENT_BRANCH"
+  # echo "-----------------------------------------------------------------------------"
+  # echo "  GIT  Rename Last Commit  --------------------------------------------------"
+  # echo "-----------------------------------------------------------------------------"
+  # echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  # echo "[NEW COMMIT MESSAGE] - $COMMIT_MESSAGE"
+  # echo "-----------------------------------------------------------------------------"
+
+  # # amend the last commit with the new message
+  # git commit --amend -m "$COMMIT_MESSAGE"
+
+  # # push with --force-with-lease to avoid overwriting others' work
+  # git push --force-with-lease origin "$CURRENT_BRANCH"
 }
