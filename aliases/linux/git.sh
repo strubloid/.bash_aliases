@@ -883,8 +883,8 @@ git-rename-last-commit(){
   echo "-----------------------------------------------------------------------------"
 
   # amend the last commit with the new message
-  # git commit --amend -m "$COMMIT_MESSAGE"
+  git commit --amend -m "$COMMIT_MESSAGE"
 
-  # # push with --force-with-lease to avoid overwriting others' work
-  # git push --force-with-lease origin "$CURRENT_BRANCH"
+  # push with --force-with-lease to avoid overwriting others' work
+  git push --force-with-lease origin "$CURRENT_BRANCH"
 }
