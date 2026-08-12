@@ -887,9 +887,16 @@ git-rename-last-commit(){
   echo "[Commited] - OK"
   echo "-----------------------------------------------------------------------------"
 
-  # push with --force-with-lease to avoid overwriting others' work
-  git push --force-with-lease origin "$CURRENT_BRANCH"
+  # ask if this commit was already pushed to the remote
+  read -p "Is this commit pushed to the repo? [N/y]: " IS_PUSHED
 
-  echo "[gitpush --force-with-lease origin $CURRENT_BRANCH] - OK"
-  echo "-----------------------------------------------------------------------------"
+  ## if the user confirms it was pushed, force-push the amended commit
+  if [[ "$IS_PUSHED" =~ ^[yY](es)?$ ]]; then
+  
+    # push with --force-with-lease to avoid overwriting others' work
+    git push --force-with-lease origin "$CURRENT_BRANCH"
+
+    echo "[gitpush --force-with-lease origin $CURRENT_BRANCH] - OK"
+    echo "-----------------------------------------------------------------------------"
+  fi
 }
