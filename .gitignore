@@ -35,3 +35,6 @@ search/not_found_elements.csv
 
 # ignoring the config file
 .env
+
+## ignoring any modelfile
+Modelfile
