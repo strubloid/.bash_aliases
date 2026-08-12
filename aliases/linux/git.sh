@@ -835,7 +835,7 @@ git-rename-last-commit(){
 
   if [ -z "$1" ]
   then
-    read -p "[New Commit Message (paste lines, Ctrl+D to finish)]: " -d '' COMMIT_MESSAGE || true
+    IFS= read -rp "[New Commit Message (paste lines, Ctrl+D to finish)]: " -d '' -s COMMIT_MESSAGE || true
   else
     COMMIT_MESSAGE="$1"
   fi

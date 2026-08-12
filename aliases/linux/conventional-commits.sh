@@ -49,7 +49,7 @@ cc-prompt-and-run() {
   # Description (required) - can be passed as $2 to skip the prompt
   local DESCRIPTION="$2"
   if [ -z "$DESCRIPTION" ]; then
-    read -p "[Description (paste lines, Ctrl+D to finish)]: " -d '' DESCRIPTION || true
+    IFS= read -rp "[Description (paste lines, Ctrl+D to finish)]: " -d '' -s DESCRIPTION || true
   fi
 
   # Optional scope
@@ -62,12 +62,12 @@ cc-prompt-and-run() {
 
   # Optional body
   local BODY
-  read -p "[Body - optional (paste lines, Ctrl+D to finish, empty to skip)]: " -d '' BODY || true
+  IFS= read -rp "[Body - optional (paste lines, Ctrl+D to finish, empty to skip)]: " -d '' -s BODY || true
 
   # Breaking change description (only if breaking)
   local BREAKING_DESC=""
   if [[ "$BREAKING" =~ [yY](es)?$ ]]; then
-    read -p "[Breaking change description (paste lines, Ctrl+D to finish)]: " -d '' BREAKING_DESC || true
+    IFS= read -rp "[Breaking change description (paste lines, Ctrl+D to finish)]: " -d '' -s BREAKING_DESC || true
   fi
 
   cc-commit-run "$TYPE" "$SCOPE" "$BREAKING" "$DESCRIPTION" "$BODY" "$BREAKING_DESC"
