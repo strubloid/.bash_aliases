@@ -44,7 +44,8 @@ cc-commit-run() {
 
 # Helper: reads multiline input into the named variable
 # Usage: read-multiline VAR_NAME "prompt"
-# Terminates on an empty line (paste and the trailing newline acts as terminator)
+# Terminates when a line contains only "."
+# (like mail/ed/sed - works regardless of blank lines in the content)
 read-multiline() {
   local varname="$1"
   local prompt="$2"
@@ -54,7 +55,7 @@ read-multiline() {
   echo "$prompt"
 
   while IFS= read -r line; do
-    if [ -z "$line" ]; then
+    if [ "$line" = "." ]; then
       break
     fi
     if [ -z "$input" ]; then
@@ -74,7 +75,7 @@ cc-prompt-and-run() {
   # Description (required) - can be passed as $2 to skip the prompt
   local DESCRIPTION="$2"
   if [ -z "$DESCRIPTION" ]; then
-    read-multiline DESCRIPTION "[Description (paste lines, empty line to finish)]: "
+    read-multiline DESCRIPTION "[Description (type '.' on a line by itself to finish)]: "
   fi
 
   # Optional scope
@@ -87,12 +88,12 @@ cc-prompt-and-run() {
 
   # Optional body
   local BODY
-  read-multiline BODY "[Body - optional (paste lines, empty line to finish, empty input to skip)]: "
+  read-multiline BODY "[Body - optional (type '.' on a line by itself to finish, or '.' alone to skip)]: "
 
   # Breaking change description (only if breaking)
   local BREAKING_DESC=""
   if [[ "$BREAKING" =~ [yY](es)?$ ]]; then
-    read-multiline BREAKING_DESC "[Breaking change description (paste lines, empty line to finish)]: "
+    read-multiline BREAKING_DESC "[Breaking change description (type '.' on a line by itself to finish)]: "
   fi
 
   cc-commit-run "$TYPE" "$SCOPE" "$BREAKING" "$DESCRIPTION" "$BODY" "$BREAKING_DESC"

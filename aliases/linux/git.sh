@@ -832,7 +832,8 @@ git-ignore-file-from-commit(){
 
 ## Helper: reads multiline input into the named variable
 ## Usage: read-multiline VAR_NAME "prompt"
-## Terminates on an empty line (paste and the trailing newline acts as terminator)
+## Terminates when a line contains only "."
+## (like mail/ed/sed - works regardless of blank lines in the content)
 read-multiline() {
   local varname="$1"
   local prompt="$2"
@@ -842,7 +843,7 @@ read-multiline() {
   echo "$prompt"
 
   while IFS= read -r line; do
-    if [ -z "$line" ]; then
+    if [ "$line" = "." ]; then
       break
     fi
     if [ -z "$input" ]; then
@@ -874,7 +875,7 @@ git-rename-last-commit(){
 
   if [ -z "$1" ]
   then
-    read-multiline COMMIT_MESSAGE "[Paste new commit message (empty line to finish)]: "
+    read-multiline COMMIT_MESSAGE "[Paste new commit message (type '.' on a line by itself to finish)]: "
   else
     COMMIT_MESSAGE="$1"
     echo "$COMMIT_MESSAGE"
@@ -885,6 +886,6 @@ git-rename-last-commit(){
   # amend the last commit with the new message
   # git commit --amend -m "$COMMIT_MESSAGE"
 
-  # push with --force-with-lease to avoid overwriting others' work
+  # # push with --force-with-lease to avoid overwriting others' work
   # git push --force-with-lease origin "$CURRENT_BRANCH"
 }
