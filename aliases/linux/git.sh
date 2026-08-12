@@ -868,7 +868,6 @@ git-rename-last-commit(){
     read-multiline COMMIT_MESSAGE "[Paste new commit message (type '.' on a line by itself to finish)]: "
   else
     COMMIT_MESSAGE="$1"
-    echo "$COMMIT_MESSAGE"
   fi
 
   echo "-----------------------------------------------------------------------------"
@@ -880,8 +879,7 @@ git-rename-last-commit(){
   echo "$PREVIOUS_COMMIT_MESSAGE"
   echo "-----------------------------------------------------------------------------"
   echo "[NEW COMMIT MESSAGE]"
-
-
+  echo "$COMMIT_MESSAGE"
   echo "-----------------------------------------------------------------------------"
 
   # amend the last commit with the new message
