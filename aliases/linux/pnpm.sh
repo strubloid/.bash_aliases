@@ -33,14 +33,42 @@ function check-pnpm(){
     return 0
   fi
 
-  echo "[] Running pnpm check and extract commands...]"
+  echo "[] Running pnpm checks and extract commands...]"
 
-  ## running the pnpm check command to check for errors
-  pnpm check
+  ## would you like to check the type errors?
+  read -p "Would you like to check the type errors? [y/N]: " CHECK_TYPE_ERRORS
+  if [[ "$CHECK_TYPE_ERRORS" =~ ^[Yy]$ ]]; then
+    pnpm typecheck
+  fi
 
-  echo "[] Running pnpm extract command...]"
+  ## would you like to run the lint?
+  read -p "Would you like to run lint? [y/N]: " CHECK_LINT
+  if [[ "$CHECK_LINT" =~ ^[Yy]$ ]]; then
+    pnpm lint
+  fi
 
-  ## running the pnpm extract command to extract the dependencies
-  pnpm -r extract
+  ## would you like to run the tests?
+  read -p "Would you like to run tests? [y/N]: " CHECK_TESTS
+  if [[ "$CHECK_TESTS" =~ ^[Yy]$ ]]; then
+    pnpm test
+  fi
+
+  ## would you like to run the security audit?
+  read -p "Would you like to run security audit? [y/N]: " CHECK_AUDIT
+  if [[ "$CHECK_AUDIT" =~ ^[Yy]$ ]]; then
+    pnpm audit
+  fi
+
+  ## would you like to run the pnpm doctor?
+  read -p "Would you like to run pnpm doctor? [y/N]: " CHECK_DOCTOR
+  if [[ "$CHECK_DOCTOR" =~ ^[Yy]$ ]]; then
+    pnpm doctor
+  fi
+
+  ## would you like to extract the dependencies?
+  read -p "Would you like to extract dependencies? [y/N]: " CHECK_EXTRACT
+  if [[ "$CHECK_EXTRACT" =~ ^[Yy]$ ]]; then
+    pnpm -r extract
+  fi
 
 }
