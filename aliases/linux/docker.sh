@@ -41,6 +41,14 @@ function docker-enter(){
   docker exec -it "$dockerWorkId" /bin/bash
 }
 
+## entering the postgres database running inside docker
+function docker-enter-database(){
+
+  dockerDatabaseId=$(docker container ls | grep 'postgres' | awk '{print $1}')
+
+  docker exec -it "$dockerDatabaseId" psql -U postgres
+}
+
 # This will be checking all docker commands that list things
 function docker-status(){
   docker ps
