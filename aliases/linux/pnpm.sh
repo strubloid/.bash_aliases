@@ -25,7 +25,7 @@ function check-and-install-pnpm() {
   curl -fsSL https://get.pnpm.io/install.sh | sh -
 }
 
-
+## basic checks for pnpm
 function check-pnpm(){
 
   # if pnpm not exists, we will install it
@@ -42,6 +42,14 @@ function check-pnpm(){
 
   ## running the pnpm extract command to extract the dependencies
   pnpm -r extract
+
+  ## would you like to build only the frontend?
+  read -p "Would you like to build only the frontend? [y/N]: " CHECK_FRONTEND
+  if [[ "$CHECK_FRONTEND" =~ ^[Yy]$ ]]; then
+    pnpm --filter web build   ## builds only the frontend 
+  else
+    pnpm build                ## total build of the project
+  fi
 
 }
 
