@@ -900,3 +900,50 @@ git-rename-last-commit(){
     echo "-----------------------------------------------------------------------------"
   fi
 }
+
+## This will be checking if the branch exist, and if it does, it will pull the branch from the remote
+git-pull-if-branch-exists(){
+  local branch_name="$1"
+
+  ## this will be checking if exist the branch_name, and will only run if exists.
+  if git show-ref --verify --quiet "refs/heads/${branch_name}"; then
+    echo "[$branch_name] - branch exists, pulling changes..."
+    git checkout "$branch_name"
+    git pull origin "$branch_name"
+  fi
+}
+
+## this function will be checking if any of those branches bellow are updated and if they are, it will pull the changes
+function git-update-main-branches(){
+
+  local original_branch
+  original_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+  echo "[git] - Update main branches"
+  echo "[$original_branch] - current branch"
+
+  git-pull-if-branch-exists main
+  git-pull-if-branch-exists master
+  git-pull-if-branch-exists develop
+  git-pull-if-branch-exists dev
+
+  ## if the original branch is not empty, it will checkout to the original branch
+  if [ -n "$original_branch" ]; then
+    git checkout "$original_branch"
+  fi
+
+}
+
+## This function will be creating the branch
+function git-new-branch() {
+  local branch_name="$1"
+  if [ -z "$branch_name" ]; then
+    read -p "Enter new branch name: " branch_name
+  fi
+
+  ##before we create a new branch we need to ensure that main branches are updated
+  git-update-main-branches
+
+  ## create the new branch and switch to it
+  git checkout -b "$branch_name"
+}
