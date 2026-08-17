@@ -21,11 +21,7 @@ function install-vim() {
 ## this is to install sublime text on linux
 function install-sublime() {
 
-  ## installing the key of sublime text
-  echo "adding the sublime text key to the apt sources list"
-  wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo tee /etc/apt/keyrings/sublimehq-pub.asc > /dev/null
-
   ## installing the sublime
   echo "installing the sublime text"
-  sudo apt update && sudo apt install -y sublime-text
+  sudo snap install sublime-text --classic
 }
