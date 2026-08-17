@@ -99,6 +99,18 @@ cc-prompt-and-run() {
   cc-commit-run "$TYPE" "$SCOPE" "$BREAKING" "$DESCRIPTION" "$BODY" "$BREAKING_DESC"
 }
 
+function cc-testing(){
+
+  ## we are using the new pnpm extract command to extract the dependencies and check if any changes were made
+  if ! pnpm-extract; then
+    echo "[x] pnpm-extract detected changes. Commit aborted. Please review the changes before trying again."
+    return 1
+  fi
+
+  echo "[✓] No changes detected. Proceeding with commit."
+  return 0
+}
+
 # feat: introduces a new feature to the codebase (correlates with MINOR in SemVer)
 function cc-feat()
 {

@@ -100,3 +100,34 @@ function pnpm-checks(){
   fi
 
 }
+
+## running pnpm extract and detecting if any changes were made
+function pnpm-extract() {
+
+  # if pnpm not exists, we will install it
+  if ! doesPnpmExist; then
+    return 0
+  fi
+
+  ## capturing the state of changes before running extract
+  local before_status
+  before_status=$(git status --porcelain 2>/dev/null)
+
+  echo "[] Running pnpm extract command...]"
+
+  ## running the pnpm extract command to extract the dependencies
+  pnpm -r extract
+
+  ## capturing the state of changes after running extract
+  local after_status
+  after_status=$(git status --porcelain 2>/dev/null)
+
+  ## comparing the states to determine if any changes were made
+  if [[ "$before_status" != "$after_status" ]]; then
+    echo "[x] Changes detected after extract."
+    return 1
+  fi
+
+  echo "[✓] No changes detected after extract."
+  return 0
+}
