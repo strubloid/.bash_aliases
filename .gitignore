@@ -7,6 +7,9 @@
 #ignoring work aliases
 aliases/ignore/*
 
+# ignoring secrets file from being pushed
+aliases/linux/secret.sh
+
 # this will ignore everything except my exceptions below
 /*
 /*/
