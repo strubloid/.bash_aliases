@@ -1183,7 +1183,7 @@ git-squash() {
 
   # Resolve the base branch (delegated; also handles detached HEAD + invalid arg)
   local BASE_BRANCH
-  BASE_BRANCH=$(git-base-branch "master") || return 1
+  BASE_BRANCH=$(git-base-branch "main") || return 1
 
   echo "-----------------------------------------------------------------------------"
   echo "  GIT  Squash Commits  ------------------------------------------------------"
