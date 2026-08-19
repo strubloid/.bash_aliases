@@ -1327,3 +1327,112 @@ git-squash() {
     git push --force-with-lease origin "$CURRENT_BRANCH"
   fi
 }
+
+## Performs GitHub's "Update with rebase" workflow from the command line.
+##
+## Rebases the current branch onto the latest origin/<base> (defaulting to
+## main, then master), mirroring what the GitHub "Update with rebase"
+## button does on a PR. Because rebase rewrites commit hashes, a
+## force-with-lease push is offered at the end to publish the new history.
+##
+## Args:
+##   $1 (optional) - base branch to rebase onto. If omitted, falls back to
+##                   main > master (resolved via git-default-base-branch).
+##
+## Conflicts:
+##   If the rebase stops due to conflicts, the function exits early and
+##   prints the manual recovery steps:
+##     - resolve the conflicts in the editor
+##     - git add .
+##     - git rebase --continue
+##     - run tests, then push with --force-with-lease
+##   To abandon the rebase entirely: git rebase --abort
+##
+## Exits non-zero on:
+##   - dirty working tree
+##   - detached HEAD / missing base branch
+##   - fetch failure
+##   - user cancels the operation
+##   - rebase stopped due to conflicts
+git-rebase-update() {
+
+  # refuse to run if there are uncommitted changes (rebase needs a clean tree)
+  git-check-working-tree-clean || return 1
+
+  ## Getting the current branch name
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  if [ -z "$CURRENT_BRANCH" ]; then
+    echo "[ERR]: Not on a branch (detached HEAD?). Cannot determine scope."
+    return 1
+  fi
+
+  # Resolve the base branch (tries $1, falls back to main > master)
+  local BASE_BRANCH
+  BASE_BRANCH=$(git-default-base-branch "$1") || return 1
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Update with Rebase  --------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[BASE BRANCH] - $BASE_BRANCH"
+  echo "-----------------------------------------------------------------------------"
+
+  # Fetch the latest refs from the remote so origin/<BASE_BRANCH> is up to date
+  printf "[fetch] - "
+  git fetch origin || {
+    printf "FAIL\n"
+    return 1
+  }
+  printf "OK\n"
+
+  # Preview the operation before it runs
+  echo ""
+  echo "  This will replay your commits on $CURRENT_BRANCH on top of"
+  echo "  origin/$BASE_BRANCH. Commit hashes will be rewritten, so"
+  echo "  the branch will need a --force-with-lease push afterwards."
+  echo ""
+  read -p "Proceed with rebase? [y/N]: " CAN_CONTINUE
+  if [[ ! "$CAN_CONTINUE" =~ ^[yY](es)?$ ]]; then
+    echo "[cancelled]"
+    return 1
+  fi
+
+  # Run the rebase. We rebase onto origin/<BASE_BRANCH> explicitly (rather
+  # than a local checkout of the base) so we don't need to mutate the
+  # user's local main/master just to update a PR branch.
+  echo ""
+  printf "[rebase] - "
+  git rebase "origin/$BASE_BRANCH"
+  local REBASE_STATUS=$?
+
+  if [ "$REBASE_STATUS" -ne 0 ]; then
+    printf "STOPPED\n"
+    echo "-----------------------------------------------------------------------------"
+    echo "[ERR]: Rebase stopped (likely due to conflicts)."
+    echo ""
+    echo "  To finish the rebase manually:"
+    echo "    1. Inspect the conflicts:  git status"
+    echo "    2. Resolve them in your editor"
+    echo "    3. Stage the resolution:   git add ."
+    echo "    4. Continue the rebase:    git rebase --continue"
+    echo "    5. Run your tests"
+    echo "    6. Push (force-with-lease): git push --force-with-lease origin $CURRENT_BRANCH"
+    echo ""
+    echo "  To abandon the rebase entirely: git rebase --abort"
+    echo "-----------------------------------------------------------------------------"
+    return "$REBASE_STATUS"
+  fi
+
+  printf "OK\n"
+  echo "-----------------------------------------------------------------------------"
+
+  # Offer to push with --force-with-lease (safer than --force: only pushes if
+  # the remote branch hasn't moved since our last fetch).
+  echo ""
+  read -p "Push to remote with --force-with-lease? [y/N]: " SHOULD_PUSH
+  if [[ "$SHOULD_PUSH" =~ ^[yY](es)?$ ]]; then
+    git push --force-with-lease origin "$CURRENT_BRANCH"
+  fi
+}
