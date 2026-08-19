@@ -101,6 +101,16 @@ function pnpm-checks(){
 
 }
 
+## animating dots while a background process is still running
+## usage: animate-dots <pid>
+function animate-dots() {
+  local pid="$1"
+  while kill -0 "$pid" 2>/dev/null; do
+    echo -n "."
+    sleep 0.5
+  done
+}
+
 ## running pnpm extract and detecting if any changes were made
 function pnpm-extract() {
 
@@ -113,10 +123,15 @@ function pnpm-extract() {
   local before_status
   before_status=$(git status --porcelain 2>/dev/null)
 
-  echo "[] Running pnpm extract command...]"
+  echo -n "[Running] pnpm extract: "
 
-  ## running the pnpm extract command to extract the dependencies
-  pnpm -r extract
+  ## running the pnpm extract command silently in the background
+  pnpm -r extract >/dev/null 2>&1 &
+  local pid=$!
+
+  ## animating dots while pnpm is still running
+  animate-dots "$pid"
+  wait $pid
 
   ## capturing the state of changes after running extract
   local after_status
@@ -124,10 +139,9 @@ function pnpm-extract() {
 
   ## comparing the states to determine if any changes were made
   if [[ "$before_status" != "$after_status" ]]; then
-    echo "[x] Changes detected after extract."
+    echo "[X] Changes detected after extract."
     return 1
   fi
 
-  echo "[✓] No changes detected after extract."
   return 0
 }
