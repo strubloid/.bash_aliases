@@ -132,7 +132,7 @@ function pnpm-extract() {
 
   ## comparing the states to determine if any changes were made
   if [[ "$before_status" != "$after_status" ]]; then
-    echo "[X] Changes detected after extract."
+    echo "[X] You will need to commit pnpm extract changes!"
     return 1
   fi
 
