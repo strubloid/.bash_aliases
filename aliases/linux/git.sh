@@ -947,3 +947,254 @@ function git-new-branch() {
   ## create the new branch and switch to it
   git checkout -b "$branch_name"
 }
+
+## Helper: refuse to run if the working tree has uncommitted changes
+## (a rebase requires a clean tree to operate safely).
+## Returns 0 if clean, 1 if dirty (with an error message printed).
+git-check-working-tree-clean() {
+  if ! git diff --quiet HEAD 2>/dev/null; then
+    echo "[ERR]: Working tree has uncommitted changes. Commit or stash them first."
+    return 1
+  fi
+}
+
+## Resolves a base branch to diff/rebase against.
+##
+## Args:
+##   $1 (optional) - branch name to use directly. Validated against local
+##                   branches; errors if it doesn't exist.
+##                   If omitted, an interactive picker is shown.
+##
+## Output:
+##   stdout  - the resolved branch name (one line, no decoration)
+##   stderr  - prompts (interactive picker) and any error messages
+##
+## Exit:
+##   0  on success (result printed on stdout)
+##   1  on error (message on stderr)
+git-base-branch() {
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  if [ -z "$CURRENT_BRANCH" ]; then
+    echo "[ERR]: Not on a branch (detached HEAD?). Cannot determine scope." >&2
+    return 1
+  fi
+
+  local BASE_BRANCH=""
+  if [ -n "$1" ]; then
+    if git show-ref --verify --quiet "refs/heads/${1}" 2>/dev/null; then
+      BASE_BRANCH="$1"
+    else
+      echo "[ERR]: Base branch '$1' does not exist locally" >&2
+      return 1
+    fi
+  else
+    # Build a list of local branches excluding the current one
+    local -a BRANCHES
+    BRANCHES=($(git branch --format='%(refname:short)' | grep -v "^${CURRENT_BRANCH}$"))
+
+    if [ ${#BRANCHES[@]} -eq 0 ]; then
+      echo "[ERR]: No other branches available to compare against" >&2
+      return 1
+    fi
+
+    echo "" >&2
+    echo "  Pick a base branch to compare '$CURRENT_BRANCH' against:" >&2
+    local i=1
+    for branch in "${BRANCHES[@]}"; do
+      printf "  [%d] %s\n" "$i" "$branch" >&2
+      i=$((i+1))
+    done
+
+    local SELECTION
+    read -p "  Selection [1]: " SELECTION
+    SELECTION=${SELECTION:-1}
+
+    if ! [[ "$SELECTION" =~ ^[0-9]+$ ]] || [ "$SELECTION" -lt 1 ] || [ "$SELECTION" -gt "${#BRANCHES[@]}" ]; then
+      echo "[ERR]: Invalid selection: '$SELECTION'" >&2
+      return 1
+    fi
+
+    BASE_BRANCH="${BRANCHES[$((SELECTION-1))]}"
+  fi
+
+  # Print the resolved branch on stdout so callers can capture it cleanly
+  printf "%s\n" "$BASE_BRANCH"
+}
+
+## Shows all commits on the current branch that are NOT in a base branch.
+## Base branch resolution is delegated to `git-base-branch` (which handles
+## the detached HEAD and invalid branch errors itself).
+##
+## Args:
+##   $1 - REQUIRED base branch name. The function exits with an error if
+##        this argument is missing. The branch must exist locally.
+##
+## Exits with an error if:
+##   - $1 is missing
+##   - On the base branch itself (no branch-specific commits to show)
+##   - Any error from `git-base-branch` (detached HEAD, invalid branch, etc.)
+get-branch-commits() {
+
+  ## requires the first argument to be the branch to compare to
+  if [ -z "$1" ]; then
+    echo "[ERR]: get-branch-commits requires a base branch as the first argument"
+    return 1
+  fi
+
+  # Resolve the base branch (delegated; also handles detached HEAD + invalid arg)
+  local BASE_BRANCH
+  BASE_BRANCH=$(git-base-branch "$1") || return 1
+
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  if [ "$CURRENT_BRANCH" = "$BASE_BRANCH" ]; then
+    echo "[ERR]: You are on the base branch ($BASE_BRANCH). No branch-specific commits to show."
+    return 1
+  fi
+
+  local COMMIT_COUNT
+  COMMIT_COUNT=$(git rev-list --count "${BASE_BRANCH}..HEAD")
+  echo "[Commits on] $CURRENT_BRANCH"
+  echo "[Not in] $BASE_BRANCH"
+  echo "[Total] $COMMIT_COUNT commits"
+  echo "-----------------------------------------------------------------------------"
+
+  # --graph for visual branch topology
+  # --color=always preserves colors when piped (through `cat`)
+  # Custom format: hash | date | subject, then (author) and refs on a new line
+  git log --graph --color=always \
+    --pretty=format:"%C(yellow)%h%C(reset) %C(cyan)%ad%C(reset) %s%n  %C(green)(%an)%C(reset)%d" \
+    --date=short "${BASE_BRANCH}..HEAD" | cat
+  printf "\n-----------------------------------------------------------------------------\n\n"
+}
+
+## Interactive picker for what to do with each commit on the current branch
+## that isn't in the given base branch. Walks commits oldest-first and asks
+## the user to mark each one as:
+##   [p]ick    = keep this commit as-is
+##   [s]quash  = merge this commit into the previous one
+##   [d]rop    = remove this commit entirely
+##
+## Args:
+##   $1 - REQUIRED base branch. Commits on the current branch not in this
+##        base are the candidates to act on.
+##
+## On success, populates these globals for the caller:
+##   PICKED_HASHES    - full commit hashes (array, oldest first)
+##   PICKED_MESSAGES  - commit subject lines (array)
+##   PICKED_ACTIONS   - pick / squash / drop per commit (array)
+##   PICKED_COUNT     - number of commits picked
+##
+## Exit:
+##   0  on success
+##   1  on error (missing arg, no commits, invalid action, zero picks)
+pick-commits-to-squash() {
+  local BASE_BRANCH="$1"
+
+  if [ -z "$BASE_BRANCH" ]; then
+    echo "[ERR]: pick-commits-to-squash requires a base branch as the first argument" >&2
+    return 1
+  fi
+
+  # Collect all commits on the current branch that are not in $BASE_BRANCH
+  # (oldest first, so the squashing order matches what the user will see)
+  local -a HASHES
+  local -a MESSAGES
+  while IFS=$'\t' read -r hash msg; do
+    HASHES+=("$hash")
+    MESSAGES+=("$msg")
+  done < <(git log --reverse --pretty=format:"%H%x09%s" "${BASE_BRANCH}..HEAD")
+
+  if [ ${#HASHES[@]} -eq 0 ]; then
+    echo "[ERR]: No commits found between current branch and '$BASE_BRANCH'. Nothing to squash." >&2
+    return 1
+  fi
+
+  echo ""
+  echo "  Decide what to do with each commit (oldest first). Defaults in [brackets]."
+  echo "    [p]ick    = keep this commit as-is"
+  echo "    [s]quash  = merge this commit into the previous one"
+  echo "    [d]rop    = remove this commit entirely"
+  echo ""
+
+  local -a ACTIONS
+  for i in $(seq 1 "${#HASHES[@]}"); do
+    local ACTION
+    local short_hash="${HASHES[$((i-1))]:0:7}"
+    if [ "$i" -eq 1 ]; then
+      # First commit must be 'pick' (cannot squash the very first one)
+      echo "  ───────────────────────────────────────────────"
+      echo "  → [$i] ${short_hash}  ${MESSAGES[$((i-1))]}"
+      echo "      Action: pick (required, first commit)"
+      echo "  ───────────────────────────────────────────────"
+      ACTION="pick"
+    else
+      local DEFAULT_ACTION="s"
+      echo "  ───────────────────────────────────────────────"
+      echo "  → [$i] ${short_hash}  ${MESSAGES[$((i-1))]}"
+      read -p "      Action: [p]ick/[s]quash/[d]rop? [$DEFAULT_ACTION]: " ACTION
+      ACTION=${ACTION:-$DEFAULT_ACTION}
+      case "$ACTION" in
+        p|P) ACTION="pick"   ;;
+        s|S) ACTION="squash" ;;
+        d|D) ACTION="drop"   ;;
+        *)
+          echo "[ERR]: Invalid action '$ACTION'. Use p/s/d." >&2
+          return 1
+          ;;
+      esac
+    fi
+    ACTIONS+=("$ACTION")
+  done
+  echo "  ───────────────────────────────────────────────"
+  echo ""
+
+  # Validate: at least one commit must be 'pick'
+  local PICK_COUNT=0
+  for action in "${ACTIONS[@]}"; do
+    if [ "$action" = "pick" ]; then
+      PICK_COUNT=$((PICK_COUNT + 1))
+    fi
+  done
+
+  if [ "$PICK_COUNT" -eq 0 ]; then
+    echo "[ERR]: Need at least one commit marked as 'pick'" >&2
+    return 1
+  fi
+
+  # Expose results to the caller via globals (assigned without `local` on purpose)
+  PICKED_HASHES=("${HASHES[@]}")
+  PICKED_MESSAGES=("${MESSAGES[@]}")
+  PICKED_ACTIONS=("${ACTIONS[@]}")
+  PICKED_COUNT=${#HASHES[@]}
+}
+
+git-squash() {
+
+  # refuse to run if there are uncommitted changes (rebase needs a clean tree)
+  git-check-working-tree-clean || return 1
+
+  ## Getting the current branch name
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  # Resolve the base branch (delegated; also handles detached HEAD + invalid arg)
+  local BASE_BRANCH
+  BASE_BRANCH=$(git-base-branch "master") || return 1
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Squash Commits  ------------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[BASE BRANCH] - $BASE_BRANCH"
+  echo "-----------------------------------------------------------------------------"
+
+  ## Getting the branch that we are comparing to
+  get-branch-commits "$BASE_BRANCH"
+
+  ## Now we have this function to pick all the commits to squash
+  # pick-commits-to-squash "$BASE_BRANCH"
+}
