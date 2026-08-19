@@ -1356,6 +1356,14 @@ git-squash() {
 ##   - rebase stopped due to conflicts
 git-rebase-update() {
 
+  # Parse --dry-run / -n flag up-front so it doesn't get passed through
+  # to git-default-base-branch as a phantom base branch argument.
+  local DRY_RUN=0
+  if [ "${1:-}" = "--dry-run" ] || [ "${1:-}" = "-n" ]; then
+    DRY_RUN=1
+    shift
+  fi
+
   # refuse to run if there are uncommitted changes (rebase needs a clean tree)
   git-check-working-tree-clean || return 1
 
@@ -1386,6 +1394,20 @@ git-rebase-update() {
     return 1
   }
   printf "OK\n"
+
+  # Dry-run short-circuit: fetch + show both views + exit. No rebase, no
+  # prompts, no history rewrites. Useful for previewing what would happen.
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo ""
+    echo "[dry-run] - showing before/after views, no changes will be made"
+    git-show-before-and-after-rebase "$BASE_BRANCH"
+    return 0
+  fi
+
+  # Show the current divergence so the user can see what is about to be
+  # replayed before committing to the rebase.
+  echo ""
+  git-show-before-and-after-rebase "$BASE_BRANCH"
 
   # Preview the operation before it runs
   echo ""
@@ -1435,4 +1457,140 @@ git-rebase-update() {
   if [[ "$SHOULD_PUSH" =~ ^[yY](es)?$ ]]; then
     git push --force-with-lease origin "$CURRENT_BRANCH"
   fi
+}
+
+## Continues an in-progress rebase after conflicts have been resolved.
+##
+## Stages all resolved files with `git add .` and then calls
+## `git rebase --continue`. If more conflicts appear, repeat the cycle:
+##   1. Edit the conflicted files
+##   2. git-rebase-continue
+##   3. Run your tests
+## When the rebase finishes cleanly, publish the new history with:
+##   git-push-force-with-lease
+##
+## To abandon the rebase instead, use git-rebase-abort.
+git-rebase-continue() {
+
+  # Stage every change (covers both modified conflicted files and any
+  # unrelated edits made during resolution).
+  printf "[add] - "
+  git add . || {
+    printf "FAIL\n"
+    return 1
+  }
+  printf "OK\n"
+
+  echo ""
+  printf "[rebase --continue] - "
+  git rebase --continue
+  local RC=$?
+
+  if [ "$RC" -ne 0 ]; then
+    printf "STOPPED\n"
+    echo ""
+    echo "[ERR]: Rebase could not continue."
+    echo "      More conflicts? Resolve them, then run git-rebase-continue again."
+    echo "      Or run git-rebase-abort to bail out and restore the pre-rebase state."
+    return "$RC"
+  fi
+
+  printf "OK\n"
+  echo ""
+  echo "[rebase] - DONE. Next step: git-push-force-with-lease"
+  return 0
+}
+
+## Aborts an in-progress rebase and restores the branch to its pre-rebase
+## state. Asks for confirmation before running (this is destructive: any
+## commits added during the rebase are discarded).
+git-rebase-abort() {
+
+  # Refuse early if no rebase is in progress, so we don't print a scary
+  # git error or accidentally trigger a no-op.
+  local GIT_DIR
+  GIT_DIR=$(git rev-parse --git-dir)
+  if [ ! -d "${GIT_DIR}/rebase-merge" ] && [ ! -d "${GIT_DIR}/rebase-apply" ]; then
+    echo "[ERR]: No rebase in progress on this branch."
+    return 1
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Rebase Abort  --------------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "  This will discard the in-progress rebase and restore the branch to its"
+  echo "  state before the rebase started. Any local commits that were already"
+  echo "  applied during the rebase will be lost."
+  echo "-----------------------------------------------------------------------------"
+
+  read -p "Proceed with rebase --abort? [y/N]: " CAN_CONTINUE
+  if [[ ! "$CAN_CONTINUE" =~ ^[yY](es)?$ ]]; then
+    echo "[cancelled]"
+    return 1
+  fi
+
+  echo ""
+  printf "[rebase --abort] - "
+  git rebase --abort
+  local RC=$?
+
+  if [ "$RC" -ne 0 ]; then
+    printf "FAIL\n"
+    return "$RC"
+  fi
+
+  printf "OK\n"
+  echo ""
+  echo "[rebase] - aborted. Branch is back to its pre-rebase state."
+}
+
+## Pushes the current branch to a remote with --force-with-lease.
+##
+## --force-with-lease is safer than --force: it only pushes if the remote
+## branch hasn't moved since the last fetch/pull. This protects against
+## accidentally overwriting someone else's newer work on the remote branch.
+## Use this after git-rebase-update (or any rebase that rewrites history)
+## has completed cleanly.
+##
+## Args:
+##   $1 (optional) - remote name. Defaults to "origin".
+git-push-force-with-lease() {
+
+  local REMOTE="${1:-origin}"
+
+  # Refuse to run on a detached HEAD (we can't push without a branch ref).
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+  if [ -z "$CURRENT_BRANCH" ]; then
+    echo "[ERR]: Not on a branch (detached HEAD?). Cannot determine scope."
+    return 1
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Push Force-With-Lease  ----------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[CURRENT BRANCH] - $CURRENT_BRANCH"
+  echo "[REMOTE]         - $REMOTE"
+  echo "-----------------------------------------------------------------------------"
+  echo "  This will rewrite the remote branch. Other collaborators may need to"
+  echo "  reset their local copies."
+  echo "-----------------------------------------------------------------------------"
+
+  read -p "Proceed with force-with-lease push? [y/N]: " CAN_CONTINUE
+  if [[ ! "$CAN_CONTINUE" =~ ^[yY](es)?$ ]]; then
+    echo "[cancelled]"
+    return 1
+  fi
+
+  echo ""
+  printf "[push] - "
+  git push --force-with-lease "$REMOTE" "$CURRENT_BRANCH"
+  local RC=$?
+
+  if [ "$RC" -ne 0 ]; then
+    printf "FAIL\n"
+    return "$RC"
+  fi
+
+  printf "OK\n"
 }
