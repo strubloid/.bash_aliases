@@ -182,20 +182,3 @@ function cc-revert()
 {
   cc-prompt-and-run "revert" "$1"
 }
-
-
-function gs(){
-
-
-  # 1 - we list all the commits that was done in the current branch
-
-
-  # 2 - we pick all the options that we want to squash
-
-
-  # 3 - we run the git rebase command with the options that we picked
-  git rebase -i HEAD~$commit_count
-
-  # 4 - we run the git push command with the --force option to push the changes to the remote repository
-
-}
