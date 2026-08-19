@@ -123,8 +123,8 @@ function pnpm-extract() {
 
   echo -n "[✓] Running pnpm extract: "
 
-  ## running the pnpm extract command silently in the background
-  pnpm -r extract >/dev/null 2>&1 &
+  ## running the pnpm extract command silently in a subshell to suppress job-control notifications
+  (pnpm -r extract >/dev/null 2>&1) &
   local pid=$!
 
   ## animating dots while pnpm is still running
