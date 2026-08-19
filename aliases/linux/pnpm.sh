@@ -121,7 +121,7 @@ function pnpm-extract() {
   local before_status
   before_status=$(git status --porcelain 2>/dev/null)
 
-  echo -n "[✓] Running pnpm extract: "
+  echo "[✓] Running pnpm extract: "
 
   ## running the pnpm extract command silently
   pnpm -r extract >/dev/null 2>&1
