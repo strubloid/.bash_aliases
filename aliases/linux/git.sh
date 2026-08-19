@@ -1100,13 +1100,16 @@ pick-commits-to-squash() {
   fi
 
   # Collect all commits on the current branch that are not in $BASE_BRANCH
-  # (oldest first, so the squashing order matches what the user will see)
+  # (oldest first, so the squashing order matches what the user will see).
+  # The trailing `printf '\n'` is required because `git log` does not emit a
+  # newline after its last commit, and `while read` silently drops any line
+  # without a terminator — which would lose the most recent commit.
   local -a HASHES
   local -a MESSAGES
   while IFS=$'\t' read -r hash msg; do
     HASHES+=("$hash")
     MESSAGES+=("$msg")
-  done < <(git log --reverse --pretty=format:"%H%x09%s" "${BASE_BRANCH}..HEAD")
+  done < <(git log --reverse --pretty=format:"%H%x09%s" "${BASE_BRANCH}..HEAD" && printf '\n')
 
   if [ ${#HASHES[@]} -eq 0 ]; then
     echo "[ERR]: No commits found between current branch and '$BASE_BRANCH'. Nothing to squash." >&2
@@ -1172,6 +1175,37 @@ pick-commits-to-squash() {
   PICKED_COUNT=${#HASHES[@]}
 }
 
+## Resolves the base branch.
+##   - If $1 is provided, validates it exists locally and uses it directly.
+##   - If $1 is omitted, falls back to common names in order: main > master.
+##
+## Output:
+##   stdout - resolved branch name (one line)
+##   stderr - error message on failure
+##
+## Exit:
+##   0  on success
+##   1  on error
+git-default-base-branch() {
+  # Explicit branch: defer validation to git-base-branch (which already
+  # handles the existence check + detached-HEAD check)
+  if [ -n "$1" ]; then
+    git-base-branch "$1"
+    return $?
+  fi
+
+  # No arg: try common base branches in order
+  for branch in main master; do
+    if git show-ref --verify --quiet "refs/heads/${branch}" 2>/dev/null; then
+      printf "%s\n" "$branch"
+      return 0
+    fi
+  done
+
+  echo "[ERR]: No base branch found locally (tried: main, master)" >&2
+  return 1
+}
+
 git-squash() {
 
   # refuse to run if there are uncommitted changes (rebase needs a clean tree)
@@ -1181,9 +1215,9 @@ git-squash() {
   local CURRENT_BRANCH
   CURRENT_BRANCH=$(git branch --show-current)
 
-  # Resolve the base branch (delegated; also handles detached HEAD + invalid arg)
+  # Resolve the base branch (tries $1, falls back to main > master)
   local BASE_BRANCH
-  BASE_BRANCH=$(git-base-branch "main") || return 1
+  BASE_BRANCH=$(git-default-base-branch "$1") || return 1
 
   echo "-----------------------------------------------------------------------------"
   echo "  GIT  Squash Commits  ------------------------------------------------------"
@@ -1196,5 +1230,100 @@ git-squash() {
   get-branch-commits "$BASE_BRANCH"
 
   ## Now we have this function to pick all the commits to squash
-  # pick-commits-to-squash "$BASE_BRANCH"
+  pick-commits-to-squash "$BASE_BRANCH"
+
+  # ----------------------------------------------------------------
+  # From here on, the user's decisions are baked into the globals
+  # PICKED_HASHES, PICKED_ACTIONS, PICKED_MESSAGES, PICKED_COUNT
+  # (populated by pick-commits-to-squash).
+  # ----------------------------------------------------------------
+
+  # Get the new commit message (multi-line, terminated by a single '.')
+  echo ""
+  read-multiline COMMIT_MESSAGE "[New commit message (type '.' on a line by itself to finish)]: "
+
+  if [ -z "$COMMIT_MESSAGE" ]; then
+    echo "[ERR]: Commit message cannot be empty"
+    return 1
+  fi
+
+  # Build the rebase todo file (one line per picked commit: <action> <hash>)
+  local TODO_FILE
+  TODO_FILE=$(mktemp)
+  local i
+  for i in $(seq 1 "${PICKED_COUNT}"); do
+    echo "${PICKED_ACTIONS[$((i-1))]} ${PICKED_HASHES[$((i-1))]}" >> "$TODO_FILE"
+  done
+
+  # Preview and ask for final confirmation
+  echo ""
+  echo "-----------------------------------------------------------------------------"
+  echo "  Preview of rebase todo:"
+  echo "-----------------------------------------------------------------------------"
+  cat "$TODO_FILE"
+  echo "-----------------------------------------------------------------------------"
+  echo ""
+  echo "  New commit message:"
+  echo "-----------------------------------------------------------------------------"
+  echo "$COMMIT_MESSAGE"
+  echo "-----------------------------------------------------------------------------"
+  echo ""
+
+  local CAN_CONTINUE
+  read -p "Proceed with squash? [y/N]: " CAN_CONTINUE
+  if [[ ! "$CAN_CONTINUE" =~ ^[yY](es)?$ ]]; then
+    echo "[cancelled]"
+    rm -f "$TODO_FILE"
+    return 1
+  fi
+
+  # Pre-build the commit message file so GIT_EDITOR can drop it in without
+  # opening a second editor pass during the rebase.
+  local MSG_FILE
+  MSG_FILE=$(mktemp)
+  printf "%s\n" "$COMMIT_MESSAGE" > "$MSG_FILE"
+
+  # Run the rebase. The two env-var overrides replace the interactive editor
+  # passes: GIT_SEQUENCE_EDITOR overwrites git's auto-generated todo file with
+  # ours, GIT_EDITOR overwrites git's commit-message file with ours. Git calls
+  # each as `$EDITOR <file>`, so the appended <file> becomes the second arg to
+  # cp (the target to overwrite).
+  echo ""
+  echo "[rebase] - Squashing ${PICKED_COUNT} commit(s) into the base..."
+  GIT_SEQUENCE_EDITOR="cp $TODO_FILE" \
+  GIT_EDITOR="cp $MSG_FILE" \
+  git rebase -i "$BASE_BRANCH"
+
+  local REBASE_STATUS=$?
+  rm -f "$TODO_FILE" "$MSG_FILE"
+
+  if [ "$REBASE_STATUS" -ne 0 ]; then
+    echo "[ERR]: Rebase exited with status $REBASE_STATUS"
+    echo "      You may need to resolve conflicts manually:"
+    echo "        git status"
+    echo "        # edit the conflicted files, then:"
+    echo "        git add ."
+    echo "        git rebase --continue"
+    echo "      Or abort entirely with:  git rebase --abort"
+    return "$REBASE_STATUS"
+  fi
+
+  echo "[rebase] - OK"
+  echo "-----------------------------------------------------------------------------"
+
+  # Show the new commit history (with colors preserved, pager disabled)
+  echo ""
+  echo "  New commit history (top 5):"
+  echo "  ----------------------------"
+  git -c color.ui=always log -n 5 --pretty=format:"  %C(yellow)%h%C(reset) %s" | cat
+  echo ""
+  echo "  ----------------------------"
+
+  # Offer to push with --force-with-lease (safer than --force: only pushes if
+  # the remote branch hasn't moved since our last fetch/pull).
+  echo ""
+  read -p "Push to remote with --force-with-lease? [y/N]: " SHOULD_PUSH
+  if [[ "$SHOULD_PUSH" =~ ^[yY](es)?$ ]]; then
+    git push --force-with-lease origin "$CURRENT_BRANCH"
+  fi
 }
