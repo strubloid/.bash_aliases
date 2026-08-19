@@ -5,10 +5,8 @@
 ## checking if pnpm exists
 function doesPnpmExist() {
   if command -v pnpm &>/dev/null; then
-    echo "pnpm is already installed."
     return 0
   else
-    echo "pnpm is not installed."
     return 1
   fi
 }
@@ -21,7 +19,7 @@ function check-and-install-pnpm() {
     return 0
   fi
 
-  echo "pnpm not found. Installing latest binary..."
+  echo "[Installing] pnpm..."
   curl -fsSL https://get.pnpm.io/install.sh | sh -
 }
 
@@ -33,12 +31,12 @@ function check-pnpm(){
     return 0
   fi
 
-  echo "[] Running pnpm check and extract commands...]"
+  echo "[Running] pnpm check and extract commands..."
 
   ## running the pnpm check command to check for errors
   pnpm check
 
-  echo "[] Running pnpm extract command...]"
+  echo "[Running] pnpm extract command..."
 
   ## running the pnpm extract command to extract the dependencies
   pnpm -r extract
@@ -61,7 +59,7 @@ function pnpm-checks(){
     return 0
   fi
 
-  echo "[] Running pnpm checks and extract commands...]"
+  echo "[Running] pnpm checks and extract commands...]"
 
   ## would you like to check the type errors?
   read -p "Would you like to check the type errors? [y/N]: " CHECK_TYPE_ERRORS
