@@ -59,7 +59,7 @@ function pnpm-checks(){
     return 0
   fi
 
-  echo "[Running] pnpm checks and extract commands...]"
+  echo "[Running] pnpm checks and extract commands..."
 
   ## would you like to check the type errors?
   read -p "Would you like to check the type errors? [y/N]: " CHECK_TYPE_ERRORS
@@ -107,7 +107,6 @@ function animate-dots() {
     echo -n "."
     sleep 0.5
   done
-  echo " [Done] \n"
 }
 
 ## running pnpm extract and detecting if any changes were made
@@ -122,7 +121,7 @@ function pnpm-extract() {
   local before_status
   before_status=$(git status --porcelain 2>/dev/null)
 
-  echo -n "[Running] pnpm extract: \n"
+  echo -n "[✓] Running pnpm extract: "
 
   ## running the pnpm extract command silently in the background
   pnpm -r extract >/dev/null 2>&1 &
