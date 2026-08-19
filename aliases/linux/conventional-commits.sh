@@ -72,6 +72,12 @@ read-multiline() {
 cc-prompt-and-run() {
   local TYPE="$1"
 
+  ## running pnpm-extract to ensure no pending dependency changes before committing
+  if ! pnpm-extract; then
+    echo "[x] pnpm-extract detected changes. Commit aborted. Please review the changes before trying again."
+    return 1
+  fi
+
   # Description (required) - can be passed as $2 to skip the prompt
   local DESCRIPTION="$2"
   if [ -z "$DESCRIPTION" ]; then
