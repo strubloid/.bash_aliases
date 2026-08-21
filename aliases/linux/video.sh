@@ -26,6 +26,11 @@ increase-audio-in-video() {
 ## it to a vtt file using the whisper model
 video-transcribe() {
 
+  if ! command -v ffmpeg >/dev/null 2>&1; then
+    echo "ffmpeg not found. Installing..."
+    sudo apt install ffmpeg -y
+  fi
+
   if [ -z "$1" ]
   then
       read -p "Tell me the file to transcribe from it : " video_file

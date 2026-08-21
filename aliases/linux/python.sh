@@ -220,6 +220,13 @@ py-install-requirements(){
   fi
 }
 
+## Activate the bash_aliases python virtual environment located at
+## ~/.bash_aliases_scripts/.venv
+python-bash-aliases-env(){
+  export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts"
+  source "$BASH_ALIASES_SCRIPTS/.venv/bin/activate"
+}
+
 limit-parameters-python()
 {
   ulimit -s 8192
