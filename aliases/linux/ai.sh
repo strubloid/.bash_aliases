@@ -166,6 +166,110 @@ ai-run-opencode() {
     | ai-strip-ansi
 }
 
+## Interactive model picker.
+##
+## Usage: ai-pick-model <default-model>
+## Prints the chosen model id on stdout.
+##
+## Behaviour by context:
+##   - Interactive TTY:  prompts "Use default? [Y/n]". 'y' / Enter uses
+##                       the default. Anything other than 'n' / 'N' is
+##                       taken as a direct model id. 'n' / 'N' shows the
+##                       full opencode model list and asks for a pick.
+##   - Piped input:      reads the first line of stdin as the response
+##                       and processes it the same way (no prompt).
+##   - No stdin at all:  falls back to the default (safe for scripts).
+ai-pick-model() {
+  local default="${1:-opencode-go/minimax-m3}"
+
+  local response=""
+
+  if [[ -t 0 ]]; then
+    ## Interactive: prompt the user.
+    echo ""
+    echo "[ai-create-tasks] Default model: $default"
+    if ! read -r -p "Use default model? [Y/n]: " response; then
+      echo "$default"
+      return 0
+    fi
+    response="${response:-Y}"
+  else
+    ## Non-interactive: try to consume one line from stdin if any.
+    if ! read -r response; then
+      echo "$default"
+      return 0
+    fi
+  fi
+
+  ## Accept the default.
+  if [[ "$response" =~ ^[Yy]$ ]] || [[ -z "$response" ]]; then
+    echo "$default"
+    return 0
+  fi
+
+  ## Anything other than 'n' / 'N' is treated as a direct model id, so
+  ## `ai-create-tasks transcript.vtt opencode-go/kimi-k3` works too.
+  if [[ ! "$response" =~ ^[Nn]$ ]]; then
+    echo "$response"
+    return 0
+  fi
+
+  ## Fetch the live model list from opencode.
+  local models=()
+  while IFS= read -r m; do
+    [[ -n "$m" ]] && models+=("$m")
+  done < <(opencode models 2>/dev/null | sed -E 's/\x1b\[[0-9;]*m//g')
+
+  if [[ ${#models[@]} -eq 0 ]]; then
+    echo "[ERROR] Could not retrieve model list from opencode" >&2
+    return 1
+  fi
+
+  echo ""
+  echo "[ai-create-tasks] Available models (${#models[@]} total)."
+  echo "[ai-create-tasks] Tip: paste a model id like 'opencode-go/minimax-m3' instead of a number."
+  echo ""
+
+  local n=1
+  for m in "${models[@]}"; do
+    local marker=""
+    if [[ "$m" == "$default" ]]; then
+      marker="  <-- default"
+    fi
+    printf "  %3d) %s%s\n" "$n" "$m" "$marker"
+    n=$((n+1))
+  done
+
+  echo ""
+
+  while true; do
+    local pick=""
+
+    if [[ -t 0 ]]; then
+      read -r -p "Pick by number (1-${#models[@]}) or type a model id: " pick || true
+    else
+      read -r pick || true
+    fi
+
+    if [[ -z "$pick" ]]; then
+      echo "[ai-create-tasks] Please enter a number or model id."
+      continue
+    fi
+
+    if [[ "$pick" =~ ^[0-9]+$ ]]; then
+      if (( pick >= 1 && pick <= ${#models[@]} )); then
+        echo "${models[$((pick-1))]}"
+        return 0
+      fi
+      echo "[ai-create-tasks] Invalid number: $pick (must be 1-${#models[@]})."
+      continue
+    fi
+
+    echo "$pick"
+    return 0
+  done
+}
+
 ## Preflight check for OpenCode.
 ##
 ## - If the `opencode` binary is not on PATH but is installed at the
@@ -233,13 +337,15 @@ ai-create-tasks() {
   ## ---- input validation -------------------------------------------------
   local transcript_file="${1:-}"
   local output_dir="${2:-$(pwd)/tasks}"
-  local model="${3:-opencode-go/minimax-m3}"
+  local model="$3"
 
   if [[ -z "$transcript_file" ]]; then
     echo "Usage: ai-create-tasks <transcript-file> [output-dir] [model]"
     echo "  transcript-file : path to VTT (or plain text) transcript"
     echo "  output-dir      : where task1.md, task2.md, ... are written (default: ./tasks)"
-    echo "  model           : opencode model identifier (default: opencode-go/minimax-m3)"
+    echo "  model           : opencode model id. If omitted, you will be"
+    echo "                    prompted: use default (opencode-go/minimax-m3)"
+    echo "                    or pick from the live opencode model list."
     return 1
   fi
 
@@ -264,6 +370,15 @@ ai-create-tasks() {
   done
   if [[ "$missing" -ne 0 ]]; then
     return 1
+  fi
+
+  ## ---- model selection -------------------------------------------------
+  ## If the user passed a model as the 3rd argument, use it. Otherwise
+  ## prompt interactively (or fall back to the default in non-TTY).
+  if [[ -z "$model" ]]; then
+    if ! model=$(ai-pick-model "opencode-go/minimax-m3"); then
+      return 1
+    fi
   fi
 
   ## ---- work area -------------------------------------------------------
