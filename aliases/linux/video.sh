@@ -53,6 +53,7 @@ video-transcribe() {
   touch "$video_file_transcribed"
 
   ## populating with the transcription
+  echo "[INFO] Transcribing video file: $correct_file_path to $video_file_transcribed"
   "$BASH_ALIASES_VENV_BIN/whisper" "$correct_file_path" --language "$lang" > "$video_file_transcribed"
 
 }
