@@ -2,6 +2,59 @@
 
 # Strubloid::linux::Python
 
+## Installs the python environment required by the bash_aliases project.
+## Creates ~/.bash_aliases_scripts/.venv and installs all dependencies from
+## scripts/requirements.txt (openai, openai-whisper, ...).
+## Also installs system tools used by other alias scripts (yt-dlp, ffmpeg).
+py-bash-aliases-install(){
+
+  # Ensure python3-venv is installed
+  if ! dpkg -l | grep -q python3-venv; then
+    echo "python3-venv not found. Installing..."
+    sudo apt install python3-venv -y
+  fi
+
+  export BASH_ALIASES_SCRIPTS="$HOME/.bash_aliases_scripts"
+  local venv_path="$BASH_ALIASES_SCRIPTS/.venv"
+  local requirements_file="$BASH_ALIASES_PROJECT_ROOT/scripts/requirements.txt"
+
+  # Create the scripts directory if missing
+  if [[ ! -d "$BASH_ALIASES_SCRIPTS" ]]; then
+    echo "Creating scripts directory at $BASH_ALIASES_SCRIPTS..."
+    mkdir -p "$BASH_ALIASES_SCRIPTS"
+  fi
+
+  # Copy helper scripts from the project into the scripts directory
+  if [[ -d "$BASH_ALIASES_PROJECT_ROOT/scripts" ]]; then
+    echo "Syncing helper scripts to $BASH_ALIASES_SCRIPTS..."
+    cp -r "$BASH_ALIASES_PROJECT_ROOT/scripts/." "$BASH_ALIASES_SCRIPTS/"
+  fi
+
+  # Create the venv if it doesn't exist
+  if [[ ! -f "$venv_path/bin/python3" ]]; then
+    echo "Creating virtual environment at $venv_path..."
+    python3 -m venv "$venv_path"
+  else
+    echo "Virtual environment already exists at $venv_path"
+  fi
+
+  # Install dependencies from requirements.txt
+  if [[ -f "$requirements_file" ]]; then
+    echo "Installing requirements from $requirements_file..."
+    "$venv_path/bin/pip" install --upgrade pip
+    "$venv_path/bin/pip" install -r "$requirements_file"
+  else
+    echo "Warning: requirements.txt not found at $requirements_file"
+    echo "Falling back to installing openai and openai-whisper directly..."
+    "$venv_path/bin/pip" install openai openai-whisper
+  fi
+
+  echo ""
+  echo "[bash_aliases python environment installed]"
+  echo "  venv: $venv_path"
+  echo "  activate with: source $venv_path/bin/activate"
+}
+
 # # alias gpt-summarizer='/media/games/apps/gpt-summarizer/main_cli.py'
 py-start-local(){
 
