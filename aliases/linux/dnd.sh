@@ -77,7 +77,7 @@ BASH_ALIASES_VENV_BIN="${BASH_ALIASES_VENV_BIN:-$HOME/.bash_aliases_scripts/.ven
 # UTILITY
 # =============================================================================
 
-function dnd-log()  { printf '[dnd] %s\n' "$*"; }
+function dnd-log()  { printf '[dnd] %s\n' "$*" >&2; }
 function dnd-warn() { printf '[dnd][warn] %s\n' "$*" >&2; }
 function dnd-err()  { printf '[dnd][error] %s\n' "$*" >&2; }
 
@@ -176,7 +176,7 @@ function dnd-resume-prompt() {
     dnd-log "  [a] Re-analyze (keep workspace, redo audio/VAD/Whisper)"
     dnd-log "  [f] Fresh start (wipe workspace)"
     while true; do
-      read -r -n 1 -p "[dnd] Choose [r/t/a/f]: " choice
+      read -r -n 1 -p "[dnd] Choose [r=Resume, t=Rebuild timeline, a=Re-analyze, f=Fresh start]: " choice
       echo
       case "$choice" in
         r|t|a|f) break ;;
@@ -842,7 +842,7 @@ function dnd-interactive-review() {
            dnd-log "  -> marked REMOVE";  break ;;
         p) dnd-play-segment "$ws/leftovers/$segfile"; continue ;;
         s) dnd-log "  -> deferred"; break ;;
-        q) dnd-log "  -> quitting (resumable)"; return 0 ;;
+        q) dnd-log "  -> quitting (resumable)"; DND_QUIT_REQUESTED=1; return 0 ;;
         *) dnd-warn "Please press r, k, p, s or q." ;;
       esac
     done
@@ -991,7 +991,7 @@ EOF
 function dnd-video-cut-low-volume-spaces() {
 
   set -euo pipefail
-  trap 'dnd-err "Interrupted (line ${LINENO:-?}). Workspace preserved -- re-run to resume."; exit 130' INT TERM
+  trap 'dnd-err "Interrupted (line ${LINENO:-?}). Workspace preserved -- re-run to resume."; return 130' INT TERM
 
   if [[ $# -lt 1 ]]; then
     dnd-err "Usage: dnd-video-cut-low-volume-spaces <video-file>"
@@ -1062,6 +1062,10 @@ function dnd-video-cut-low-volume-spaces() {
 
   # ---- Manual review ----
   dnd-interactive-review "$ws"
+  if [[ "${DND_QUIT_REQUESTED:-0}" == "1" ]]; then
+    dnd-log "Quit requested during review. Workspace preserved at $ws -- re-run to resume."
+    return 0
+  fi
 
   # ---- Final plan + render ----
   dnd-reconstruct-plan "$ws"
