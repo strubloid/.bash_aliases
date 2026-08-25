@@ -77,6 +77,12 @@ cc-prompt-and-run() {
     echo "[x] pnpm-extract detected changes. Commit aborted. Please review the changes before trying again."
     return 1
   fi
+  
+  ## check for typescript build issues (unused vars, type mismatches, etc.)
+  if ! pnpm-project-build; then
+    echo "[x] pnpm-project-build detected TypeScript errors. Commit aborted. Please resolve the issues before trying again."
+    return 1
+  fi
 
   # Description (required) - can be passed as $2 to skip the prompt
   local DESCRIPTION="$2"
@@ -105,15 +111,22 @@ cc-prompt-and-run() {
   cc-commit-run "$TYPE" "$SCOPE" "$BREAKING" "$DESCRIPTION" "$BODY" "$BREAKING_DESC"
 }
 
+ ## we will check if things are ok before pushing any code
 function cc-testing(){
-
+ 
   ## we are using the new pnpm extract command to extract the dependencies and check if any changes were made
   if ! pnpm-extract; then
     echo "[x] pnpm-extract detected changes. Commit aborted. Please review the changes before trying again."
     return 1
   fi
-
-  echo "[✓] No changes detected. Proceeding with commit."
+ 
+  ## check for typescript build issues (unused vars, type mismatches, etc.)
+  if ! pnpm-project-build; then
+    echo "[x] pnpm-project-build detected TypeScript errors. Commit aborted. Please resolve the issues before trying again."
+    return 1
+  fi
+ 
+  echo "[✓] All pre-commit checks passed. Proceeding with commit."
   return 0
 }
 

@@ -138,3 +138,47 @@ function pnpm-extract() {
 
   return 0
 }
+
+
+## This will be checking the project build action
+function pnpm-project-build(){
+ 
+  ## ensure pnpm is available before attempting the build
+  if ! command -v pnpm >/dev/null 2>&1; then
+    echo "[!] pnpm is not available. Skipping TypeScript build check."
+    return 0
+  fi
+ 
+  ## ensure we are inside a pnpm workspace
+  if [ ! -f "pnpm-workspace.yaml" ] && [ ! -f "pnpm-workspace.yml" ]; then
+    echo "[!] Not in a pnpm workspace. Skipping TypeScript build check."
+    return 0
+  fi
+ 
+  ## ensure the web package exists in the workspace (apps/web or packages/web)
+  if [ ! -d "apps/web" ] && [ ! -d "packages/web" ]; then
+    echo "[!] No web app detected in workspace. Skipping TypeScript build check."
+    return 0
+  fi
+ 
+  echo "[*] Running TypeScript build check (pnpm --filter web exec tsc -b)..."
+ 
+  local OUTPUT
+  local EXIT_CODE
+ 
+  ## capture both stdout and stderr so we can surface only the relevant TS errors
+  OUTPUT=$(pnpm --filter web exec tsc -b 2>&1)
+  EXIT_CODE=$?
+ 
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "[x] TypeScript build check FAILED. The following issues must be resolved before committing:"
+    echo "-----------------------------------------------------------------------------"
+    echo "$OUTPUT" | grep -E "error TS" | head -50
+    echo "-----------------------------------------------------------------------------"
+    return 1
+  fi
+ 
+  echo "[✓] TypeScript build check passed."
+  return 0
+}

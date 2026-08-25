@@ -62,7 +62,7 @@ SPEECH_REVIEW_THRESHOLD="${DND_SPEECH_REVIEW_THRESHOLD:-0.50}"
 # Whisper model.  small = good speed/accuracy trade-off on CPU.
 WHISPER_MODEL="${DND_WHISPER_MODEL:-small}"
 WHISPER_LANGUAGE="${DND_WHISPER_LANGUAGE:-en}"
-WHISPER_DEVICE="${DND_WHISPER_DEVICE:-cpu}"
+WHISPER_DEVICE="${DND_WHISPER_DEVICE:-cuda}"
 
 # Audio player used during manual review.
 DND_AUDIO_PLAYER="${DND_AUDIO_PLAYER:-ffplay -hide_banner -loglevel error -autoexit -nodisp}"
@@ -77,9 +77,41 @@ BASH_ALIASES_VENV_BIN="${BASH_ALIASES_VENV_BIN:-$HOME/.bash_aliases_scripts/.ven
 # UTILITY
 # =============================================================================
 
-function dnd-log()  { printf '[dnd] %s\n' "$*" >&2; }
-function dnd-warn() { printf '[dnd][warn] %s\n' "$*" >&2; }
-function dnd-err()  { printf '[dnd][error] %s\n' "$*" >&2; }
+# Log file paths (set by dnd-video-cut-low-volume-spaces from workspace).
+# DND_LOG_FILE    - full run log (info + warn + err), one file per run
+# DND_ERROR_LOG   - persistent error.log accumulating across runs
+DND_LOG_FILE="${DND_LOG_FILE:-}"
+DND_ERROR_LOG="${DND_ERROR_LOG:-}"
+
+function dnd-log() {
+  local ts; ts="$(date -Iseconds 2>/dev/null || date)"
+  if [[ -n "$DND_LOG_FILE" ]]; then
+    printf '%s [INFO]  %s\n' "$ts" "$*" >> "$DND_LOG_FILE"
+  fi
+  printf '[dnd] %s\n' "$*" >&2
+}
+
+function dnd-warn() {
+  local ts; ts="$(date -Iseconds 2>/dev/null || date)"
+  if [[ -n "$DND_LOG_FILE" ]]; then
+    printf '%s [WARN]  %s\n' "$ts" "$*" >> "$DND_LOG_FILE"
+  fi
+  if [[ -n "$DND_ERROR_LOG" ]]; then
+    printf '%s [WARN]  %s\n' "$ts" "$*" >> "$DND_ERROR_LOG"
+  fi
+  printf '[dnd][warn] %s\n' "$*" >&2
+}
+
+function dnd-err() {
+  local ts; ts="$(date -Iseconds 2>/dev/null || date)"
+  if [[ -n "$DND_LOG_FILE" ]]; then
+    printf '%s [ERROR] %s\n' "$ts" "$*" >> "$DND_LOG_FILE"
+  fi
+  if [[ -n "$DND_ERROR_LOG" ]]; then
+    printf '%s [ERROR] %s\n' "$ts" "$*" >> "$DND_ERROR_LOG"
+  fi
+  printf '[dnd][error] %s\n' "$*" >&2
+}
 
 function dnd-format-ts() {
   # dnd-format-ts <seconds>  -> "HH:MM:SS.mmm"
@@ -144,7 +176,7 @@ function dnd-workspace-path() {
 
 function dnd-workspace-init() {
   local ws="$1"
-  mkdir -p "$ws/analysis" "$ws/leftovers" "$ws/segments" "$ws/review"
+  mkdir -p "$ws/analysis" "$ws/leftovers" "$ws/segments" "$ws/review" "$ws/logs"
   : > "$ws/review/review.log"
 }
 
@@ -600,6 +632,8 @@ PYEOF
 
 function dnd-render-from-plan() {
   # dnd-render-from-plan <input> <output> <plan_json>
+  # Sync-safe single-pass render using trim/atrim + concat filter.
+  # Uses -filter_complex_script to avoid ARG_MAX limits with many segments.
   local input="$1"
   local output="$2"
   local plan_json="$3"
@@ -614,51 +648,49 @@ function dnd-render-from-plan() {
     return 0
   fi
 
-  local tmpdir
-  tmpdir="$(dirname "$output")/segments"
-  rm -rf "$tmpdir"
-  mkdir -p "$tmpdir"
+  local fc_file
+  fc_file="$(dirname "$output")/.filter_complex_$$.txt"
+  : > "$fc_file"
 
-  dnd-log "Extracting $keep_count keep-segments -> $tmpdir"
-
+  # concat filter requires alternating [v][a][v][a]... input pairs.
+  local concat_inputs=""
   local i=0
-  local list="$tmpdir/_concat.txt"
-  : > "$list"
-
   while IFS=$'\t' read -r start end; do
-    local seg="seg-$(printf '%05d' "$i")"
-    local out="$tmpdir/${seg}.mp4"
-    local dur
-    dur=$(awk -v s="$start" -v e="$end" 'BEGIN { printf "%.3f", e - s }')
-    # -ss AFTER -i gives frame-accurate cuts with -c copy.
-    ffmpeg -y -nostdin -loglevel error \
-      -i "$input" -ss "$start" -t "$dur" \
-      -c copy -avoid_negative_ts make_zero "$out"
-    printf "file '%s'\n" "$out" >> "$list"
+    printf '[0:v]trim=start=%s:end=%s,setpts=PTS-STARTPTS[v%d];\n' \
+      "$start" "$end" "$i" >> "$fc_file"
+    printf '[0:a]atrim=start=%s:end=%s,asetpts=PTS-STARTPTS[a%d];\n' \
+      "$start" "$end" "$i" >> "$fc_file"
+    concat_inputs+="[v$i][a$i]"
     i=$((i + 1))
   done < <(jq -r '.timeline[] | select(.action=="keep") | "\(.start)\t\(.end)"' "$plan_json")
 
   if [[ "$i" -eq 0 ]]; then
-    dnd-warn "Plan produced no segments."
+    dnd-warn "Plan produced no keep-segments."
     cp -p "$input" "$output"
+    rm -f "$fc_file"
     return 0
   fi
 
-  dnd-log "Concatenating -> $output"
+  printf '%sconcat=n=%d:v=1:a=1[outv][outa]\n' \
+    "$concat_inputs" "$i" >> "$fc_file"
+
+  dnd-log "Rendering $keep_count keep-segments in a single sync-safe pass..."
+
   if ! ffmpeg -y -nostdin -loglevel error \
-      -f concat -safe 0 -i "$list" \
-      -c copy -movflags +faststart \
-      "$output"; then
-    dnd-warn "Stream-copy concat failed; falling back to re-encode."
-    ffmpeg -y -nostdin -loglevel error \
-      -f concat -safe 0 -i "$list" \
+      -i "$input" \
+      -filter_complex_script "$fc_file" \
+      -map "[outv]" -map "[outa]" \
       -c:v libx264 -preset veryfast -crf 18 \
       -c:a aac -b:a 192k \
       -movflags +faststart \
-      "$output"
+      "$output"; then
+    dnd-warn "Filter-based render failed; keeping filter_complex file for debugging: $fc_file"
+    dnd-warn "Copying original as fallback to $output"
+    cp -p "$input" "$output"
+    return 1
   fi
 
-  rm -rf "$tmpdir"
+  rm -f "$fc_file"
 }
 
 # =============================================================================
@@ -669,6 +701,9 @@ function dnd-extract-leftovers() {
   # Cuts each questionable region from the original video preserving its
   # original timeline position. Also builds leftovers.mp4 (concat) and
   # leftovers/index.json.
+  # Uses a single ffmpeg invocation with multiple -map outputs to cut all
+  # segments at once (trim/atrim + per-output map). Falls back to per-segment
+  # loop if that fails.
   local ws="$1"
   local input="$2"
   local plan_json="$ws/analysis/timeline.json"
@@ -682,36 +717,75 @@ function dnd-extract-leftovers() {
 
   if [[ "$qcount" -eq 0 ]]; then
     dnd-log "No questionable segments to review."
-    jq '{segments: [], generated: now|todate}' "$plan_json" > "$leftovers_dir/index.json"
+    jq -n '{segments: [], generated: now|todate}' > "$leftovers_dir/index.json"
     : > "$leftovers_dir/_concat.txt"
     return 0
   fi
 
   dnd-log "Extracting $qcount questionable leftovers..."
 
-  local list="$leftovers_dir/_concat.txt"
-  : > "$list"
-  local idx_json="$leftovers_dir/index.json"
-  local tmp_entries=()
+  # Collect segment data into temp files so we can iterate twice.
+  local seg_data="$leftovers_dir/.seg_data.tsv"
+  jq -r '.questionable[] | [.start, .end, .speech_confidence, .reason] | @tsv' "$plan_json" > "$seg_data"
+
+  local fc_file="$leftovers_dir/.leftovers_filter_$$.txt"
+  : > "$fc_file"
 
   local i=0
   while IFS=$'\t' read -r s e conf reason; do
-    local seg="segment-$(printf '%03d' "$((i + 1))")"
-    local out="$leftovers_dir/${seg}.mp4"
+    i=$((i + 1))
+    printf '[0:v]trim=start=%s:end=%s,setpts=PTS-STARTPTS[v%d];\n' \
+      "$s" "$e" "$i" >> "$fc_file"
+    printf '[0:a]atrim=start=%s:end=%s,asetpts=PTS-STARTPTS[a%d];\n' \
+      "$s" "$e" "$i" >> "$fc_file"
+  done < "$seg_data"
+
+  # Build ffmpeg command: one -map per segment, written via bash array to
+  # avoid ARG_MAX issues.
+  local -a ffmpeg_args
+  ffmpeg_args=(-y -nostdin -loglevel error -i "$input"
+               -filter_complex_script "$fc_file")
+  i=0
+  while IFS=$'\t' read -r s e conf reason; do
+    i=$((i + 1))
+    ffmpeg_args+=(-map "[v$i]" -map "[a$i]"
+                  "$leftovers_dir/segment-$(printf '%03d' "$i").mp4")
+  done < "$seg_data"
+
+  dnd-log "Cutting $i segments in one ffmpeg pass..."
+  if ! ffmpeg "${ffmpeg_args[@]}"; then
+    dnd-warn "Multi-output cut failed; falling back to per-segment loop."
+    i=0
+    while IFS=$'\t' read -r s e conf reason; do
+      i=$((i + 1))
+      local dur
+      dur=$(awk -v s="$s" -v e="$e" 'BEGIN { printf "%.3f", e - s }')
+      ffmpeg -y -nostdin -loglevel error \
+        -i "$input" -ss "$s" -t "$dur" \
+        -c copy -avoid_negative_ts make_zero \
+        "$leftovers_dir/segment-$(printf '%03d' "$i").mp4"
+    done < "$seg_data"
+  fi
+
+  rm -f "$fc_file" "$seg_data"
+
+  # Build index.json (metadata for review UI).
+  local idx_entries=()
+  while IFS=$'\t' read -r s e conf reason; do
     local dur
     dur=$(awk -v s="$s" -v e="$e" 'BEGIN { printf "%.3f", e - s }')
-    ffmpeg -y -nostdin -loglevel error \
-      -i "$input" -ss "$s" -t "$dur" \
-      -c copy -avoid_negative_ts make_zero "$out"
-    printf "file '%s'\n" "$out" >> "$list"
-
-    tmp_entries+=("$(jq -n --argjson n "$((i + 1))" --argjson s "$s" --argjson e "$e" --argjson d "$dur" --argjson c "$conf" --arg r "$reason" \
+    idx_entries+=("$(jq -n --argjson n "$((${#idx_entries[@]} + 1))" --argjson s "$s" --argjson e "$e" --argjson d "$dur" --argjson c "$conf" --arg r "$reason" \
       '{segment: $n, start: $s, end: $e, duration: $d, speech_confidence: $c, classification: "possible_speech", reason: $r, file: ("segment-" + (("000" + ($n|tostring)) | .[length-3:]) + ".mp4")}')")
-
-    i=$((i + 1))
   done < <(jq -r '.questionable[] | "\(.start)\t\(.end)\t\(.speech_confidence)\t\(.reason)"' "$plan_json")
 
-  printf '%s\n' "${tmp_entries[@]}" | jq -s '{generated: now|todate, segments: .}' > "$idx_json"
+  printf '%s\n' "${idx_entries[@]}" | jq -s '{generated: now|todate, segments: .}' > "$leftovers_dir/index.json"
+
+  # Build leftovers.mp4 (concatenated reference of all segments).
+  local list="$leftovers_dir/_concat.txt"
+  : > "$list"
+  for f in "$leftovers_dir"/segment-*.mp4; do
+    [[ -f "$f" ]] && printf "file '%s'\n" "$f" >> "$list"
+  done
 
   if [[ -s "$list" ]]; then
     dnd-log "Building leftovers.mp4..."
@@ -818,16 +892,19 @@ function dnd-interactive-review() {
     ts_end=$(dnd-format-ts "$e")
 
     printf '\n'
-    dnd-log "[%d/%d]  segment=%d  %s -> %s  (%.2fs, conf=%.2f)" \
-      "$i" "$total" "$segid" "$ts_start" "$ts_end" \
-      "$(awk -v s="$s" -v e="$e" 'BEGIN{print e-s}')" "$conf"
+    dnd-log "[$i/$total]  segment=$segid  $ts_start -> $ts_end  ($(awk -v s="$s" -v e="$e" 'BEGIN{printf "%.2f", e-s}')s, conf=$conf)"
     dnd-log "         reason: $reason"
     dnd-log "         file:   leftovers/$segfile"
 
     if [[ -f "$ws/leftovers/$segfile" ]]; then
-      dnd-play-segment "$ws/leftovers/$segfile"
+      dnd-play-segment "$ws/leftovers/$segfile" || true
     else
-      dnd-warn "Leftover file missing: leftovers/$segfile"
+      dnd-warn "Leftover file missing: leftovers/$segfile -- auto-skipping (no audio to review)"
+      dnd-decisions-append "$ws" "$segid" "remove"
+      printf '%s segment=%d decision=remove (auto: file missing)\n' \
+        "$(date -Iseconds)" "$segid" >> "$review_log"
+      dnd-log "  -> auto-removed (no playable file); continuing"
+      continue
     fi
 
     while true; do
@@ -840,7 +917,7 @@ function dnd-interactive-review() {
         k) dnd-decisions-append "$ws" "$segid" "remove"
            printf '%s segment=%d decision=remove\n'  "$(date -Iseconds)" "$segid" >> "$review_log"
            dnd-log "  -> marked REMOVE";  break ;;
-        p) dnd-play-segment "$ws/leftovers/$segfile"; continue ;;
+        p) dnd-play-segment "$ws/leftovers/$segfile" || true; continue ;;
         s) dnd-log "  -> deferred"; break ;;
         q) dnd-log "  -> quitting (resumable)"; DND_QUIT_REQUESTED=1; return 0 ;;
         *) dnd-warn "Please press r, k, p, s or q." ;;
@@ -990,8 +1067,11 @@ EOF
 
 function dnd-video-cut-low-volume-spaces() {
 
-  set -euo pipefail
-  trap 'dnd-err "Interrupted (line ${LINENO:-?}). Workspace preserved -- re-run to resume."; return 130' INT TERM
+  # NOTE: deliberately NOT using `set -e`. We want the script to keep going
+  # on errors (warn instead of die), and the terminal to stay open so the
+  # user can read error messages and decide what to do.
+  set -u
+  set -o pipefail
 
   if [[ $# -lt 1 ]]; then
     dnd-err "Usage: dnd-video-cut-low-volume-spaces <video-file>"
@@ -1010,7 +1090,21 @@ function dnd-video-cut-low-volume-spaces() {
   ws=$(dnd-workspace-path "$input")
   dnd-workspace-init "$ws"
 
+  # ---- Logging setup (must happen before any dnd-log call after this) ----
+  local run_ts
+  run_ts="$(date +%Y-%m-%dT%H-%M-%S)"
+  export DND_LOG_FILE="$ws/logs/dnd-${run_ts}.log"
+  export DND_ERROR_LOG="$ws/logs/error.log"
+  : > "$DND_LOG_FILE"
+  # error.log is appended across runs, never truncated.
+
+  trap 'dnd-err "Interrupted (line ${LINENO:-?}, exit=$?). Workspace preserved -- see $DND_LOG_FILE and $DND_ERROR_LOG. Re-run to resume."; return 130' INT TERM
+
+  dnd-log "=== dnd-video-cut run start ==="
   dnd-log "Workspace: $ws"
+  dnd-log "Log file:   $DND_LOG_FILE"
+  dnd-log "Error log:  $DND_ERROR_LOG"
+  dnd-log "Input:      $input"
 
   # ---- Resume handling ----
   local mode="fresh"
@@ -1073,4 +1167,13 @@ function dnd-video-cut-low-volume-spaces() {
 
   # ---- Summary ----
   dnd-print-summary "$ws" "$input"
+
+  # ---- Hold the terminal so the user can read final output ----
+  # Skipped when:
+  #   - DND_NO_PAUSE=1 (CI / scripted runs)
+  #   - stdin is not a TTY (piped / redirected input)
+  if [[ "${DND_NO_PAUSE:-0}" != "1" && -t 0 ]]; then
+    printf '\n' >&2
+    read -rp "[dnd] Press enter to exit... (set DND_NO_PAUSE=1 to skip) " </dev/tty || true
+  fi
 }
