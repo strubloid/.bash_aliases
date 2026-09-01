@@ -163,15 +163,27 @@ function pnpm-project-build(){
  
   echo "[*] Running project build (pnpm --filter web build)..."
  
+  local OUTPUT
   local EXIT_CODE
+  local ERRORS
  
-  ## stream output live so build errors are visible in real time, then capture exit code
-  pnpm --filter web build
+  ## capture both stdout and stderr so we can surface only the relevant errors
+  OUTPUT=$(pnpm --filter web build 2>&1)
   EXIT_CODE=$?
  
   if [ $EXIT_CODE -ne 0 ]; then
     echo ""
-    echo "[x] Project build FAILED (exit code: $EXIT_CODE). Resolve the errors above before continuing."
+    echo "[x] Project build FAILED (exit code: $EXIT_CODE):"
+    echo "-----------------------------------------------------------------------------"
+    ## grep for error/fail lines so verbose build output is suppressed
+    ERRORS=$(echo "$OUTPUT" | grep -iE "error|fail" | head -50)
+    if [ -n "$ERRORS" ]; then
+      echo "$ERRORS"
+    else
+      ## fallback: if no error patterns matched, show the tail of the output
+      echo "$OUTPUT" | tail -30
+    fi
+    echo "-----------------------------------------------------------------------------"
     return 1
   fi
  
