@@ -146,6 +146,135 @@ function machine-hostname()
   hostname
 }
 
+function machine-specs()
+{
+  echo "=================================================="
+  echo "           HOSTNAME / OS"
+  echo "=================================================="
+  hostnamectl
+
+  echo ""
+  echo "=================================================="
+  echo "           MACHINE IDENTITY"
+  echo "=================================================="
+  echo "Hostname     : $(hostname)"
+  echo "User         : $(whoami)"
+  echo "Vendor       : $(cat /sys/devices/virtual/dmi/id/sys_vendor 2>/dev/null)"
+  echo "Product Name : $(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null)"
+  echo "Product Ver  : $(cat /sys/devices/virtual/dmi/id/product_version 2>/dev/null)"
+  echo "Family       : $(cat /sys/devices/virtual/dmi/id/product_family 2>/dev/null)"
+  echo "Chassis      : $(cat /sys/devices/virtual/dmi/id/chassis_type 2>/dev/null) ($(cat /sys/devices/virtual/dmi/id/chassis_vendor 2>/dev/null))"
+  echo "Serial       : $(cat /sys/devices/virtual/dmi/id/product_serial 2>/dev/null)"
+  echo "UUID         : $(cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null)"
+  if ! ls /sys/devices/virtual/dmi/id/sys_vendor >/dev/null 2>&1; then
+    echo ""
+    echo "(falling back to dmidecode)"
+    sudo dmidecode -t system 2>/dev/null
+  fi
+
+  echo ""
+  echo "=================================================="
+  echo "           KERNEL / UPTIME / SHELL"
+  echo "=================================================="
+  echo "Kernel  : $(uname -r)"
+  echo "Arch    : $(uname -m)"
+  echo "Uptime  : $(uptime -p 2>/dev/null || uptime)"
+  echo "Shell   : $SHELL"
+
+  echo ""
+  echo "=================================================="
+  echo "           CPU"
+  echo "=================================================="
+  lscpu | grep -E "Model name|Architecture|CPU(s)|CPU MHz|CPU max MHz|Vendor ID|Cache|Flags"
+
+  echo ""
+  echo "=================================================="
+  echo "           MEMORY"
+  echo "=================================================="
+  free -h
+
+  echo ""
+  echo "=================================================="
+  echo "           DISKS / PARTITIONS"
+  echo "=================================================="
+  lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL
+  echo ""
+  df -h --total | grep --color=never -E "Filesystem|total|/dev/"
+
+  echo ""
+  echo "=================================================="
+  echo "           GPU"
+  echo "=================================================="
+  lspci | grep -i --color=never -E "VGA|3D|Display"
+
+  echo ""
+  echo "=================================================="
+  echo "           NETWORK ADAPTERS"
+  echo "=================================================="
+  lspci | grep -i --color=never -E "Ethernet|Wi-Fi|Network|Wireless"
+  echo ""
+  ip -brief address 2>/dev/null || ifconfig
+
+  echo ""
+  echo "=================================================="
+  echo "           USB DEVICES"
+  echo "=================================================="
+  lsusb
+
+  echo ""
+  echo "=================================================="
+  echo "           PCI DEVICES"
+  echo "=================================================="
+  lspci
+
+  echo ""
+  echo "=================================================="
+  echo "           BIOS / MOTHERBOARD"
+  echo "=================================================="
+  if [ -r /sys/class/dmi/id/board_vendor ]; then
+    echo "Vendor     : $(cat /sys/class/dmi/id/board_vendor 2>/dev/null)"
+    echo "Model      : $(cat /sys/class/dmi/id/board_name 2>/dev/null)"
+    echo "Version    : $(cat /sys/class/dmi/id/board_version 2>/dev/null)"
+    echo "BIOS Vendor: $(cat /sys/class/dmi/id/bios_vendor 2>/dev/null)"
+    echo "BIOS Ver   : $(cat /sys/class/dmi/id/bios_version 2>/dev/null)"
+    echo "BIOS Date  : $(cat /sys/class/dmi/id/bios_date 2>/dev/null)"
+  else
+    sudo dmidecode -t baseboard 2>/dev/null
+  fi
+
+  echo ""
+  echo "=================================================="
+  echo "           BATTERY"
+  echo "=================================================="
+  if command -v upower >/dev/null 2>&1; then
+    upower -i $(upower -e | grep BAT) 2>/dev/null
+  else
+    for bat in /sys/class/power_supply/BAT*; do
+      [ -e "$bat" ] || continue
+      echo "Name       : $(cat $bat/name 2>/dev/null)"
+      echo "Status     : $(cat $bat/status 2>/dev/null)"
+      echo "Capacity   : $(cat $bat/capacity 2>/dev/null)%"
+      echo "Technology : $(cat $bat/technology 2>/dev/null)"
+    done
+  fi
+
+  echo ""
+  echo "=================================================="
+  echo "           DISPLAY"
+  echo "=================================================="
+  xrandr 2>/dev/null || echo "xrandr not available (no X session)"
+
+  echo ""
+  echo "=================================================="
+  echo "           SUMMARY (inxi)"
+  echo "=================================================="
+  if command -v inxi >/dev/null 2>&1; then
+    inxi -Fxz
+  else
+    echo "inxi not installed. Install it with: sudo apt install inxi"
+  fi
+}
+
 digForMyIP()
 {
   dig +short myip.opendns.com resolver1.opendns.com
