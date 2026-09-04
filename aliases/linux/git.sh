@@ -1594,3 +1594,66 @@ git-push-force-with-lease() {
 
   printf "OK\n"
 }
+
+## Shows all changes (full patches/diffs) made by a given author across
+## the entire commit history of the repository.
+##
+## Useful for auditing a single contributor's work: every commit they
+## authored, with the full diff inline, regardless of which branch it
+## landed on.
+##
+## Args:
+##   $1 (optional) - author name or email to filter by. If omitted, uses
+##                   the currently configured git user (user.name). Passed
+##                   directly to `git log --author`, which accepts a regex.
+##
+## Exits with an error if:
+##   - not inside a git repository
+##   - no commits match the given author
+git-changes-by-author() {
+
+  # Refuse early with a friendly message if we're not inside a git repo
+  # (otherwise `git log` would print its own scary error).
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "[ERR]: Not inside a git repository"
+    return 1
+  fi
+
+  local AUTHOR="$1"
+
+  # No argument: fall back to the currently configured git user. We use
+  # user.name only (not email) because that's what shows up in the
+  # Author line and matches what the user typed in the existing aliases.
+  if [ -z "$AUTHOR" ]; then
+    AUTHOR=$(git config user.name)
+    if [ -z "$AUTHOR" ]; then
+      echo "[ERR]: Could not determine current git user. Pass an author as the first argument."
+      return 1
+    fi
+  fi
+
+  # Count commits up front so we can:
+  #   1. bail with a clear error if the author has no commits
+  #   2. print a useful footer at the end
+  # `--oneline` keeps the scan cheap on large repos.
+  local COMMIT_COUNT
+  COMMIT_COUNT=$(git log --author="$AUTHOR" --oneline | wc -l)
+  if [ "$COMMIT_COUNT" -eq 0 ]; then
+    echo "[ERR]: No commits found for author '$AUTHOR'"
+    return 1
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Changes by Author  ---------------------------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[AUTHOR] - $AUTHOR"
+  echo "[COMMITS] - $COMMIT_COUNT"
+  echo "-----------------------------------------------------------------------------"
+
+  # --color=always preserves colors when piped (through `cat`)
+  # -p shows the full patch/diff for each commit
+  # --no-merges skips merge commits (they have no meaningful per-file diff)
+  git log -p --no-merges --author="$AUTHOR" --color=always | cat
+
+  echo "-----------------------------------------------------------------------------"
+}
