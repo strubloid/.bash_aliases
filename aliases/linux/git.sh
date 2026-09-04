@@ -1610,7 +1610,7 @@ git-push-force-with-lease() {
 ## Exits with an error if:
 ##   - not inside a git repository
 ##   - no commits match the given author
-git-changes-by-author() {
+git-all-changes-by-author() {
 
   # Refuse early with a friendly message if we're not inside a git repo
   # (otherwise `git log` would print its own scary error).
@@ -1644,7 +1644,7 @@ git-changes-by-author() {
   fi
 
   echo "-----------------------------------------------------------------------------"
-  echo "  GIT  Changes by Author  ---------------------------------------------------"
+  echo "  GIT  All Changes by Author  -----------------------------------------------"
   echo "-----------------------------------------------------------------------------"
   echo "[AUTHOR] - $AUTHOR"
   echo "[COMMITS] - $COMMIT_COUNT"
@@ -1654,6 +1654,83 @@ git-changes-by-author() {
   # -p shows the full patch/diff for each commit
   # --no-merges skips merge commits (they have no meaningful per-file diff)
   git log -p --no-merges --author="$AUTHOR" --color=always | cat
+
+  echo "-----------------------------------------------------------------------------"
+}
+
+## Shows all changes (full patches/diffs) made by a given author on the
+## current branch — i.e. only commits that exist on the current branch
+## but NOT on the base branch.
+##
+## Useful for reviewing what a contributor added to a feature branch
+## before merging.
+##
+## Args:
+##   $1 (optional) - author name or email to filter by. If omitted, uses
+##                   the currently configured git user (user.name).
+##   $2 (optional) - base branch to diff against. If omitted, falls back
+##                   to main > master (resolved via git-default-base-branch).
+##
+## Exits with an error if:
+##   - not inside a git repository
+##   - no base branch can be resolved
+##   - currently checked out on the base branch (nothing branch-specific)
+##   - no commits by the author are unique to this branch
+git-changes-by-author() {
+
+  # Refuse early with a friendly message if we're not inside a git repo.
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "[ERR]: Not inside a git repository"
+    return 1
+  fi
+
+  local AUTHOR="$1"
+
+  # No author argument: fall back to the currently configured git user.
+  if [ -z "$AUTHOR" ]; then
+    AUTHOR=$(git config user.name)
+    if [ -z "$AUTHOR" ]; then
+      echo "[ERR]: Could not determine current git user. Pass an author as the first argument."
+      return 1
+    fi
+  fi
+
+  # Resolve the base branch (tries $2, falls back to main > master).
+  local BASE_BRANCH
+  BASE_BRANCH=$(git-default-base-branch "$2") || return 1
+
+  local CURRENT_BRANCH
+  CURRENT_BRANCH=$(git branch --show-current)
+
+  # Same guard as get-branch-commits: if we're sitting on the base branch
+  # itself, there are no branch-specific commits to show.
+  if [ "$CURRENT_BRANCH" = "$BASE_BRANCH" ]; then
+    echo "[ERR]: You are on the base branch ($BASE_BRANCH). No branch-specific changes to show."
+    return 1
+  fi
+
+  # Count matching commits up front so we can bail early with a clear
+  # error and print a useful footer.
+  local COMMIT_COUNT
+  COMMIT_COUNT=$(git log --author="$AUTHOR" --oneline "${BASE_BRANCH}..HEAD" | wc -l)
+  if [ "$COMMIT_COUNT" -eq 0 ]; then
+    echo "[ERR]: No commits by '$AUTHOR' found between $BASE_BRANCH and $CURRENT_BRANCH"
+    return 1
+  fi
+
+  echo "-----------------------------------------------------------------------------"
+  echo "  GIT  Changes by Author (Current Branch)  -----------------------------------"
+  echo "-----------------------------------------------------------------------------"
+  echo "[AUTHOR] - $AUTHOR"
+  echo "[BRANCH] - $CURRENT_BRANCH"
+  echo "[BASE]   - $BASE_BRANCH"
+  echo "[COMMITS] - $COMMIT_COUNT"
+  echo "-----------------------------------------------------------------------------"
+
+  # --color=always preserves colors when piped (through `cat`)
+  # -p shows the full patch/diff for each commit
+  # --no-merges skips merge commits (they have no meaningful per-file diff)
+  git log -p --no-merges --author="$AUTHOR" --color=always "${BASE_BRANCH}..HEAD" | cat
 
   echo "-----------------------------------------------------------------------------"
 }
