@@ -504,5 +504,5 @@ find-in-bigger-files()
     minimumSize=$2
   fi
 
-  sudo find "$folderToSearch" -type f -size +"$minimumSize"M -exec ls -lh {} \;
+  find "$folderToSearch" -type f -print0 | xargs -0 wc -l | awk -v min="$minimumSize" '$1 > min'
 }
