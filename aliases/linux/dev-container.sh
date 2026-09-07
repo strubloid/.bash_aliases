@@ -2,7 +2,8 @@
 
 # Strubloid::general::dev-container
 
-function devcontainer-enter() {
+## This will be entering the container with specific name
+function devcontainer-enter-container-name() {
   local container_name="$1"
 
   if [ -z "$container_name" ]; then
@@ -19,4 +20,10 @@ function devcontainer-enter() {
   fi
 
   docker exec -it "$container_id" /bin/bash
+}
+
+# This will be entering the dev container local folder
+# You will be able to enter the machine with bash as terminal
+function devcontainer-enter(){
+  devcontainer exec --workspace-folder . bash
 }
