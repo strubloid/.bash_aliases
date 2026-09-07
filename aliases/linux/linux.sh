@@ -506,3 +506,28 @@ find-in-bigger-files()
 
   find "$folderToSearch" -type f -print0 | xargs -0 wc -l | awk -v min="$minimumSize" '$1 > min'
 }
+
+find-in-bigger-files-type(){
+  if [ -z "$1" ]
+  then
+      read -p "What is the folder to search : " folderToSearch
+  else
+    folderToSearch=$1
+  fi
+
+  if [ -z "$2" ]
+  then
+      read -p "What is the minimum size of the file : " minimumSize
+  else
+    minimumSize=$2
+  fi
+
+  if [ -z "$3" ]
+  then
+      read -p "What is the file type to search : " fileType
+  else
+    fileType=$3
+  fi
+
+  find "$folderToSearch" -type f -name "*.$fileType" -print0 | xargs -0 wc -l | awk -v min="$minimumSize" '$1 > min'
+}
