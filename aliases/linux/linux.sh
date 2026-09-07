@@ -300,22 +300,6 @@ check-HDs()
   df -t ext4
 }
 
-searchForBiggerThan50MBFiles()
-{
-  sudo find / -type f -size +50M -exec ls -lh {} \;
-}
-
-searchBiggerThan()
-{
-  if [ -z "$1" ]
-  then
-      read -p "What is the minimum size of the file : " minimumSize
-  else
-    minimumSize=$1
-  fi
-  sudo find / -type f -size +"$minimumSize"M -exec ls -lh {} \;
-}
-
 changeMyEditor()
 {
   sudo update-alternatives --config editor
@@ -483,4 +467,42 @@ compress-file-ffmpeg()
 allFilesToWav()
 {
   find . -type f -name "*.mp3" -print0 | xargs -0 -I {} ffmpeg -i {} -acodec pcm_s16le -ar 44100 {}.wav
+}
+
+## This will find all files bigger than 50MB in the system and print them in a nice way
+find-files-bigger-than-50MB()
+{
+  sudo find / -type f -size +50M -exec ls -lh {} \;
+}
+
+## This will find all files bigger than a specific size in the system and print them in a nice way
+find-files-bigger-than()
+{
+  if [ -z "$1" ]
+  then
+      read -p "What is the minimum size of the file : " minimumSize
+  else
+    minimumSize=$1
+  fi
+  sudo find / -type f -size +"$minimumSize"M -exec ls -lh {} \;
+}
+
+## This will find all files bigger than a specific size in a specific folder and print them in a nice way
+find-in-bigger-files()
+{
+  if [ -z "$1" ]
+  then
+      read -p "What is the folder to search : " folderToSearch
+  else
+    folderToSearch=$1
+  fi
+
+  if [ -z "$2" ]
+  then
+      read -p "What is the minimum size of the file : " minimumSize
+  else
+    minimumSize=$2
+  fi
+
+  sudo find "$folderToSearch" -type f -size +"$minimumSize"M -exec ls -lh {} \;
 }
