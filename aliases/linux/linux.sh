@@ -507,6 +507,7 @@ find-in-bigger-files()
   find "$folderToSearch" -type f -print0 | xargs -0 wc -l | awk -v min="$minimumSize" '$1 > min'
 }
 
+## Finding big files of a type
 find-in-bigger-files-type(){
   if [ -z "$1" ]
   then

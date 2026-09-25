@@ -116,3 +116,8 @@ opencode-add-current-skill-globally() {
   echo "  Personal: $global_copilot_skills_folder"
   echo "  Global:   $global_opencode_skills_folder"
 }
+
+## This will refresh the opencode models and update the local cache
+opencode-refresh(){
+  opencode models --refresh
+}
