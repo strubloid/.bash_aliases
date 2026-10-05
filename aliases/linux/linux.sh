@@ -532,3 +532,37 @@ find-in-bigger-files-type(){
 
   find "$folderToSearch" -type f -name "*.$fileType" -print0 | xargs -0 wc -l | awk -v min="$minimumSize" '$1 > min'
 }
+
+update-locale-to-ireland()
+{
+    echo "Updating locale to Ireland (en_IE.UTF-8)..."
+
+    if [ -z "$1" ]; then
+        read -p "Enter locale (default: en_IE.UTF-8): " localeInput
+        LOCALE_VAR="${localeInput:-en_IE.UTF-8}"
+    else
+        LOCALE_VAR="$1"
+    fi
+
+    echo "Setting locale to: $LOCALE_VAR"
+
+    sudo update-locale "LANG=$LOCALE_VAR" "LANGUAGE=$LOCALE_VAR"
+
+    export LANG="$LOCALE_VAR"
+    export LANGUAGE="$LOCALE_VAR"
+
+    if grep -q "^export LANG=" "$HOME/.bashrc" 2>/dev/null; then
+        sed -i "s|^export LANG=.*|export LANG=\"$LOCALE_VAR\"|" "$HOME/.bashrc"
+    else
+        echo "export LANG=\"$LOCALE_VAR\"" >> "$HOME/.bashrc"
+    fi
+
+    if grep -q "^export LANGUAGE=" "$HOME/.bashrc" 2>/dev/null; then
+        sed -i "s|^export LANGUAGE=.*|export LANGUAGE=\"$LOCALE_VAR\"|" "$HOME/.bashrc"
+    else
+        echo "export LANGUAGE=\"$LOCALE_VAR\"" >> "$HOME/.bashrc"
+    fi
+
+    echo "Locale updated successfully!"
+    echo "Current locale: $(locale)"
+}
