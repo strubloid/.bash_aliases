@@ -121,3 +121,8 @@ opencode-add-current-skill-globally() {
 opencode-refresh(){
   opencode models --refresh
 }
+
+## This will be responsible for logging in to the opencode console
+opencode-re-login() {
+  opencode console login
+}
