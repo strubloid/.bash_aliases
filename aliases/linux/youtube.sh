@@ -36,6 +36,36 @@ get-video-subtitle(){
   yt-dlp --write-auto-subs --sub-lang "$lang" --skip-download "$url"
 }
 
+# function to download a youtube video using yt-dlp
+# Usage: download-youtube-video <youtube-url>
+download-youtube-video(){
+  local url="$1"
+
+  download-youtube-video() {
+  local url="$1"
+
+  if [[ -z "$url" ]]; then
+    echo "Usage: download-youtube-video <youtube-url>"
+    return 1
+  fi
+
+  check-and-install-yt-dlp || return 1
+
+  if ! command -v ffmpeg >/dev/null 2>&1; then
+    echo "FFmpeg is required. Install it with: sudo apt install ffmpeg"
+    return 1
+  fi
+
+  yt-dlp \
+    -f "bestvideo[vcodec^=avc1]+bestaudio/best[vcodec^=avc1]" \
+    --merge-output-format mkv \
+    --remux-video mov \
+    --postprocessor-args "VideoRemuxer+ffmpeg_o:-c:v copy -c:a pcm_s16le -ar 48000" \
+    --no-playlist \
+    "$url"
+  }
+}
+
 ## same youtube subtitle function but for local video file
 get-local-video-subtitle(){
   local file="$(pwd)/$1"
@@ -113,4 +143,64 @@ get-youtube-video-summary(){
     "$venv_path/bin/python3" "$BASH_ALIASES_SCRIPTS/chat-gpt-resume.py" "$vtt_file"
   fi
   
+}
+
+# Usage: youtube-cut-video <video-file> [--from <time>] [--to <time>]
+# Times use ffmpeg's time format, such as 00:01:30 or 90.
+youtube-cut-video(){
+  local file="$1"
+  local from=""
+  local to=""
+
+  if [[ -z "$file" ]]; then
+    echo "Usage: youtube-cut-video <video-file> [--from <time>] [--to <time>]"
+    return 1
+  fi
+  shift
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --from)
+        if [[ -z "$2" ]]; then
+          echo "Error: --from requires a time."
+          return 1
+        fi
+        from="$2"
+        shift 2
+        ;;
+      --to)
+        if [[ -z "$2" ]]; then
+          echo "Error: --to requires a time."
+          return 1
+        fi
+        to="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown argument: $1"
+        echo "Usage: youtube-cut-video <video-file> [--from <time>] [--to <time>]"
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$from" && -z "$to" ]]; then
+    echo "Error: provide --from, --to, or both."
+    return 1
+  fi
+  if [[ ! -f "$file" ]]; then
+    echo "Error: video file not found: $file"
+    return 1
+  fi
+  if ! command -v ffmpeg &>/dev/null; then
+    echo "Error: ffmpeg is not installed."
+    return 1
+  fi
+
+  local output="${file%.*}-cut.${file##*.}"
+  local ffmpeg_args=()
+  [[ -n "$from" ]] && ffmpeg_args+=(-ss "$from")
+  [[ -n "$to" ]] && ffmpeg_args+=(-to "$to")
+
+  ffmpeg "${ffmpeg_args[@]}" -i "$file" -c copy -n "$output"
 }
